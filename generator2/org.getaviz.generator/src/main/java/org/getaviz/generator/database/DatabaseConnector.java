@@ -14,8 +14,14 @@ public class DatabaseConnector implements AutoCloseable {
 	private final Driver driver;
 	private static DatabaseConnector instance = null;
 
+//  alt
+//	private DatabaseConnector() {
+//		URL = "bolt://neo4j:7687";
+//		driver = GraphDatabase.driver(URL);
+//	}
+	
 	private DatabaseConnector() {
-		URL = "bolt://neo4j:7687";
+		URL = "bolt://localhost:11003";
 		driver = GraphDatabase.driver(URL);
 	}
 	

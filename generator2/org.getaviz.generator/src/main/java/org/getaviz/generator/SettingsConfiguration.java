@@ -765,8 +765,13 @@ public class SettingsConfiguration {
 			NOS;
 		}
 	}
+
+//	alter Stand
+//	public static enum Metaphor {
+//		RD, CITY
+//	}
 	
 	public static enum Metaphor {
-		RD, CITY
+		RD, CITY, ABAP
 	}
 }
