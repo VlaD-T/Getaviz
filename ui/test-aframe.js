@@ -9,8 +9,8 @@ var payload = {
 }
 
 fetch(url, {
-  method: 'POST', // or 'PUT'
-  body: JSON.stringify(payload), // data may be of type `string` or {object}!
+  method: 'POST', 
+  body: JSON.stringify(payload), 
   headers:{
     'Content-Type': 'application/json'
   }
