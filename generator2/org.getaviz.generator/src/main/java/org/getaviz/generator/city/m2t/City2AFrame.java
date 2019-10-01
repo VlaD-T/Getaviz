@@ -44,20 +44,16 @@ public class City2AFrame {
 		StringBuilder districts = new StringBuilder();
 		StringBuilder buildings = new StringBuilder();
 		StringBuilder segments = new StringBuilder();
-		connector.executeWrite(
-				"MATCH (n:Model)-[:CONTAINS*]->(d:District)-[:HAS]->(p:Position)"
-				+ " SET d.AframeCode = '<box>asd</box>'"
-				+ " WHERE n.building_type = \'"
-						+ config.getBuildingTypeAsString() + "\' RETURN d,p"
-				);
-		
+		log.info("Test execute write");
+
 		connector.executeRead(
 				"MATCH (n:Model)-[:CONTAINS*]->(d:District)-[:HAS]->(p:Position) WHERE n.building_type = \'"
 						+ config.getBuildingTypeAsString() + "\' RETURN d,p")
 				.forEachRemaining((record) -> {
-					log.info("District node log: " + record.get("d").asNode());
 					districts.append(toDistrict(record.get("d").asNode(), record.get("p").asNode()));
+					writeAframeCodeToNeo4j(record.get("d").asNode(), toDistrict(record.get("d").asNode(), record.get("p").asNode()));
 				});
+
 		if (config.getBuildingType() == BuildingType.CITY_ORIGINAL || config.isShowBuildingBase()) {
 			connector.executeRead(
 					"MATCH (n:Model)-[:CONTAINS*]->(b:Building)-[:HAS]->(p:Position) WHERE n.building_type = \'"
@@ -83,6 +79,15 @@ public class City2AFrame {
 					});
 		}
 		return districts.toString() + buildings + segments;
+	}
+
+	private void writeAframeCodeToNeo4j(Node nodeId, String aframeCode) {
+		connector.executeWrite(
+				"MATCH (n) \n" +
+				"WHERE ID(n) = " + nodeId.id() + "\n" +
+				"SET n.aframe_code = \'" + aframeCode + "\' \n" +
+				"RETURN n"
+		);
 	}
 
 	private String toDistrict(Node district, Node position) {

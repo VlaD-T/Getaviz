@@ -26,7 +26,7 @@ fetch(url, {
       if (aframe_code) {
         return $('a-scene').append($(aframe_code));
       } else {
-        return console.log(`Element with ID:${element.meta[0].id} has no "aframe_code";`);
+        //return console.log(`Element with ID:${element.meta[0].id} has no "aframe_code";`);
       }
     })
   })
