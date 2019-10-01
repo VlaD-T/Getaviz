@@ -18,7 +18,7 @@ public class ABAP_City2AFrame {
 	private SettingsConfiguration config = SettingsConfiguration.getInstance();
 	private DatabaseConnector connector = DatabaseConnector.getInstance();
 	private Log log = LogFactory.getLog(this.getClass());
-
+ 
 	public ABAP_City2AFrame() {
 		log.info("ABAP_City2AFrame has started");
 		FileWriter fw = null;

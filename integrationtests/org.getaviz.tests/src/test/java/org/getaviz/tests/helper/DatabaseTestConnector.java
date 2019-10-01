@@ -11,6 +11,8 @@ public class DatabaseTestConnector implements AutoCloseable {
 
 	public DatabaseTestConnector() {
 		driver = GraphDatabase.driver("bolt://neo4j:7687");
+//		driver = GraphDatabase.driver("bolt://neo4j:11003");
+//		driver = GraphDatabase.driver("bolt://localhost:11003");
 	}
 	
 	public StatementResult executeRead(String statement) {

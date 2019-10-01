@@ -28,6 +28,7 @@ public class DatabaseBuilder {
 			Process pScan = runtime.exec("/opt/jqassistant/bin/jqassistant.sh scan -reset -u " + config.getInputFiles() + " -storeUri " +
 					DatabaseConnector.getDatabaseURL());
 			pScan.waitFor();
+			
 		} catch (InterruptedException e) {
 			log.error(e);
 			e.printStackTrace();

@@ -3,6 +3,7 @@ package org.getaviz.generator;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.getaviz.generator.city.m2m.City2City;
+import org.getaviz.generator.city.m2m.ABAP_City2ABAP_City;
 import org.getaviz.generator.city.m2t.City2AFrame;
 import org.getaviz.generator.city.m2t.ABAP_City2AFrame;
 import org.getaviz.generator.city.m2t.City2X3D;
@@ -59,17 +60,17 @@ public class Generator {
 				break;
 			}
 			case ABAP: {
-				new SAP2ABAP_City();
-				new JQA2JSON();
-				new City2City();
-				switch (config.getOutputFormat()) {
-				case X3D:
-					new City2X3D(); break;
-				case AFrame:
-					new ABAP_City2AFrame(); break; 
+//				new SAP2ABAP_City();
+//				new JQA2JSON();
+//				new City2City();
+//				switch (config.getOutputFormat()) {
+//				case X3D:
+//					new City2X3D(); break;
+//				case AFrame:
+//					new ABAP_City2AFrame(); break; 
 				}
 				break;
-			}
+//			}
 			}
 
 		} catch (Exception e) {

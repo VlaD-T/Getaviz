@@ -98,11 +98,18 @@ public class SettingsConfiguration {
 		return files;
 	}
 	
+	public String getAbapMetaphor() {
+		return config.getString("metaphor", "rd");
+	}
+	
 	public Metaphor getMetaphor() {
-		String metaphor = config.getString("metaphor", "rd");
-		switch (metaphor) {
+//		String metaphor = config.getString("metaphor", "rd");
+//		switch (metaphor) {
+		switch (getAbapMetaphor()) {
 			case "city":
 				return Metaphor.CITY;
+			case "abap":	
+				return Metaphor.ABAP;
 			default:
 				return Metaphor.RD;
 		}
@@ -772,6 +779,6 @@ public class SettingsConfiguration {
 //	}
 	
 	public static enum Metaphor {
-		RD, CITY, ABAP
+		RD, CITY, ABAP;
 	}
 }
