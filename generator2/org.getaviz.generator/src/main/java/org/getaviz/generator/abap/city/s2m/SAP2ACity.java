@@ -24,8 +24,7 @@ public class SAP2ACity {
 				new GregorianCalendar().getTime().toString(), config.getBuildingTypeAsString()),"n").id();
 		
 		connector.executeRead(
-			"MATCH (n:Package) " +
-			"WHERE NOT (n)<-[:CONTAINS]-(:Package) " + 
+			"MATCH (n:Package) " +			
 			"RETURN n" 
 		).forEachRemaining((result) -> {
 			long sapPackage = result.get("n").asNode().id();
@@ -38,19 +37,9 @@ public class SAP2ACity {
 	private Long sapPackageToDistrict(Long sapPackage, Long parent) {
 		long district = connector.addNode(cypherCreateNode(parent,sapPackage,Labels.District.name()),"n").id();
 		
-		StatementResult subPackages = connector.executeRead(
-			" MATCH (n)-[:CONTAINS]->(p:Package) WHERE ID(n) = " + sapPackage +
-			" RETURN p");
-		
-		subPackages.forEachRemaining((result) -> {
-			sapPackageToDistrict(result.get("p").asNode().id(), district);
-		});
-		
 		StatementResult subTypes = connector.executeRead(
-			" MATCH (n)-[:CONTAINS]->(t:Type) WHERE ID(n) = " + sapPackage +
-			
-			" AND (t:Class OR t:Interface OR t:Report OR t:FunctionGroup OR t:Table) " +
-			" AND NOT t:Inner RETURN t");
+			" MATCH (n)-[:CONTAINS]->(t:Type) WHERE ID(n) = " + sapPackage +		
+			" RETURN t");
 		
 		subTypes.forEachRemaining((result) -> {
 			structureToBuilding(result.get("t").asNode().id(), district);
@@ -65,57 +54,18 @@ public class SAP2ACity {
 	private Long structureToBuilding(Long structure, Long parent) {
 		long building = connector.addNode(cypherCreateNode(parent, structure, Labels.Building.name()),"n").id();
 		
-		StatementResult methods = readStructureElements(structure, parent, Labels.Method);
-		StatementResult attributes = readStructureElements(structure, parent, Labels.Field);
-		StatementResult formRoutines = readStructureElements(structure, parent, Labels.FormRoutine);
-		StatementResult functionModules = readStructureElements(structure, parent, Labels.FunctionModule);
-		StatementResult abapStructures = readStructureElements(structure, parent, Labels.AbapStructure);
-		StatementResult domains = readStructureElements(structure, parent, Labels.Domain);
-		StatementResult dataElements = readStructureElements(structure, parent, Labels.DataElement);
-		StatementResult tableTypes = readStructureElements(structure, parent, Labels.TableType);
-		//Table Elements
-		//Structur Elements
-		
-		methods.forEachRemaining((result) -> {
-			elementToBuildingPart(result.get("m").asNode().id(), building);
-				});
-		attributes.forEachRemaining((result) -> {
-			elementToBuildingPart(result.get("m").asNode().id(), building);
-				});
-		formRoutines.forEachRemaining((result) -> {
-			elementToBuildingPart(result.get("m").asNode().id(), building);
-				});
-		functionModules.forEachRemaining((result) -> {
+//		Elements of structure
+		StatementResult elements = readStructureElements2(structure, parent);
+		elements.forEachRemaining((result) -> {
 			elementToBuildingPart(result.get("m").asNode().id(), building);
 				});		
-		abapStructures.forEachRemaining((result) -> {
-			elementToBuildingPart(result.get("m").asNode().id(), building);
-				});
-		domains.forEachRemaining((result) -> {
-			elementToBuildingPart(result.get("m").asNode().id(), building);
-				});
-		dataElements.forEachRemaining((result) -> {
-			elementToBuildingPart(result.get("m").asNode().id(), building);
-				});
-		tableTypes.forEachRemaining((result) -> {
-			elementToBuildingPart(result.get("m").asNode().id(), building);
-				});
-		
-		
-		StatementResult subStructures = connector.executeRead(
-			" MATCH (n)-[:DECLARES]->(t:Type:Inner) WHERE ID(n) = " + structure +
-			" RETURN t");
-		
-		subStructures.forEachRemaining((result) -> {
-			structureToBuilding(result.get("t").asNode().id(), parent);
-		});
-		
+
 		return building;
 	}
 	
-	private StatementResult readStructureElements(Long structure, Long parent, Labels label) {		
+	private StatementResult readStructureElements2(Long structure, Long parent) {		
 		return connector.executeRead(
-				" MATCH (n)-[:DECLARES]->(m:" + label.name() + ") WHERE ID(n) = " + structure +
+				" MATCH (n)-[:DECLARES]->(m) WHERE ID(n) = " + structure +
 				" RETURN m");
 	}
 	
