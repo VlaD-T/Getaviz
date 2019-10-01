@@ -1,4 +1,4 @@
-package org.getaviz.generator.city.s2m;
+package org.getaviz.generator.abap.city.s2m;
 
 import org.getaviz.generator.SettingsConfiguration;
 import org.getaviz.generator.database.Labels;
@@ -14,12 +14,12 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.getaviz.generator.database.DatabaseConnector;
 
-public class SAP2ABAP_City {
+public class SAP2ACity {
 	private SettingsConfiguration config = SettingsConfiguration.getInstance();
 	private Log log = LogFactory.getLog(this.getClass());
 	private DatabaseConnector connector = DatabaseConnector.getInstance();
 
-	public SAP2ABAP_City() {
+	public SAP2ACity() {
 		log.info("SAP2ABAP_City started");
 		
 		connector.executeWrite("MATCH (n:City) DETACH DELETE n"); 

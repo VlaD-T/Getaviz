@@ -2,10 +2,11 @@ package org.getaviz.generator;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.getaviz.generator.abap.city.m2m.ACity2ACity;
+import org.getaviz.generator.abap.city.m2t.ACity2AFrame;
+import org.getaviz.generator.abap.city.s2m.SAP2ACity;
 import org.getaviz.generator.city.m2m.City2City;
-import org.getaviz.generator.city.m2m.ABAP_City2ABAP_City;
 import org.getaviz.generator.city.m2t.City2AFrame;
-import org.getaviz.generator.city.m2t.ABAP_City2AFrame;
 import org.getaviz.generator.city.m2t.City2X3D;
 import org.getaviz.generator.jqa.DatabaseBuilder;
 import org.getaviz.generator.jqa.JQA2JSON;
@@ -13,7 +14,6 @@ import org.getaviz.generator.rd.m2m.RD2RD;
 import org.getaviz.generator.rd.m2t.RD2AFrame;
 import org.getaviz.generator.rd.m2t.RD2X3D;
 import org.getaviz.generator.city.s2m.JQA2City;
-import org.getaviz.generator.city.s2m.SAP2ABAP_City;
 import org.getaviz.generator.rd.s2m.JQA2RD;
 
 public class Generator {

@@ -4,9 +4,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.getaviz.generator.SettingsConfiguration;
 import org.getaviz.generator.SettingsConfiguration.Metaphor;
-import org.getaviz.generator.city.m2m.ABAP_City2ABAP_City;
+import org.getaviz.generator.abap.city.m2m.ACity2ACity;
+import org.getaviz.generator.abap.city.s2m.SAP2ACity;
 import org.getaviz.generator.city.s2m.JQA2City;
-import org.getaviz.generator.city.s2m.SAP2ABAP_City;
 import org.getaviz.generator.city.m2m.City2City;
 import org.getaviz.generator.database.DatabaseConnector;
 import org.getaviz.generator.mockups.Bank;
@@ -29,7 +29,7 @@ public class CityBankTest {
 		mockup.loadProperties("CityBankTest.properties");
 		connector = mockup.getConnector();
 		
-		new SAP2ABAP_City();
+		new SAP2ACity();
 //		new JQA2City();
 //		new ABAP_City2ABAP_City();
 //		new City2City();

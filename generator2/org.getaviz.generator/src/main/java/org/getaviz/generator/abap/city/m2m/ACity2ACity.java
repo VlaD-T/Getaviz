@@ -1,4 +1,4 @@
-package org.getaviz.generator.city.m2m;
+package org.getaviz.generator.abap.city.m2m;
 
 import org.getaviz.generator.SettingsConfiguration;
 import org.getaviz.generator.database.Labels;
@@ -20,7 +20,7 @@ import org.neo4j.driver.v1.StatementResult;
 import org.neo4j.driver.v1.types.Node;
 import org.neo4j.driver.v1.types.Path;
 
-public class ABAP_City2ABAP_City {
+public class ACity2ACity {
 	private SettingsConfiguration config = SettingsConfiguration.getInstance();
 	private Log log = LogFactory.getLog(this.getClass());
 	private List<RGBColor> PCKG_colors;
@@ -28,70 +28,73 @@ public class ABAP_City2ABAP_City {
 	private HashMap<Long, double[]> properties = new HashMap<Long, double[]>();
 	private Node model;
 	private DatabaseConnector connector = DatabaseConnector.getInstance();
-
-	public ABAP_City2ABAP_City() {
+ 
+	public ACity2ACity() {		
 		log.info("ABAP_City2ABAP_City started");
-		model = connector.executeRead("MATCH (n:Model {building_type: \'" + config.getBuildingTypeAsString() +
-			"\'}) RETURN n").next().get("n").asNode();
-		if (config.getBuildingType() == BuildingType.CITY_BRICKS || config.getBuildingType() == BuildingType.CITY_PANELS) {
-			connector.executeRead("MATCH (n:Model:City)-[:CONTAINS*]->(m:BuildingSegment) RETURN m").forEachRemaining((result) -> {
-				setBuildingSegmentAttributes(result.get("m").asNode().id());
-			});
-		}
-		int packageMaxLevel = connector.executeRead("MATCH p=(n:District)-[:CONTAINS*]->(m:District) WHERE NOT (m)-[:CONTAINS]->(:District) RETURN length(p) AS length ORDER BY length(p) DESC LIMIT 1").
-			single().get("length").asInt() + 1;
-		PCKG_colors = createColorGradiant(new RGBColor(config.getPackageColorStart()), new RGBColor(config.getPackageColorEnd()),
-			packageMaxLevel);
-
-		if (config.getOriginalBuildingMetric() == BuildingMetric.NOS) {
-			int NOS_max = connector.executeRead("MATCH (n:Building) RETURN max(n.numberOfStatements) AS nos").single().
-				get("nos").asInt();
-			NOS_colors = createColorGradiant(new RGBColor(config.getClassColorStart()), new RGBColor(config.getClassColorEnd()),
-				NOS_max + 1);
-		}
-
-		connector.executeRead("MATCH p=(n:Model:City)-[:CONTAINS*]->(m:District) RETURN p").forEachRemaining((result) -> {
-			setDistrictAttributes(result.get("p").asPath());
-		});
-		connector.executeRead("MATCH (n:Model:City)-[:CONTAINS*]->(b:Building) RETURN b").forEachRemaining((result) -> {
-			setBuildingAttributes(result.get("b").asNode());
-		});
-		connector.executeRead("MATCH (n:Model:City)-[:CONTAINS*]->(d:District)-[:VISUALIZES]->(element)  RETURN d, element.hash as hash ORDER BY element.hash").forEachRemaining((result) -> {
-			Node node = result.get("d").asNode();
-			double width = node.get("width").asDouble(0.0);
-			double length = node.get("length").asDouble(0.0);
-			double[] array = {width, length};
-			properties.put(node.id(), array);
-		});
-		connector.executeRead(
-			"MATCH (n:Model:City)-[:CONTAINS*]->(b:Building)-[:VISUALIZES]->(element) " +
-				"RETURN b, element.hash as hash " + "ORDER BY element.hash"
-		).forEachRemaining((result) -> {
-			Node node = result.get("b").asNode();
-			double width = node.get("width").asDouble(0.0);
-			double length = node.get("length").asDouble(0.0);
-			double[] array = {width, length};
-			properties.put(node.id(), array);
-		});
-
-		CityLayout.cityLayout(model.id(), properties);
-
-		switch (config.getBuildingType()) {
-			case CITY_BRICKS:
-				BrickLayout.brickLayout(model.id()); break; // Layout for buildingSegments
-			case CITY_PANELS:
-				connector.executeRead("MATCH (n:Model:City)-[:CONTAINS*]->(b:Building) RETURN b").forEachRemaining((result) -> {
-					setBuildingSegmentPositions(result.get("b").asNode());
-				});
-				break;
-			case CITY_FLOOR:
-				connector.executeRead("MATCH (n:Model:City)-[:CONTAINS*]->(b:Building) RETURN b").forEachRemaining((result) -> {
-					calculateSegments(result.get("b").asNode());
-				});
-				break;
-			default: {
-			} // CityDebugUtils.infoEntities(cityRoot.document.entities, 0, true, true)	
-		}
+		
+//		
+//		model = connector.executeRead("MATCH (n:Model {building_type: \'" + config.getBuildingTypeAsString() +
+//			"\'}) RETURN n").next().get("n").asNode();
+//		if (config.getBuildingType() == BuildingType.CITY_BRICKS || config.getBuildingType() == BuildingType.CITY_PANELS) {
+//			connector.executeRead("MATCH (n:Model:City)-[:CONTAINS*]->(m:BuildingSegment) RETURN m").forEachRemaining((result) -> {
+//				setBuildingSegmentAttributes(result.get("m").asNode().id());
+//			});
+//		}
+//		int packageMaxLevel = connector.executeRead("MATCH p=(n:District)-[:CONTAINS*]->(m:District) WHERE NOT (m)-[:CONTAINS]->(:District) RETURN length(p) AS length ORDER BY length(p) DESC LIMIT 1").
+//			single().get("length").asInt() + 1;
+//		PCKG_colors = createColorGradiant(new RGBColor(config.getPackageColorStart()), new RGBColor(config.getPackageColorEnd()),
+//			packageMaxLevel);
+//
+//		if (config.getOriginalBuildingMetric() == BuildingMetric.NOS) {
+//			int NOS_max = connector.executeRead("MATCH (n:Building) RETURN max(n.numberOfStatements) AS nos").single().
+//				get("nos").asInt();
+//			NOS_colors = createColorGradiant(new RGBColor(config.getClassColorStart()), new RGBColor(config.getClassColorEnd()),
+//				NOS_max + 1);
+//		}
+//
+//		connector.executeRead("MATCH p=(n:Model:City)-[:CONTAINS*]->(m:District) RETURN p").forEachRemaining((result) -> {
+//			setDistrictAttributes(result.get("p").asPath());
+//		});
+//		connector.executeRead("MATCH (n:Model:City)-[:CONTAINS*]->(b:Building) RETURN b").forEachRemaining((result) -> {
+//			setBuildingAttributes(result.get("b").asNode());
+//		});
+//		connector.executeRead("MATCH (n:Model:City)-[:CONTAINS*]->(d:District)-[:VISUALIZES]->(element)  RETURN d, element.hash as hash ORDER BY element.hash").forEachRemaining((result) -> {
+//			Node node = result.get("d").asNode();
+//			double width = node.get("width").asDouble(0.0);
+//			double length = node.get("length").asDouble(0.0);
+//			double[] array = {width, length};
+//			properties.put(node.id(), array);
+//		});
+//		connector.executeRead(
+//			"MATCH (n:Model:City)-[:CONTAINS*]->(b:Building)-[:VISUALIZES]->(element) " +
+//				"RETURN b, element.hash as hash " + "ORDER BY element.hash"
+//		).forEachRemaining((result) -> {
+//			Node node = result.get("b").asNode();
+//			double width = node.get("width").asDouble(0.0);
+//			double length = node.get("length").asDouble(0.0);
+//			double[] array = {width, length};
+//			properties.put(node.id(), array);
+//		});
+//
+//		CityLayout.cityLayout(model.id(), properties);
+//
+//		switch (config.getBuildingType()) {
+//			case CITY_BRICKS:
+//				BrickLayout.brickLayout(model.id()); break; // Layout for buildingSegments
+//			case CITY_PANELS:
+//				connector.executeRead("MATCH (n:Model:City)-[:CONTAINS*]->(b:Building) RETURN b").forEachRemaining((result) -> {
+//					setBuildingSegmentPositions(result.get("b").asNode());
+//				});
+//				break;
+//			case CITY_FLOOR:
+//				connector.executeRead("MATCH (n:Model:City)-[:CONTAINS*]->(b:Building) RETURN b").forEachRemaining((result) -> {
+//					calculateSegments(result.get("b").asNode());
+//				});
+//				break;
+//			default: {
+//			} // CityDebugUtils.infoEntities(cityRoot.document.entities, 0, true, true)	
+//		}
+		
 		log.info("ABAP_City2ABAP_City finished");
 	}
 

@@ -1,4 +1,4 @@
-package org.getaviz.generator.city.m2t;
+package org.getaviz.generator.abap.city.m2t;
 
 import org.getaviz.generator.SettingsConfiguration;
 import org.getaviz.generator.database.Labels;
@@ -14,13 +14,14 @@ import java.util.List;
 
 import org.getaviz.generator.OutputFormatHelper;
 
-public class ABAP_City2AFrame {
+public class ACity2AFrame {
 	private SettingsConfiguration config = SettingsConfiguration.getInstance();
 	private DatabaseConnector connector = DatabaseConnector.getInstance();
 	private Log log = LogFactory.getLog(this.getClass());
  
-	public ABAP_City2AFrame() {
+	public ACity2AFrame() {
 		log.info("ABAP_City2AFrame has started");
+		
 		FileWriter fw = null;
 		String fileName = "model.html";
 
@@ -37,6 +38,8 @@ public class ABAP_City2AFrame {
 					e.printStackTrace();
 				}
 		}
+		
+		
 		log.info("ABAP_City2AFrame has finished");
 	}
 
