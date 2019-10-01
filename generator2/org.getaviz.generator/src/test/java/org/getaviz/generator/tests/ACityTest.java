@@ -58,7 +58,7 @@ public class ACityTest {
 				.single();
 		int numberOfVisualizedPackages = result.get("result").asInt();
 		System.out.println("Pakete:" + result);
-//		assertEquals(3, numberOfVisualizedPackages);
+		assertEquals(2, numberOfVisualizedPackages);
 	}
 	
 //	Probe Report
@@ -69,6 +69,7 @@ public class ACityTest {
 				.single();
 		int numberOfVisualizedReports = result.get("result").asInt();
 		System.out.println("Reports:" + result);
+		assertEquals(1, numberOfVisualizedReports);
 	}
 	@Test
 	void numberOfVisualizedTypes() {
@@ -76,7 +77,7 @@ public class ACityTest {
 				.executeRead("MATCH (building:Building)-[:VISUALIZES]->(:Type) RETURN count(building) AS result")
 				.single();
 		int numberOfVisualizedTypes = result.get("result").asInt();
-//		assertEquals(4, numberOfVisualizedTypes);
+		assertEquals(3, numberOfVisualizedTypes);
 		System.out.println("Typen:" + result);
 	}
 	
@@ -87,47 +88,47 @@ public class ACityTest {
 				.single();
 		int numberOfVisualizedClasses = result.get("result").asInt();
 		System.out.println("Klassen:" + result);
-//		assertEquals(0, test);
+		assertEquals(1, numberOfVisualizedClasses);
 	}
 	
 	@Test
 	void numberOfVisualizedFuGr() {
 		Record result = connector
-				.executeRead("MATCH (building:Building)-[:VISUALIZES]->(:Functiongroup) RETURN count(building) AS result")
+				.executeRead("MATCH (building:Building)-[:VISUALIZES]->(:FunctionGroup) RETURN count(building) AS result")
 				.single();
 		int numberOfVisualizedFuGr = result.get("result").asInt();
 		System.out.println("Funktionsgruppen:" + result);
+		assertEquals(1, numberOfVisualizedFuGr);
 	}
 	
-	@Test
-	void numberOfVisualizedDataObjects() {
-		Record result = connector
-				.executeRead("MATCH (building:Building)-[:VISUALIZES]->(:DataDictionary) RETURN count(building) AS result")
-				.single();
-		int numberOfVisualizedDataObjects = result.get("result").asInt();
-		System.out.println("DataDictionary:" + result);
-	}
+//	@Test
+//	void numberOfVisualizedDataObjects() {
+//		Record result = connector
+//				.executeRead("MATCH (building:Building)-[:VISUALIZES]->(:DataDictionary) RETURN count(building) AS result")
+//				.single();
+//		int numberOfVisualizedDataObjects = result.get("result").asInt();
+//		System.out.println("DataDictionary:" + result);
+//		assertEquals(1, numberOfVisualizedDataObjects);
+//	}
 	
 	@Test
 	void numberOfVisualizedForms() {
 		Record result = connector
-		.executeRead("MATCH (building:BuildingSegment)-[:VISUALIZES]->(:Formroutine) RETURN count(building) AS result")
-		.single();
-//		StatementResult result = connector
-//				.executeRead("MATCH p=(d:District)-[:CONTAINS*]->(b:Building) RETURN p AS result");
-//		"MATCH p=(n:Model:City)-[:CONTAINS*]->(m:District) RETURN p"
-//		(VISAP_T_REPORT2)-[:DECLARES]->(VISAP_T_FORM)
-//		int numberOfVisualizedForms = result.get("result").asInt();
+				.executeRead("MATCH (building:BuildingPart)-[:VISUALIZES]->(:FormRoutine) RETURN count(building) AS result")
+				.single();
+		int numberOfVisualizedForms = result.get("result").asInt();
 		System.out.println("Formroutinen:" + result);
+		assertEquals(1, numberOfVisualizedForms);
 	}
 	
 	@Test
 	void numberOfVisualizedMethods() {
 		Record result = connector
-				.executeRead("MATCH (building:BuildingSegment)-[:VISUALIZES]->(:Method) RETURN count(building) AS result")
+				.executeRead("MATCH (building:BuildingPart)-[:VISUALIZES]->(:Method) RETURN count(building) AS result")
 				.single();
 		int numberOfVisualizedMethods = result.get("result").asInt();
 		System.out.println("Methoden:" + result);
+		assertEquals(0, numberOfVisualizedMethods);
 	}
 	
 	
