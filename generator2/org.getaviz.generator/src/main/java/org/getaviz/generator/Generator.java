@@ -59,18 +59,6 @@ public class Generator {
 				}
 				break;
 			}
-			case ABAP: {
-//				new SAP2ABAP_City();
-//				new JQA2JSON();
-//				new City2City();
-//				switch (config.getOutputFormat()) {
-//				case X3D:
-//					new City2X3D(); break;
-//				case AFrame:
-//					new ABAP_City2AFrame(); break; 
-				}
-				break;
-//			}
 			}
 
 		} catch (Exception e) {
