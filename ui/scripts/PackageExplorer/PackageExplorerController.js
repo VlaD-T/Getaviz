@@ -56,7 +56,7 @@ var packageExplorerController = (function() {
                         item = {
                             id: entity.id,
                             open: false,
-                            checked: true,
+                            checked: false,
                             parentId: "",
                             name: entity.name,
                             icon: controllerConfig.packageIcon,
@@ -66,7 +66,7 @@ var packageExplorerController = (function() {
                         item = {
                             id: entity.id,
                             open: true,
-                            checked: true,
+                            checked: false,
                             parentId: "",
                             name: entity.name,
                             icon: controllerConfig.projectIcon,
@@ -77,31 +77,31 @@ var packageExplorerController = (function() {
             } else {	
 				switch(entity.type) {
 					case "Project":
-						item = { id: entity.id, open: true, checked: true, parentId: entity.belongsTo.id, name: entity.name, icon: controllerConfig.projectIcon, iconSkin: "zt"};
+						item = { id: entity.id, open: true, checked: false, parentId: entity.belongsTo.id, name: entity.name, icon: controllerConfig.projectIcon, iconSkin: "zt"};
 						break;
 					case "Namespace":
-						item = { id: entity.id, open: false, checked: true, parentId: entity.belongsTo.id, name: entity.name, icon: controllerConfig.packageIcon, iconSkin: "zt"};
+						item = { id: entity.id, open: false, checked: false, parentId: entity.belongsTo.id, name: entity.name, icon: controllerConfig.packageIcon, iconSkin: "zt"};
 						break;
 					case "Class":
                         if(entity.id.endsWith("_2") || entity.id.endsWith("_3")){
                             break;
                         };
-						item = { id: entity.id, open: false, checked: true, parentId: entity.belongsTo.id, name: entity.name, icon: controllerConfig.typeIcon, iconSkin: "zt"};
+						item = { id: entity.id, open: false, checked: false, parentId: entity.belongsTo.id, name: entity.name, icon: controllerConfig.typeIcon, iconSkin: "zt"};
 						break;
 					case  "ParameterizableClass":
-						item = { id: entity.id, open: false, checked: true, parentId: entity.belongsTo.id, name: entity.name, icon: controllerConfig.typeIcon, iconSkin: "zt"};
+						item = { id: entity.id, open: false, checked: false, parentId: entity.belongsTo.id, name: entity.name, icon: controllerConfig.typeIcon, iconSkin: "zt"};
 						break;
 					case "Enum":
-						item = { id: entity.id, open: false, checked: true, parentId: entity.belongsTo.id, name: entity.name, icon: controllerConfig.typeIcon, iconSkin: "zt"};
+						item = { id: entity.id, open: false, checked: false, parentId: entity.belongsTo.id, name: entity.name, icon: controllerConfig.typeIcon, iconSkin: "zt"};
 						break;
 					case "EnumValue":
-						item = { id: entity.id, open: false, checked: true, parentId: entity.belongsTo.id, name: entity.name, icon: controllerConfig.fieldIcon, iconSkin: "zt"};
+						item = { id: entity.id, open: false, checked: false, parentId: entity.belongsTo.id, name: entity.name, icon: controllerConfig.fieldIcon, iconSkin: "zt"};
 						break;
 					case "Attribute":
-						item = { id: entity.id, open: false, checked: true, parentId: entity.belongsTo.id, name: entity.name, icon: controllerConfig.fieldIcon, iconSkin: "zt"};
+						item = { id: entity.id, open: false, checked: false, parentId: entity.belongsTo.id, name: entity.name, icon: controllerConfig.fieldIcon, iconSkin: "zt"};
 						break;
 					case "Method":
-						item = { id: entity.id, open: false, checked: true, parentId: entity.belongsTo.id, name: entity.name, icon: controllerConfig.methodIcon, iconSkin: "zt"};
+						item = { id: entity.id, open: false, checked: false, parentId: entity.belongsTo.id, name: entity.name, icon: controllerConfig.methodIcon, iconSkin: "zt"};
 						break;
 					
 					default: 
@@ -205,6 +205,7 @@ var packageExplorerController = (function() {
 		nodes.forEach(function(node){
 			node.checkedOld = node.checked; //fix zTree bug on getChangeCheckedNodes	
 			entities.push(model.getEntityById(node.id));
+			aframeModelLoadController.checkAndLoadNodeById(node.id);
 		});
 								
 		var applicationEvent = {			
@@ -216,8 +217,7 @@ var packageExplorerController = (function() {
 			events.filtered.on.publish(applicationEvent);
 		} else {
 			events.filtered.off.publish(applicationEvent);
-		}
-		
+		}		
     }
 
     function zTreeOnClick(treeEvent, treeId, treeNode) {

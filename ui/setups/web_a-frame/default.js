@@ -35,7 +35,9 @@
 		{ 	name: 	"canvasFlyToController" 
 		},
 		{	name: 	"searchController" 
-		},
+        },
+        {   name: "aframeModelLoadController"
+        },
 
 		{	name: 	"packageExplorerController",
 		},

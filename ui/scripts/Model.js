@@ -41,10 +41,12 @@ var model = (function() {
                 element.antipattern,
                 element.roles,
 				element.isTransparent,
-				element.version
+				element.version,
+				element.isLoaded
 			);
 			
 			entity.isTransparent = false;
+			entity.isLoaded = false;
 						
 			switch(entity.type) {
 				case "text":
@@ -466,6 +468,9 @@ var model = (function() {
 		return parents;
 	}
 
+	async function changeLoadedStatus(id) {
+		return entitiesById.get(id).isLoaded = true;
+	}
 	
 	function getAllEntities(){
 		return entitiesById;
@@ -480,12 +485,12 @@ var model = (function() {
     }
 	
 	function getAllVersions() {
-            return entitiesByVersion;
+		return entitiesByVersion;
 	}
 
     function getAllIssues() {
         return issues;
-    }
+	}
 
 	function getAllSecureEntities(){
 	    let entities = [];
@@ -637,7 +642,8 @@ var model = (function() {
         getIssuesById               : getIssuesById,
 		createEntity				: createEntity,
 		removeEntity				: removeEntity,
-		
+
+		changeLoadedStatus			: changeLoadedStatus,
 		addVersion                  : addVersion,
 		removeVersion               : removeVersion,
 		addIssue					: addIssue,
