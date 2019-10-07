@@ -7,19 +7,18 @@ var aframeModelLoadController = (function () {
         application.transferConfigParams(setupConfig, controllerConfig);
     };
 
-    async function checkIfElementWasAlreadyLoaded(nodeId) {
+    async function checkIfElementIsAlreadyLoaded(nodeId) {
         return model.getEntityById(nodeId).isLoaded;
     }
 
-    //model.getEntityById(nodeId).isLoaded = true;
-
     function checkAndLoadNodeById(nodeId) {
-        checkIfElementWasAlreadyLoaded(nodeId).then(isLoaded => {
+        checkIfElementIsAlreadyLoaded(nodeId).then(isLoaded => {
             if (isLoaded) {
                 return;
             }
+            
             console.log("in Process");
-            model.changeLoadedStatus(nodeId);
+            model.changeIsLoadedStatus(nodeId);
             const url = 'http://localhost:7474/db/data/transaction/commit';
             const payload = {
                 'statements': [

@@ -468,7 +468,7 @@ var model = (function() {
 		return parents;
 	}
 
-	async function changeLoadedStatus(id) {
+	async function changeIsLoadedStatus(id) {
 		return entitiesById.get(id).isLoaded = true;
 	}
 	
@@ -643,7 +643,7 @@ var model = (function() {
 		createEntity				: createEntity,
 		removeEntity				: removeEntity,
 
-		changeLoadedStatus			: changeLoadedStatus,
+		changeIsLoadedStatus		: changeIsLoadedStatus,
 		addVersion                  : addVersion,
 		removeVersion               : removeVersion,
 		addIssue					: addIssue,

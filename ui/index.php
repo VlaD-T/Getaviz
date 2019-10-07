@@ -74,8 +74,6 @@ EOT;
 
     }
 
-
-
 ?>
 <script type="text/javascript">
     var modelUrl		 = "<?php echo $modelUrl; ?>";
