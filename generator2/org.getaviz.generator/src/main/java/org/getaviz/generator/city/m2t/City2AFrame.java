@@ -44,14 +44,12 @@ public class City2AFrame {
 		StringBuilder districts = new StringBuilder();
 		StringBuilder buildings = new StringBuilder();
 		StringBuilder segments = new StringBuilder();
-		log.info("Test execute write");
 
 		connector.executeRead(
 				"MATCH (n:Model)-[:CONTAINS*]->(d:District)-[:HAS]->(p:Position) WHERE n.building_type = \'"
 						+ config.getBuildingTypeAsString() + "\' RETURN d,p")
 				.forEachRemaining((record) -> {
-					districts.append(toDistrict(record.get("d").asNode(), record.get("p").asNode()));
-					writeAframeCodeToNeo4j(record.get("d").asNode(), toDistrict(record.get("d").asNode(), record.get("p").asNode()));
+					writeAframeCodeToNeo4jNode(record.get("d").asNode(), toDistrict(record.get("d").asNode(), record.get("p").asNode()));
 				});
 
 		if (config.getBuildingType() == BuildingType.CITY_ORIGINAL || config.isShowBuildingBase()) {
@@ -59,7 +57,7 @@ public class City2AFrame {
 					"MATCH (n:Model)-[:CONTAINS*]->(b:Building)-[:HAS]->(p:Position) WHERE n.building_type = \'"
 							+ config.getBuildingTypeAsString() + "\' RETURN b,p")
 					.forEachRemaining((record) -> {
-						buildings.append(toBuilding(record.get("b").asNode(), record.get("p").asNode()));
+						writeAframeCodeToNeo4jNode(record.get("b").asNode(), toBuilding(record.get("b").asNode(), record.get("p").asNode()));
 					});
 		}
 
@@ -70,21 +68,23 @@ public class City2AFrame {
 					.forEachRemaining((record) -> {
 						Node segment = record.get("bs").asNode();
 						if (segment.hasLabel(Labels.Floor.name())) {
-							segments.append(toFloor(segment, record.get("p").asNode()));
+							writeAframeCodeToNeo4jNode(record.get("bs").asNode(), toFloor(segment, record.get("p").asNode()));
 						} else if (segment.hasLabel(Labels.Chimney.name())) {
-							segments.append(toChimney(segment, record.get("p").asNode()));
+							writeAframeCodeToNeo4jNode(record.get("bs").asNode(), toChimney(segment, record.get("p").asNode()));
 						} else {
-							segments.append(toBuildingSegment(segment, record.get("p").asNode()));
+							writeAframeCodeToNeo4jNode(record.get("bs").asNode(), toBuildingSegment(segment, record.get("p").asNode()));
 						}
 					});
 		}
 		return districts.toString() + buildings + segments;
 	}
 
-	private void writeAframeCodeToNeo4j(Node nodeId, String aframeCode) {
+	private void writeAframeCodeToNeo4jNode(Node node, String aframeCode) {
+		Node entity = connector.getVisualizedEntity(node.id());
 		connector.executeWrite(
 				"MATCH (n) \n" +
-				"WHERE ID(n) = " + nodeId.id() + "\n" +
+				"WHERE ID(n) = " + node.id() + "\n" +
+				"SET n.nodeHashId = \'" + entity.get("hash").asString() + "\' \n" +
 				"SET n.aframe_code = \'" + aframeCode + "\' \n" +
 				"RETURN n"
 		);
