@@ -49,6 +49,7 @@ public class City2AFrame {
 				"MATCH (n:Model)-[:CONTAINS*]->(d:District)-[:HAS]->(p:Position) WHERE n.building_type = \'"
 						+ config.getBuildingTypeAsString() + "\' RETURN d,p")
 				.forEachRemaining((record) -> {
+					//districts.append(toDistrict(record.get("d").asNode(), record.get("p").asNode()));
 					writeAframeCodeToNeo4jNode(record.get("d").asNode(), toDistrict(record.get("d").asNode(), record.get("p").asNode()));
 				});
 
@@ -57,6 +58,7 @@ public class City2AFrame {
 					"MATCH (n:Model)-[:CONTAINS*]->(b:Building)-[:HAS]->(p:Position) WHERE n.building_type = \'"
 							+ config.getBuildingTypeAsString() + "\' RETURN b,p")
 					.forEachRemaining((record) -> {
+						//buildings.append(toBuilding(record.get("b").asNode(), record.get("p").asNode()));
 						writeAframeCodeToNeo4jNode(record.get("b").asNode(), toBuilding(record.get("b").asNode(), record.get("p").asNode()));
 					});
 		}
@@ -66,12 +68,16 @@ public class City2AFrame {
 					"MATCH (n:Model)-[:CONTAINS*]->(bs:BuildingSegment)-[:HAS]->(p:Position) WHERE n.building_type = \'"
 							+ config.getBuildingTypeAsString() + "\' RETURN bs,p")
 					.forEachRemaining((record) -> {
+						log.info(record);
 						Node segment = record.get("bs").asNode();
 						if (segment.hasLabel(Labels.Floor.name())) {
+							//segments.append(toFloor(segment, record.get("p").asNode()));
 							writeAframeCodeToNeo4jNode(record.get("bs").asNode(), toFloor(segment, record.get("p").asNode()));
 						} else if (segment.hasLabel(Labels.Chimney.name())) {
+							//segments.append(toChimney(segment, record.get("p").asNode()));
 							writeAframeCodeToNeo4jNode(record.get("bs").asNode(), toChimney(segment, record.get("p").asNode()));
 						} else {
+							//segments.append(toBuildingSegment(segment, record.get("p").asNode()));
 							writeAframeCodeToNeo4jNode(record.get("bs").asNode(), toBuildingSegment(segment, record.get("p").asNode()));
 						}
 					});
@@ -147,6 +153,7 @@ public class City2AFrame {
 	}
 
 	private String toBuildingSegment(Node segment, Node position) {
+		log.info(segment);
 		Node entity = connector.getVisualizedEntity(segment.id());
 		List<Node> separators = new ArrayList<>();
 		connector.executeRead("MATCH (n)-[:HAS]->(ps:PanelSeparator) RETURN ps").forEachRemaining((record) -> {
@@ -247,6 +254,7 @@ public class City2AFrame {
 	}
 
 	private String toFloor(Node floor, Node position) {
+		log.info(floor);
 		Node entity = connector.getVisualizedEntity(floor.id());
 		StringBuilder builder = new StringBuilder();
 		builder.append("<a-box id=\"" + entity.get("hash").asString() + "\"");
@@ -271,6 +279,7 @@ public class City2AFrame {
 	}
 
 	private String toChimney(Node chimney, Node position) {
+		log.info(chimney);
 		Node entity = connector.getVisualizedEntity(chimney.id());		
 		StringBuilder builder = new StringBuilder();
 	    builder.append("<a-box id=\"" + entity.get("hash").asString() + "\"");

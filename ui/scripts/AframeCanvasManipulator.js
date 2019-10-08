@@ -109,7 +109,8 @@ var canvasManipulator = (function () {
     }
 
     function hideEntities(entities) {
-        entities.forEach(function (entity) {
+        entities.forEach(async (entity) => {
+            await aframeModelLoadController.checkAndLoadNodeById(entity.id);
             let component = document.getElementById(entity.id);
             if (component == undefined) {
                 events.log.error.publish({text: "CanvasManipualtor - hideEntities - components for entityIds not found"});
@@ -119,8 +120,9 @@ var canvasManipulator = (function () {
         });
     }
 
-    function showEntities(entities) {
-        entities.forEach(function (entity) {
+    async function showEntities(entities) {
+        entities.forEach(async (entity) => {
+            await aframeModelLoadController.checkAndLoadNodeById(entity.id);
             let component = document.getElementById(entity.id);
             if (component == undefined) {
                 events.log.error.publish({text: "CanvasManipualtor - showEntities - components for entityIds not found"});

@@ -10,7 +10,9 @@
 			logInfoConsole		: false,
 			logActionConsole	: false,
 			logEventConsole		: false
-		},	
+        },	
+        {   name: "aframeModelLoadController"
+        },
 		
 		{	name:	"emailController",
 		
@@ -35,8 +37,6 @@
 		{ 	name: 	"canvasFlyToController" 
 		},
 		{	name: 	"searchController" 
-        },
-        {   name: "aframeModelLoadController"
         },
 
 		{	name: 	"packageExplorerController",

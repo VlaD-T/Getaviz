@@ -205,7 +205,6 @@ var packageExplorerController = (function() {
 		nodes.forEach(function(node){
 			node.checkedOld = node.checked; //fix zTree bug on getChangeCheckedNodes	
 			entities.push(model.getEntityById(node.id));
-			aframeModelLoadController.checkAndLoadNodeById(node.id);
 		});
 								
 		var applicationEvent = {			

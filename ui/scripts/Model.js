@@ -468,7 +468,7 @@ var model = (function() {
 		return parents;
 	}
 
-	async function changeIsLoadedStatus(id) {
+	function changeIsLoadedStatus(id) {
 		return entitiesById.get(id).isLoaded = true;
 	}
 	
