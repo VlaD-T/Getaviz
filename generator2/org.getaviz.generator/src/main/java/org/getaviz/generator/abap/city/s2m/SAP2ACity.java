@@ -36,6 +36,7 @@ public class SAP2ACity {
 
 	private Long sapPackageToDistrict(Long sapPackage, Long parent) {
 		long district = connector.addNode(cypherCreateNode(parent,sapPackage,Labels.District.name()),"n").id();
+		connector.addRelationship(sapPackage, district, "MAPPED");
 		
 		StatementResult subTypes = connector.executeRead(
 			" MATCH (n)-[:CONTAINS]->(t:Type) WHERE ID(n) = " + sapPackage +		
@@ -49,29 +50,31 @@ public class SAP2ACity {
 		return district;
 	}
 	
-	
 
 	private Long structureToBuilding(Long structure, Long parent) {
 		long building = connector.addNode(cypherCreateNode(parent, structure, Labels.Building.name()),"n").id();
+		connector.addRelationship(structure, building, "MAPPED");
 		
 //		Elements of structure
-		StatementResult elements = readStructureElements2(structure, parent);
+		StatementResult elements = readStructureElements(structure, parent);
 		elements.forEachRemaining((result) -> {
 			elementToBuildingPart(result.get("m").asNode().id(), building);
 				});		
-
 		return building;
 	}
 	
-	private StatementResult readStructureElements2(Long structure, Long parent) {		
+	private StatementResult readStructureElements(Long structure, Long parent) {		
 		return connector.executeRead(
 				" MATCH (n)-[:DECLARES]->(m) WHERE ID(n) = " + structure +
 				" RETURN m");
 	}
 	
 	
-	private void elementToBuildingPart(Long element, Long parent) {
-		connector.executeWrite(cypherCreateNode(parent, element, Labels.BuildingPart.name()));
+	private Long elementToBuildingPart(Long element, Long parent) {
+		long buildingPart = connector.addNode(cypherCreateNode(parent, element, Labels.BuildingPart.name()),"n").id();
+		connector.addRelationship(element, buildingPart, "MAPPED");
+		
+		return buildingPart;
 	}
 	
 	

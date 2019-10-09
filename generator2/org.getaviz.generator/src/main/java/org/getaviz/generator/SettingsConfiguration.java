@@ -357,7 +357,41 @@ public class SettingsConfiguration {
 	}
 
 	public Color getClassColor() {
-		return getColor(config.getString("city.class.color", "#353559"));
+		return getColor(config.getString("city.class.color", "#C5CEA9"));
+	}
+	
+
+	
+	public String getACityColorHex(String type) {
+		String defaultColor = "";
+		
+		switch (type) {
+		case "CLASS":
+			defaultColor = "#C5CEA9"; break;
+		case "REPS":
+			defaultColor = "#C5CEA9"; break;
+		case "FUGR":
+			defaultColor = "#C87ADE"; break;
+		case "TABL":
+			defaultColor = "#C5CEA9"; break;
+		case "FORM":
+			defaultColor = "#C5CEA9"; break;
+		case "METH":
+			defaultColor = "#C5CEA9"; break;
+		case "ATTR":
+			defaultColor = "#C5CEA9"; break;
+		case "FUMO":
+			defaultColor = "#C5CEA9"; break;
+		case "DOMA":
+			defaultColor = "#C5CEA9"; break;
+		case "DTEL":
+			defaultColor = "#C5CEA9"; break;
+		case "TTYP":
+			defaultColor = "#C5CEA9"; break;
+		case "STRU":
+			defaultColor = "#C5CEA9"; break;
+		}
+		return defaultColor;	
 	}
 
 	public Color getCityColor(String name) {

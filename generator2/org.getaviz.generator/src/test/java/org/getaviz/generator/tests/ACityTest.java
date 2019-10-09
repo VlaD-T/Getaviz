@@ -31,20 +31,8 @@ public class ACityTest {
 		connector = mockup.getConnector();
 		
 		new SAP2ACity();
-//		new JQA2City();
-//		new ABAP_City2ABAP_City();
-//		new City2City();
+		new ACity2ACity();
 	}
-	
-//	@BeforeAll //SAP
-//	static void setup() {
-//		mockup.setupDatabase("./test/databases/CityBankTest.db");
-//		mockup.loadProperties("CityBankTest.properties");
-//		connector = mockup.getConnector();
-//
-//		new SAP2ABAP_City();
-//		new City2City();
-//	}
 	
 	@AfterAll
 	static void close() {
@@ -77,7 +65,7 @@ public class ACityTest {
 				.executeRead("MATCH (building:Building)-[:VISUALIZES]->(:Type) RETURN count(building) AS result")
 				.single();
 		int numberOfVisualizedTypes = result.get("result").asInt();
-		assertEquals(3, numberOfVisualizedTypes);
+		assertEquals(4, numberOfVisualizedTypes);
 		System.out.println("Typen:" + result);
 	}
 	
@@ -128,8 +116,15 @@ public class ACityTest {
 				.single();
 		int numberOfVisualizedMethods = result.get("result").asInt();
 		System.out.println("Methoden:" + result);
-		assertEquals(0, numberOfVisualizedMethods);
+		assertEquals(1, numberOfVisualizedMethods);
 	}
+	
+//	@Test 
+//	void numberOfBuildings() {
+//		Record result = connector.executeRead("MATCH (model:Model)-[VISUALIZED]->(:Building) RETURN count(building) AS result").single();
+//		int numberOfBuildings = result.get("result").asInt();
+//		assertEquals(4, numberOfBuildings);
+//	}
 	
 	
 
