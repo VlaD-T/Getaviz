@@ -36,6 +36,10 @@ var canvasManipulator = (function () {
         entities.forEach(function (entity2) {
             //  getting the entity again here, because without it the check if originalTransparency is defined fails sometimes
             let entity = model.getEntityById(entity2.id);
+            if (entity == undefined) {
+                return;
+            }
+            // await aframeModelLoadController.checkAndLoadNodeById(entity.id);
             let component = document.getElementById(entity.id);
             if (component == undefined) {
                 events.log.error.publish({text: "CanvasManipualtor - changeTransparencyOfEntities - components for entityIds not found"});
@@ -120,7 +124,7 @@ var canvasManipulator = (function () {
         });
     }
 
-    async function showEntities(entities) {
+    function showEntities(entities) {
         entities.forEach(async (entity) => {
             await aframeModelLoadController.checkAndLoadNodeById(entity.id);
             let component = document.getElementById(entity.id);
@@ -215,13 +219,24 @@ var canvasManipulator = (function () {
     }
 
     function getElementIds() {
-        let sceneArray = Array.from(scene.children);
-        sceneArray.shift(); // so camera entity needs to be first in model.html
-        sceneArray.pop();  // last element is of class "a-canvas"
+        // console.log(scene)
+        // let sceneArray = Array.from(scene.children);
+        // sceneArray.shift(); // so camera entity needs to be first in model.html
+        // sceneArray.pop();  // last element is of class "a-canvas"
+        // let elementIds = [];
+        // sceneArray.forEach(function (object) {
+        //     elementIds.push(object.id);
+        // });
+        // console.log(sceneArray);
+        // console.log(elementIds);
+        // return elementIds;
+ 
+        console.log(scene);
+        let sceneArray = document.querySelectorAll('.city-element');
         let elementIds = [];
-        sceneArray.forEach(function (object) {
-            elementIds.push(object.id);
-        });
+        sceneArray.forEach(cityElement => {
+            elementIds.push(cityElement.id);
+        })
         return elementIds;
     }
 

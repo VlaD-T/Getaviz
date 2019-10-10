@@ -101,6 +101,7 @@ public class City2AFrame {
 		StringBuilder builder = new StringBuilder();
 		builder.append("<a-box id=\"" + entity.get("hash").asString() + "\"");
 		builder.append("\n");
+		builder.append("\t class=\"city-element\"");
 		builder.append("\t position=\"" + position.get("x") + " " + position.get("y") + " " + position.get("z") + "\"");
 		builder.append("\n");
 		builder.append("\t width=\"" + district.get("width") + "\"");
@@ -124,6 +125,7 @@ public class City2AFrame {
 		Node entity = connector.getVisualizedEntity(building.id());
 		StringBuilder builder = new StringBuilder();
 		builder.append("<a-box id=\"" + entity.get("hash").asString() + "\"");
+		builder.append("\t class=\"city-element\"");
 		builder.append(
 				"\t\t position=\"" + position.get("x") + " " + position.get("y") + " " + position.get("z") + "\"");
 		builder.append("\n");
