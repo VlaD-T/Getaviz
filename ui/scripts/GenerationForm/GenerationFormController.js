@@ -1082,10 +1082,8 @@ var generationFormController = (function() {
 				btn_submit.on('click', function () {
 					settingsForm.jqxValidator('validate');
 					let currentPage = window.location.href;
-					//currentPage = currentPage.substring(0, currentPage.indexOf('/ui/'));
-					let currentPath = currentPage.replace(/[^\/]*$/, '');
-					//let currentPath = currentPage + "/ui/";
-					settingsForm.jqxForm('submit', currentPath + "generator-connector.php", "_self", 'POST');
+					let newPath = currentPage.substring(0, currentPage.indexOf('index.php'));
+					settingsForm.jqxForm('submit', newPath + "generator-connector.php", "_self", 'POST');
 				});
 				
 				// Cancel Form Data 
