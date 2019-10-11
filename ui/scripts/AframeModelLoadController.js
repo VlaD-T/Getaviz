@@ -13,7 +13,6 @@ var aframeModelLoadController = (function () {
             if (isLoaded) {
                 return;
             }
-            model.changeIsLoadedStatus(nodeId);
             let data = await loadNodeById(nodeId);
             let results = data.results;
             // Aframe code property is nested, so get it out
@@ -21,7 +20,40 @@ var aframeModelLoadController = (function () {
                 if (result.data[0]) {
                     let aframe_code = result.data[0].row[0].aframe_code;
                     if (aframe_code) {
-                        $('a-scene a-entity#camera').after(aframe_code);                        
+                        $('a-scene a-entity#camera').after(aframe_code);  
+                        model.changeIsLoadedStatus(nodeId);      
+                        // Tests
+                        let entity = document.getElementById(nodeId);
+                        // entity.originalColor = component.getAttribute("color");
+
+                        // Second option
+                        let sceneEl = document.querySelector('a-scene');
+                        // AFRAME.registerComponent('do-something-once-loaded', {
+                        //     init: function () {
+                        //       // This will be called after the entity has properly attached and loaded.
+                        //       console.log('I am ready!');
+                        //       console.log(this);                              
+                        //     }
+                        // });
+                        let boxTag = 'a-box';
+                        let entityEl = document.createElement(`${boxTag}`);
+                        // entityEl.setAttribute('do-something-once-loaded', '');
+                        entityEl.setAttribute('geometry', {
+                            primitive: 'box',
+                            height: 3,
+                            width: 1
+                          });
+                        
+                        let color = sceneEl.getAttribute('color');
+                        sceneEl.appendChild(entityEl);
+
+                        // If any connection is shown and all the elements are transparent, apply the transparency to a new element.
+                        // if (model.getEntityById(nodeId).isTransparent) {
+                        //     let entities = [];
+                        //     entities.push(document.getElementById(nodeId));
+                        //     let transparencyValue = relationTransparencyController.getControllerConfig().fullFadeValue;
+                        //     canvasManipulator.changeTransparencyOfEntities(entities, transparencyValue); 
+                        // }
                     }
                 }
             }) 

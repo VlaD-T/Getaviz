@@ -50,7 +50,7 @@ public class City2AFrame {
 						+ config.getBuildingTypeAsString() + "\' RETURN d,p")
 				.forEachRemaining((record) -> {
 					//districts.append(toDistrict(record.get("d").asNode(), record.get("p").asNode()));
-					writeAframeCodeToNeo4jNode(record.get("d").asNode(), toDistrict(record.get("d").asNode(), record.get("p").asNode()));
+					writeAframePropertiesToNeo4jNode(record.get("d").asNode(), toDistrict(record.get("d").asNode(), record.get("p").asNode()));
 				});
 
 		if (config.getBuildingType() == BuildingType.CITY_ORIGINAL || config.isShowBuildingBase()) {
@@ -59,7 +59,7 @@ public class City2AFrame {
 							+ config.getBuildingTypeAsString() + "\' RETURN b,p")
 					.forEachRemaining((record) -> {
 						//buildings.append(toBuilding(record.get("b").asNode(), record.get("p").asNode()));
-						writeAframeCodeToNeo4jNode(record.get("b").asNode(), toBuilding(record.get("b").asNode(), record.get("p").asNode()));
+						writeAframePropertiesToNeo4jNode(record.get("b").asNode(), toBuilding(record.get("b").asNode(), record.get("p").asNode()));
 					});
 		}
 
@@ -72,26 +72,26 @@ public class City2AFrame {
 						Node segment = record.get("bs").asNode();
 						if (segment.hasLabel(Labels.Floor.name())) {
 							//segments.append(toFloor(segment, record.get("p").asNode()));
-							writeAframeCodeToNeo4jNode(record.get("bs").asNode(), toFloor(segment, record.get("p").asNode()));
+							writeAframePropertiesToNeo4jNode(record.get("bs").asNode(), toFloor(segment, record.get("p").asNode()));
 						} else if (segment.hasLabel(Labels.Chimney.name())) {
 							//segments.append(toChimney(segment, record.get("p").asNode()));
-							writeAframeCodeToNeo4jNode(record.get("bs").asNode(), toChimney(segment, record.get("p").asNode()));
+							writeAframePropertiesToNeo4jNode(record.get("bs").asNode(), toChimney(segment, record.get("p").asNode()));
 						} else {
 							//segments.append(toBuildingSegment(segment, record.get("p").asNode()));
-							writeAframeCodeToNeo4jNode(record.get("bs").asNode(), toBuildingSegment(segment, record.get("p").asNode()));
+							writeAframePropertiesToNeo4jNode(record.get("bs").asNode(), toBuildingSegment(segment, record.get("p").asNode()));
 						}
 					});
 		}
 		return districts.toString() + buildings + segments;
 	}
 
-	private void writeAframeCodeToNeo4jNode(Node node, String aframeCode) {
+	private void writeAframePropertiesToNeo4jNode(Node node, String aframeProperty) {
 		Node entity = connector.getVisualizedEntity(node.id());
 		connector.executeWrite(
 				"MATCH (n) \n" +
 				"WHERE ID(n) = " + node.id() + "\n" +
 				"SET n.nodeHashId = \'" + entity.get("hash").asString() + "\' \n" +
-				"SET n.aframe_code = \'" + aframeCode + "\' \n" +
+				"SET n.aframeProperty = \'" + aframeProperty + "\' \n" +
 				"RETURN n"
 		);
 	}
@@ -99,6 +99,33 @@ public class City2AFrame {
 	private String toDistrict(Node district, Node position) {
 		Node entity = connector.getVisualizedEntity(district.id());
 		StringBuilder builder = new StringBuilder();
+		builder.append("<a-box id=\"" + entity.get("hash").asString() + "\"");
+		builder.append("\n");
+		builder.append("\t class=\"city-element\"");
+		builder.append("\t position=\"" + position.get("x") + " " + position.get("y") + " " + position.get("z") + "\"");
+		builder.append("\n");
+		builder.append("\t width=\"" + district.get("width") + "\"");
+		builder.append("\n");
+		builder.append("\t height=\"" + district.get("height") + "\"");
+		builder.append("\n");
+		builder.append("\t depth=\"" + district.get("length") + "\"");
+		builder.append("\n");
+		builder.append("\t color=\"" + district.get("color").asString() + "\"");
+		builder.append("\n");
+		builder.append("\t shader=\"flat\"");
+		builder.append("\n");
+		builder.append("\t flat-shading=\"true\">");
+		builder.append("\n");
+		builder.append("</a-box>");
+		builder.append("\n");
+		return builder.toString();
+	}
+
+	// For tests (write as property and not as an element)
+	private String toDistrict2(Node district, Node position) {
+		Node entity = connector.getVisualizedEntity(district.id());
+		StringBuilder builder = new StringBuilder();
+		builder.append("tag=\"a-box\"");
 		builder.append("<a-box id=\"" + entity.get("hash").asString() + "\"");
 		builder.append("\n");
 		builder.append("\t class=\"city-element\"");

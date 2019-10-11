@@ -39,7 +39,6 @@ var canvasManipulator = (function () {
             if (entity == undefined) {
                 return;
             }
-            // await aframeModelLoadController.checkAndLoadNodeById(entity.id);
             let component = document.getElementById(entity.id);
             if (component == undefined) {
                 events.log.error.publish({text: "CanvasManipualtor - changeTransparencyOfEntities - components for entityIds not found"});
@@ -48,8 +47,13 @@ var canvasManipulator = (function () {
             if (entity.originalTransparency === undefined) {
                 entity.originalTransparency = {};
                 entity.currentTransparency = {};
-                if(component.getAttribute("material").opacity) {
-                    entity.originalTransparency = 1 - component.getAttribute("material").opacity;
+                // If elements are new, they probably don't have opacity parameter
+                if (component.getAttribute("material")) {
+                    if(component.getAttribute("material").opacity) {
+                        entity.originalTransparency = 1 - component.getAttribute("material").opacity;
+                    }
+                } else {
+                    entity.originalTransparency = 0;
                 }
             }
             entity.currentTransparency = value;
@@ -59,6 +63,7 @@ var canvasManipulator = (function () {
 
     function resetTransparencyOfEntities(entities) {
         entities.forEach(function (entity) {
+            console.log('reset transparency')
             let component = document.getElementById(entity.id);
             if (component == undefined) {
                 events.log.error.publish({text: "CanvasManipualtor - resetTransparencyOfEntities - components for entityIds not found"});
@@ -218,24 +223,15 @@ var canvasManipulator = (function () {
         object.setAttribute("visible", visibility);
     }
 
-    function getElementIds() {
-        // console.log(scene)
-        // let sceneArray = Array.from(scene.children);
-        // sceneArray.shift(); // so camera entity needs to be first in model.html
-        // sceneArray.pop();  // last element is of class "a-canvas"
-        // let elementIds = [];
-        // sceneArray.forEach(function (object) {
-        //     elementIds.push(object.id);
-        // });
-        // console.log(sceneArray);
-        // console.log(elementIds);
-        // return elementIds;
- 
-        console.log(scene);
-        let sceneArray = document.querySelectorAll('.city-element');
+    function getElementIds() { 
+        let allEntities = model.getAllEntities();
         let elementIds = [];
-        sceneArray.forEach(cityElement => {
-            elementIds.push(cityElement.id);
+        // set opacity for not loaded elements, so that they appear transparent after any other element was selected 
+        allEntities.forEach(entity => {
+            elementIds.push(entity.id);
+            if (!entity.isLoaded) {
+                entity.isTransparent = true;
+            }
         })
         return elementIds;
     }
