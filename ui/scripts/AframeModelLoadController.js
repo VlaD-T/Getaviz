@@ -28,7 +28,8 @@ var aframeModelLoadController = (function () {
             this.el.setAttribute('class', this.data.class);
             this.el.setAttribute('color', this.data.color);
             this.el.setAttribute('depth', this.data.depth);
-            console.log(this.data.flatShading);
+            this.el.setAttribute('flat-shading', this.data.flatShading);
+            // console.log(this.data.flatShading);
             // this.el.setAttribute('flat-shading', this.data.flat-shading);
             this.el.setAttribute('position', this.data.position);
             this.el.setAttribute('shader', this.data.shader);
