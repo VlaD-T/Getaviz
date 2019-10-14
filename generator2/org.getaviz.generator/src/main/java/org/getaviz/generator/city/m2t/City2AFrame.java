@@ -128,21 +128,13 @@ public class City2AFrame {
 		builder.append("\"tag\":\"a-box\"");
 		builder.append(", \"id\":\"" + entity.get("hash").asString() + "\"");
 		builder.append(", \"class\":\"city-element\"");
-//		builder.append("\n");
-//		builder.append("\t position:\"" + position.get("x") + " " + position.get("y") + " " + position.get("z") + "\"");
-//		builder.append("\n");
-//		builder.append("\t width:\"" + district.get("width") + "\"");
-//		builder.append("\n");
-//		builder.append("\t height:\"" + district.get("height") + "\"");
-//		builder.append("\n");
-//		builder.append("\t depth:\"" + district.get("length") + "\"");
-//		builder.append("\n");
-//		builder.append("\t color:\"" + district.get("color").asString() + "\"");
-//		builder.append("\n");
-//		builder.append("\t shader:\"flat\"");
-//		builder.append("\n");
-//		builder.append("\t flat-shading:\"true\"");
-		builder.append("\n");
+		builder.append(", \"position\":\"" + position.get("x") + " " + position.get("y") + " " + position.get("z") + "\"");
+		builder.append(", \"width\":\"" + district.get("width") + "\"");
+		builder.append(", \"height\":\"" + district.get("height") + "\"");
+		builder.append(", \"depth\":\"" + district.get("length") + "\"");
+		builder.append(", \"color\":\"" + district.get("color").asString() + "\"");
+		builder.append(", \"shader\":\"flat\"");
+		builder.append(", \"flat-shading\":\"true\"");
 		return builder.toString();
 	}
 
