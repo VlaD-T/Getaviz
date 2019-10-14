@@ -18,9 +18,16 @@ var aframeModelLoadController = (function () {
             // Aframe code property is nested, so get it out
             results.forEach(result => {
                 if (result.data[0]) {
+                    console.log(result.data[0]);
+                    let aframeProperty = result.data[0].row[0].aframeProperty;
+                    let aframeObject = JSON.parse(`{ ${aframeProperty} }`);
+                    console.log(aframeObject);
+                    
+
+
                     let aframe_code = result.data[0].row[0].aframe_code;
                     if (aframe_code) {
-                        $('a-scene a-entity#camera').after(aframe_code);  
+                        // $('a-scene a-entity#camera').after(aframe_code);  
                         model.changeIsLoadedStatus(nodeId);      
                         // Tests
                         let entity = document.getElementById(nodeId);
