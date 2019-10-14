@@ -7,16 +7,34 @@ var aframeModelLoadController = (function () {
         application.transferConfigParams(setupConfig, controllerConfig);
     };
 
-    AFRAME.registerComponent('do-something-once-loaded', {
+    AFRAME.registerComponent('set-aframe-attributes', {
         schema: {
-            aframeProperty: {type: 'string', default: ''}
+            tag: { type: 'string', default: '' },
+            id: { type: 'string', default: '' },
+            class: { type: 'string', default: '' },
+            color: { type: 'string', default: '' },
+            depth: { type: 'string', default: '' },
+            shader: { type: 'string', default: '' },
+            flatShading: { type: 'string', default: '' },
+            position: { type: 'string', default: '' },
+            width: { type: 'string', default: '' },
+            height: { type: 'string', default: '' }
         },
 
         init: function () {
             // This will be called after the entity has properly attached and loaded.
-            console.log('I am ready!');
-            this.attrValue = '';
-            console.log(this.attrValue);                              
+            this.attrValue = ''; // imported payload is in this.data, so we don't need this one
+            this.el.setAttribute('id', this.data.id); 
+            this.el.setAttribute('class', this.data.class);
+            this.el.setAttribute('color', this.data.color);
+            this.el.setAttribute('depth', this.data.depth);
+            console.log(this.data.flatShading);
+            // this.el.setAttribute('flat-shading', this.data.flat-shading);
+            this.el.setAttribute('position', this.data.position);
+            this.el.setAttribute('shader', this.data.shader);
+            this.el.setAttribute('width', this.data.width);
+            this.el.setAttribute('height', this.data.height);
+            // console.log(this.el.getAttribute('position'));
         }
     });
 
@@ -38,8 +56,8 @@ var aframeModelLoadController = (function () {
                     
                     let boxTag = 'a-box';
                     let entityEl = document.createElement(`${boxTag}`);
-                    entityEl.setAttribute('position', {x:88.0, y:1.5, z:88.0});
-                    entityEl.setAttribute('do-something-once-loaded', aframeProperty);
+                    // entityEl.setAttribute('position', {x:88.0, y:1.5, z:88.0});
+                    entityEl.setAttribute('set-aframe-attributes', aframeObject);
                     // let position = sceneEl.getAttribute('position');
                     // console.log(position); 
                     let sceneEl = document.querySelector('a-scene');

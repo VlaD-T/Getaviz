@@ -134,7 +134,7 @@ public class City2AFrame {
 		builder.append(", \"depth\":\"" + district.get("length") + "\"");
 		builder.append(", \"color\":\"" + district.get("color").asString() + "\"");
 		builder.append(", \"shader\":\"flat\"");
-		builder.append(", \"flat-shading\":\"true\"");
+		builder.append(", \"flatShading\":\"true\"");
 		return builder.toString();
 	}
 
