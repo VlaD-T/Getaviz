@@ -15,9 +15,9 @@ var relationTransparencyController = (function () {
 	};
 
 
-	function getControllerConfig() {
-		return controllerConfig;
-	}
+	// function getControllerConfig() {
+	// 	return controllerConfig;
+	// }
 
 	function initialize(setupConfig) {
 		application.transferConfigParams(setupConfig, controllerConfig);
@@ -153,8 +153,8 @@ var relationTransparencyController = (function () {
 		initialize: initialize,
 		activate: activate,
 		deactivate: deactivate,
-		reset: reset,
-		getControllerConfig: getControllerConfig
+		reset: reset
+		// getControllerConfig: getControllerConfig
 	};
 })();
 

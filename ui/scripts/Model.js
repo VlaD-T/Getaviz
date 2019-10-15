@@ -10,7 +10,8 @@ var model = (function() {
 		added			: { name: "added" },
 		componentSelected : { name: "componentSelected" },
 		antipattern     : { name: "antipattern" },
-		versionSelected : { name: "versionSelected" }
+		versionSelected : { name: "versionSelected" },
+		loaded			: { name: "loaded" }
     };
 
 	let entitiesById = new Map();
@@ -42,11 +43,12 @@ var model = (function() {
                 element.roles,
 				element.isTransparent,
 				element.version,
-				element.isLoaded
+				element.mustBeTransparent // for new elements, which are not loaded yet
 			);
 			
 			entity.isTransparent = false;
 			entity.isLoaded = false;
+			entity.mustBeTransparent = false;
 						
 			switch(entity.type) {
 				case "text":
@@ -468,8 +470,8 @@ var model = (function() {
 		return parents;
 	}
 
-	function changeIsLoadedStatus(id) {
-		return entitiesById.get(id).isLoaded = true;
+	function changeLoadedStatusForEntity(id) {
+		return entitiesById.get(id).loaded = true;
 	}
 	
 	function getAllEntities(){
@@ -643,7 +645,7 @@ var model = (function() {
 		createEntity				: createEntity,
 		removeEntity				: removeEntity,
 
-		changeIsLoadedStatus		: changeIsLoadedStatus,
+		changeLoadedStatusForEntity	: changeLoadedStatusForEntity,
 		addVersion                  : addVersion,
 		removeVersion               : removeVersion,
 		addIssue					: addIssue,

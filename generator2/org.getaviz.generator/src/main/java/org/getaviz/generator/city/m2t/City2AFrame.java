@@ -59,7 +59,7 @@ public class City2AFrame {
 							+ config.getBuildingTypeAsString() + "\' RETURN b,p")
 					.forEachRemaining((record) -> {
 						//buildings.append(toBuilding(record.get("b").asNode(), record.get("p").asNode()));
-						//writeAframePropertiesToNeo4jNode(record.get("b").asNode(), toBuilding(record.get("b").asNode(), record.get("p").asNode()));
+						writeAframePropertiesToNeo4jNode(record.get("b").asNode(), toBuilding2(record.get("b").asNode(), record.get("p").asNode()));
 					});
 		}
 
@@ -121,23 +121,6 @@ public class City2AFrame {
 		return builder.toString();
 	}
 
-	// For tests (write as property and not as an element)
-	private String toDistrict2(Node district, Node position) {
-		Node entity = connector.getVisualizedEntity(district.id());
-		StringBuilder builder = new StringBuilder();
-		builder.append("\"tag\":\"a-box\"");
-		builder.append(", \"id\":\"" + entity.get("hash").asString() + "\"");
-		builder.append(", \"class\":\"city-element\"");
-		builder.append(", \"position\":\"" + position.get("x") + " " + position.get("y") + " " + position.get("z") + "\"");
-		builder.append(", \"width\":\"" + district.get("width") + "\"");
-		builder.append(", \"height\":\"" + district.get("height") + "\"");
-		builder.append(", \"depth\":\"" + district.get("length") + "\"");
-		builder.append(", \"color\":\"" + district.get("color").asString() + "\"");
-		builder.append(", \"shader\":\"flat\"");
-		builder.append(", \"flatShading\":\"true\"");
-		return builder.toString();
-	}
-
 	private String toBuilding(Node building, Node position) {
 		Node entity = connector.getVisualizedEntity(building.id());
 		StringBuilder builder = new StringBuilder();
@@ -160,6 +143,44 @@ public class City2AFrame {
 		builder.append("\n");
 		builder.append("</a-box>");
 		builder.append("\n");
+		return builder.toString();
+	}
+
+	// For tests (write as property and not as an element)
+	private String toDistrict2(Node district, Node position) {
+		Node entity = connector.getVisualizedEntity(district.id());
+		StringBuilder builder = new StringBuilder();
+		builder.append("{");
+		builder.append("\"tag\":\"a-box\"");
+		builder.append(", \"id\":\"" + entity.get("hash").asString() + "\"");
+		builder.append(", \"class\":\"city-element\"");
+		builder.append(", \"position\":\"" + position.get("x") + " " + position.get("y") + " " + position.get("z") + "\"");
+		builder.append(", \"width\":\"" + district.get("width") + "\"");
+		builder.append(", \"height\":\"" + district.get("height") + "\"");
+		builder.append(", \"depth\":\"" + district.get("length") + "\"");
+		builder.append(", \"color\":\"" + district.get("color").asString() + "\"");
+		builder.append(", \"shader\":\"flat\"");
+		builder.append(", \"flatShading\":\"true\"");
+		builder.append("}");
+		return builder.toString();
+	}
+
+	// For tests (write as property and not as an element)
+	private String toBuilding2(Node building, Node position) {
+		Node entity = connector.getVisualizedEntity(building.id());
+		StringBuilder builder = new StringBuilder();
+		builder.append("{");
+		builder.append("\"tag\":\"a-box\"");
+		builder.append(", \"id\":\"" + entity.get("hash").asString() + "\"");
+		builder.append(", \"class\":\"city-element\"");
+		builder.append(", \"position\":\"" + position.get("x") + " " + position.get("y") + " " + position.get("z") + "\"");
+		builder.append(", \"width\":\"" + building.get("width") + "\"");
+		builder.append(", \"height\":\"" + building.get("height") + "\"");
+		builder.append(", \"depth\":\"" + building.get("length") + "\"");
+		builder.append(", \"color\":\"" + building.get("color").asString() + "\"");
+		builder.append(", \"shader\":\"flat\"");
+		builder.append(", \"flatShading\":\"true\"");
+		builder.append("}");
 		return builder.toString();
 	}
 

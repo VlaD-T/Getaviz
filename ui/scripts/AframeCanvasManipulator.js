@@ -19,6 +19,30 @@ var canvasManipulator = (function () {
         initialCameraView.target = globalCamera.target;
         initialCameraView.position = globalCamera.object.position;
         initialCameraView.spherical = globalCamera.spherical;
+
+        AFRAME.registerComponent('set-aframe-attributes', {
+            // schema defines properties of element
+            schema: {
+                tag: { type: 'string', default: '' },
+                id: { type: 'string', default: '' },
+                class: { type: 'string', default: '' },
+                position: { type: 'string', default: '' },
+                width: { type: 'string', default: '' },
+                height: { type: 'string', default: '' },
+                depth: { type: 'string', default: '' },
+                color: { type: 'string', default: '' },            
+                shader: { type: 'string', default: '' },
+                flatShading: { type: 'string', default: '' }
+            },
+    
+            init: function () {
+                // This will be called after the entity has properly attached and loaded.
+                this.attrValue = ''; // imported payload is in this.data, so we don't need this one
+                Object.keys(this.schema).forEach(key => {
+                    this.el.setAttribute(`${key}`, this.data[key]);                
+                })
+            }
+        });
     }
 
     function reset() {
@@ -31,6 +55,8 @@ var canvasManipulator = (function () {
 
         globalCamera.scale = initialCameraView.spherical.radius/globalCamera.spherical.radius;
     }
+
+    // function 
 
     function changeTransparencyOfEntities(entities, value) {
         entities.forEach(function (entity2) {
@@ -63,7 +89,6 @@ var canvasManipulator = (function () {
 
     function resetTransparencyOfEntities(entities) {
         entities.forEach(function (entity) {
-            console.log('reset transparency')
             let component = document.getElementById(entity.id);
             if (component == undefined) {
                 events.log.error.publish({text: "CanvasManipualtor - resetTransparencyOfEntities - components for entityIds not found"});
@@ -119,7 +144,7 @@ var canvasManipulator = (function () {
 
     function hideEntities(entities) {
         entities.forEach(async (entity) => {
-            await aframeModelLoadController.checkAndLoadNodeById(entity.id);
+            // await aframeModelLoadController.checkAndLoadNodeById(entity.id);
             let component = document.getElementById(entity.id);
             if (component == undefined) {
                 events.log.error.publish({text: "CanvasManipualtor - hideEntities - components for entityIds not found"});
@@ -131,7 +156,7 @@ var canvasManipulator = (function () {
 
     function showEntities(entities) {
         entities.forEach(async (entity) => {
-            await aframeModelLoadController.checkAndLoadNodeById(entity.id);
+            // await aframeModelLoadController.checkAndLoadNodeById(entity.id);
             let component = document.getElementById(entity.id);
             if (component == undefined) {
                 events.log.error.publish({text: "CanvasManipualtor - showEntities - components for entityIds not found"});
@@ -230,10 +255,20 @@ var canvasManipulator = (function () {
         allEntities.forEach(entity => {
             elementIds.push(entity.id);
             if (!entity.isLoaded) {
-                entity.isTransparent = true;
+                entity.mustBeTransparent = true;
             }
         })
         return elementIds;
+    }
+
+    function appendAframeElementWithProperties(payload) {
+        let aframeProperty = payload.row[0].aframeProperty;
+        let aframeObject = JSON.parse(`${aframeProperty}`); // create an object
+
+        let entityEl = document.createElement(`${aframeObject.tag}`);
+        entityEl.setAttribute('set-aframe-attributes', aframeObject); // this attributes will be set after element is created
+        let sceneEl = document.querySelector('a-scene');
+        sceneEl.appendChild(entityEl);
     }
 
     return {
@@ -261,7 +296,9 @@ var canvasManipulator = (function () {
         setCenterOfRotation: setCenterOfRotation,
         getCenterOfEntity: getCenterOfEntity,
 
-        getElementIds: getElementIds
+        getElementIds: getElementIds,
+
+        appendAframeElementWithProperties: appendAframeElementWithProperties
     };
 
 })

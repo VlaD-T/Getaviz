@@ -13,6 +13,8 @@
         },	
         {   name: "aframeModelLoadController"
         },
+        {   name: "neo4jModelLoadController"
+        },
 		
 		{	name:	"emailController",
 		

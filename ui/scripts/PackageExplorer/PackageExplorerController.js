@@ -220,6 +220,10 @@ var packageExplorerController = (function() {
     }
 
     function zTreeOnClick(treeEvent, treeId, treeNode) {
+		// Tried to activate node on click, doesn't work that simple. Left as TODO. 
+		// let node = tree.getSelectedNodes();
+		// tree.checkNode(node);
+
         var applicationEvent = {
 			sender: packageExplorerController,
 			entities: [model.getEntityById(treeNode.id)]
