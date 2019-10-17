@@ -25,7 +25,7 @@ var model = (function() {
 	let paths = [];
 	let labels = [];
 
-	function createEntities(elements) {            
+	async function createEntities(elements) {            
 		//create initial entites from famix elements 
 		elements.forEach(function(element) {
 			
@@ -222,6 +222,8 @@ var model = (function() {
 				});
 			});		
 		});
+
+		return packageExplorerController.reset();
     }
 	
 	
@@ -251,14 +253,12 @@ var model = (function() {
 		};
 		
 		entity.isTransparent = false;
-		entity.isLoaded = false;
 		entity.mustBeTransparent = false;
 		
 		const statesArray = Object.keys(states);
 		statesArray.forEach(function(stateName){
 			entity[stateName] = false;
 		});
-
 		
 		switch(entity.type) {
 			case "text":

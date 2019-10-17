@@ -32,7 +32,6 @@
 	    <script type="text/javascript" src="scripts/RelationConnector/AframeRelationConnectorController.js"></script>
 	    <script type="text/javascript" src="scripts/CanvasHover/AframeCanvasHoverController.js"></script>
         <script type="text/javascript" src="scripts/camera-beta.js"></script>
-        <script type="text/javascript" src="scripts/AframeModelLoadController.js"></script>
         <script type="text/javascript" src="scripts/Neo4jModelLoadController.js"></script>
 EOT;
         $canvasId = "aframe-canvas";

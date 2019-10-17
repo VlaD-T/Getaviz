@@ -11,10 +11,8 @@
 			logActionConsole	: false,
 			logEventConsole		: false
         },	
-        {   name: "aframeModelLoadController"
-        },
         {   name: "neo4jModelLoadController",
-            loadStartData: "all" //all, rootPackages
+            loadStartData: "rootPackages" //all, rootPackages
         },
 		
 		{	name:	"emailController",

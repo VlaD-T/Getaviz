@@ -18,17 +18,13 @@ $(document).ready(function () {
 			resizable: false
 		});		
 	}
-	//load famix data
-	$.getJSON(metaDataJsonUrl, initializeApplication);
+	
+	// timeout, to make sure the scene is loaded
+	setTimeout(function(){initializeApplication(metaDataJsonUrl);}, 1000);
 });
 
-function initializeApplication(metaDataJson){
-    //wait for canvas to be loaded full here...
-	var canvas = document.getElementById(canvasId);
-	if(!canvas){
-		setTimeout(function(){initializeApplication(metaDataJson);}, 100);
-		return;
-	}
+async function initializeApplication(metaDataJsonUrl){
+	let canvas = document.getElementById(canvasId);
 
 	actionController.initialize();
 	canvasManipulator.initialize();
@@ -38,21 +34,22 @@ function initializeApplication(metaDataJson){
 
 	//create entity model
 	if (canvas.localName === 'a-scene') { // for A-Frame
-		// let rootPackages = await 
-		neo4jModelLoadController.getStartData();
-		model.createEntities(metaDataJson); // must be replaced
+		// let startData = await neo4jModelLoadController.getStartData();
+		// model.createEntities(startData);
+
+		let response = await fetch(metaDataJsonUrl);
+		let data = await response.json()
+		await model.createEntities(data);
 	} else {
-		model.createEntities(metaDataJson);
+		let response = await fetch(metaDataJsonUrl);
+		let data = await response.json()
+		await model.createEntities(data);
 	}
 
 	if(setup.loadPopUp){
 		$("#RootLoadPopUp").jqxWindow("close");		
 	}
 }
-
-
-
-
 
 
 var application = (function() {

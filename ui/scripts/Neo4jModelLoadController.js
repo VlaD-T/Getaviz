@@ -11,20 +11,23 @@ var neo4jModelLoadController = (function () {
         events.filtered.off.subscribe(checkAndLoadNodesById); // packageExplorer - by showing the element
     };
 
-    function getStartData() {
-        console.log(controllerConfig.loadStartData);
-    };
-
-    async function loadRootPackages() {
-        const payload = {
-            'statements': [
-                // neo4j requires keyword "statement", so leave as is
-                { 'statement': `MATCH (n) WHERE n.nodeHashId ="${nodeId}" RETURN n` }
-            ]
+    async function getStartData() {
+        let payload = {}
+        if (controllerConfig.loadStartData === 'rootPackages') {
+            console.log('Load root packages');
+            payload = {
+                'statements': [
+                    // neo4j requires keyword "statement", so leave as is
+                    { 'statement': `MATCH (p:Package) WHERE NOT (:Package)-[:CONTAINS]->(p) RETURN p` }
+                ]
+            }
+        } else { // load all
+            console.log('Load everything');
         }
 
         let response = await getNeo4jData(payload);
-    }
+        return response;
+    };
 
     async function checkAndLoadNodesById(applicationEvent) {
         try {
