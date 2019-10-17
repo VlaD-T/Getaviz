@@ -25,206 +25,15 @@ var model = (function() {
 	let paths = [];
 	let labels = [];
 
-	function initialize(famixModel) {            
+	function createEntities(elements) {            
 		//create initial entites from famix elements 
-		famixModel.forEach(function(element) {
+		elements.forEach(function(element) {
 			
 			if(element.type === undefined){
 				console.log("element.type undefined");
 			}
 
-			let entity = createEntity(
-				element.type.substring(element.type.indexOf(".") + 1), 
-				element.id, 
-				element.name, 
-				element.qualifiedName, 
-				element.belongsTo,
-                element.antipattern,
-                element.roles,
-				element.isTransparent,
-				element.version
-			);
-			
-			entity.isTransparent = false;
-			entity.isLoaded = false;
-			entity.mustBeTransparent = false;
-						
-			switch(entity.type) {
-				case "text":
-                    entity.versions = element.versions.split(",");
-                    for(let i = 0; i < entity.versions.length; ++i) {
-                        entity.versions[i] = entity.versions[i].trim();
-                    }
-                    entity.versions.forEach(function(version){
-                        if(version !== undefined) {
-                            if(entitiesByVersion.has(version)) {
-                                let map = entitiesByVersion.get(version);
-                                map.push(entity);
-                                entitiesByVersion.set(version, map);
-                            } else {
-                                addVersion(version);
-                                let map = [];
-                                map.push(entity);
-                                entitiesByVersion.set(version, map);
-                            }
-                        }
-                    });
-                    labels.push(entity);
-                    break;
-				case "issue":
-					entity.open = (element.open === "true");
-                    entity.security = (element.security === "true");
-					entity.qualifiedName = entity.id;
-					issues.push(entity);
-                    issuesById.set(entity.id, entity);
-					break;
-
-				case "path":
-					entity.start = element.start;
-					entity.end = element.end;
-					entity.role = element.role;
-					paths.push(entity);
-					break;
-                case "stk":
-                    entity.versions = element.versions.split(",");
-                    for(let i = 0; i < entity.versions.length; ++i) {
-                    	entity.versions[i] = entity.versions[i].trim();
-                    }
-                    return;
-				case "component": 
-					entity.components = element.components.split(",");
-					entity.versions = element.versions.split(",");
-					return;
-				case "Project" :
-				case "Namespace":
-					entity.version = element.version;
-					if(entity.version !== undefined) {
-						if(entitiesByVersion.has(entity.version)) {
-							let map = entitiesByVersion.get(entity.version);
-							map.push(entity);
-							entitiesByVersion.set(entity.version, map);
-						} else {
-							addVersion(entity.version);
-							let map = [];
-							map.push(entity);
-							entitiesByVersion.set(entity.version, map);
-						}
-					}
-					break;
-
-				case "Class":
-					entity.superTypes = element.subClassOf.split(",");
-					entity.subTypes = element.superClassOf.split(",");
-					if(element.reaches !== undefined) {
-                        entity.reaches = element.reaches.split(",");
-                    } else {
-						entity.reaches = [];
-					}
-					entity.reachedBy = [];
-                                        if(entity.antipattern !== false) {
-                                            entity.antipattern = element.antipattern.split(",");
-                                        } else {
-                                            entity.antipattern = [];
-                                        }
-                                        if(entity.roles !== undefined) {
-                                            entity.roles = element.roles.split(",");
-                                        } else {
-                                            entity.roles = [];
-                                        }
-                                        entity.component = element.component;
-                    entity.version = element.version;
-					entity.betweennessCentrality = element.betweennessCentrality;
-					entity.changeFrequency = element.changeFrequency;
-					if(entity.version !== undefined) {
-						if(entitiesByVersion.has(entity.version)) {
-							let map = entitiesByVersion.get(entity.version);
-							map.push(entity);
-							entitiesByVersion.set(entity.version, map);
-						} else {
-							addVersion(entity.version);
-							let map = [];
-							map.push(entity);
-							entitiesByVersion.set(entity.version, map);
-						}
-					}
-					if(element.issues !== undefined) {
-                        entity.issues = element.issues.split(",");
-                    } else {
-						entity.issues = [];
-					}
-                  	for(let i = 0; i < entity.issues.length; ++i) {
-                        entity.issues[i] = entity.issues[i].trim();
-                    }
-                    entity.issues.forEach(function(issue) {
-                        if(entitiesByIssue.has(issue)) {
-                            let map = entitiesByIssue.get(issue);
-                        	map.push(entity);
-                            entitiesByIssue.set(issue, map);
-                        } else {
-                            addIssue(issue);
-                            let map = [];
-                            map.push(entity);
-                            entitiesByIssue.set(issue, map);
-                        }
-                    });
-					entity.numberOfOpenIssues = element.numberOfOpenIssues;
-					entity.numberOfClosedIssues = element.numberOfClosedIssues;
-					entity.numberOfClosedSecurityIssues = element.numberOfClosedSecurityIssues;
-					entity.numberOfOpenSecurityIssues = element.numberOfOpenSecurityIssues;
-
-					break;
-				case  "ParameterizableClass":
-					entity.superTypes = element.subClassOf.split(",");
-					entity.subTypes = element.superClassOf.split(",");
-					break;			
-				case "Attribute":
-					if(element.accessedBy){
-						entity.accessedBy = element.accessedBy.split(",");
-					} else {
-						entity.accessedBy = [];
-					}
-					break;
-				case "Method":
-					entity.signature = element.signature;
-					
-					let pathParts = entity.qualifiedName.split("_");
-					let pathString = pathParts[0];
-					let path = pathString.split(".");
-					path = path.splice(0, path.length - 1);
-					let methodSignature = entity.signature.split(" ");
-					methodSignature = methodSignature.splice(1, methodSignature.length);
-					
-					entity.qualifiedName = "";
-					path.forEach(function(pathPart){
-						entity.qualifiedName = entity.qualifiedName + pathPart + ".";
-					});
-					methodSignature.forEach(function(methodSignaturePart){
-						entity.qualifiedName = entity.qualifiedName + methodSignaturePart + " ";
-					});
-					
-					entity.qualifiedName = entity.qualifiedName.trim();
-					
-					if(element.calls){
-						entity.calls = element.calls.split(",");
-					} else {
-						entity.calls = [];
-					}
-					if(element.calledBy){
-						entity.calledBy = element.calledBy.split(",");
-					} else {
-						entity.calledBy = [];
-					}
-					if(element.accesses){						
-						entity.accesses = element.accesses.split(",");
-					} else {
-						entity.accesses = [];
-					}
-					break;				
-				default: 
-					return;
-			}
-						
-			entitiesById.set(element.id, entity);
+			createEntity(element);
 		});
 
 		//set object references
@@ -426,38 +235,207 @@ var model = (function() {
 			entityMap.clear();			
 		});
 	}
-	
-	/*
-element.type.substring(element.type.indexOf(".") + 1), 
-				element.id, 
-				element.name, 
-				element.qualifiedName, 
-				element.belongsTo,
-                element.antipattern,
-                element.roles,
-				element.isTransparent,
-				element.version,
-				element.mustBeTransparent // for new elements, which are not loaded yet
-	*/
-	
-	function createEntity(type, id, name, qualifiedName, belongsTo){
+
+	function createEntity(element){
 		let entity = {
-			type: type,
-			id: id,
-			name: name,
-			qualifiedName: qualifiedName,
-			belongsTo: belongsTo,
+			type: element.type.substring(element.type.indexOf(".") + 1),
+			id: element.id, 
+			name: element.name, 
+			qualifiedName: element.qualifiedName, 
+			belongsTo: element.belongsTo,
+			antipattern: element.antipattern,
+			roles: element.roles,
+			isTransparent: element.isTransparent,
+			version: element.version,
 			children: []						
 		};
+		
+		entity.isTransparent = false;
+		entity.isLoaded = false;
+		entity.mustBeTransparent = false;
 		
 		const statesArray = Object.keys(states);
 		statesArray.forEach(function(stateName){
 			entity[stateName] = false;
 		});
-                
-		entitiesById.set(id, entity);
+
 		
-		return entity;
+		switch(entity.type) {
+			case "text":
+				entity.versions = element.versions.split(",");
+				for(let i = 0; i < entity.versions.length; ++i) {
+					entity.versions[i] = entity.versions[i].trim();
+				}
+				entity.versions.forEach(function(version){
+					if(version !== undefined) {
+						if(entitiesByVersion.has(version)) {
+							let map = entitiesByVersion.get(version);
+							map.push(entity);
+							entitiesByVersion.set(version, map);
+						} else {
+							addVersion(version);
+							let map = [];
+							map.push(entity);
+							entitiesByVersion.set(version, map);
+						}
+					}
+				});
+				labels.push(entity);
+				break;
+			case "issue":
+				entity.open = (element.open === "true");
+				entity.security = (element.security === "true");
+				entity.qualifiedName = entity.id;
+				issues.push(entity);
+				issuesById.set(entity.id, entity);
+				break;
+
+			case "path":
+				entity.start = element.start;
+				entity.end = element.end;
+				entity.role = element.role;
+				paths.push(entity);
+				break;
+			case "stk":
+				entity.versions = element.versions.split(",");
+				for(let i = 0; i < entity.versions.length; ++i) {
+					entity.versions[i] = entity.versions[i].trim();
+				}
+				return;
+			case "component": 
+				entity.components = element.components.split(",");
+				entity.versions = element.versions.split(",");
+				return;
+			case "Project" :
+			case "Namespace":
+				entity.version = element.version;
+				if(entity.version !== undefined) {
+					if(entitiesByVersion.has(entity.version)) {
+						let map = entitiesByVersion.get(entity.version);
+						map.push(entity);
+						entitiesByVersion.set(entity.version, map);
+					} else {
+						addVersion(entity.version);
+						let map = [];
+						map.push(entity);
+						entitiesByVersion.set(entity.version, map);
+					}
+				}
+				break;
+
+			case "Class":
+				entity.superTypes = element.subClassOf.split(",");
+				entity.subTypes = element.superClassOf.split(",");
+				if(element.reaches !== undefined) {
+					entity.reaches = element.reaches.split(",");
+				} else {
+					entity.reaches = [];
+				}
+				entity.reachedBy = [];
+									if(entity.antipattern !== false) {
+										entity.antipattern = element.antipattern.split(",");
+									} else {
+										entity.antipattern = [];
+									}
+									if(entity.roles !== undefined) {
+										entity.roles = element.roles.split(",");
+									} else {
+										entity.roles = [];
+									}
+									entity.component = element.component;
+				entity.version = element.version;
+				entity.betweennessCentrality = element.betweennessCentrality;
+				entity.changeFrequency = element.changeFrequency;
+				if(entity.version !== undefined) {
+					if(entitiesByVersion.has(entity.version)) {
+						let map = entitiesByVersion.get(entity.version);
+						map.push(entity);
+						entitiesByVersion.set(entity.version, map);
+					} else {
+						addVersion(entity.version);
+						let map = [];
+						map.push(entity);
+						entitiesByVersion.set(entity.version, map);
+					}
+				}
+				if(element.issues !== undefined) {
+					entity.issues = element.issues.split(",");
+				} else {
+					entity.issues = [];
+				}
+				  for(let i = 0; i < entity.issues.length; ++i) {
+					entity.issues[i] = entity.issues[i].trim();
+				}
+				entity.issues.forEach(function(issue) {
+					if(entitiesByIssue.has(issue)) {
+						let map = entitiesByIssue.get(issue);
+						map.push(entity);
+						entitiesByIssue.set(issue, map);
+					} else {
+						addIssue(issue);
+						let map = [];
+						map.push(entity);
+						entitiesByIssue.set(issue, map);
+					}
+				});
+				entity.numberOfOpenIssues = element.numberOfOpenIssues;
+				entity.numberOfClosedIssues = element.numberOfClosedIssues;
+				entity.numberOfClosedSecurityIssues = element.numberOfClosedSecurityIssues;
+				entity.numberOfOpenSecurityIssues = element.numberOfOpenSecurityIssues;
+
+				break;
+			case  "ParameterizableClass":
+				entity.superTypes = element.subClassOf.split(",");
+				entity.subTypes = element.superClassOf.split(",");
+				break;			
+			case "Attribute":
+				if(element.accessedBy){
+					entity.accessedBy = element.accessedBy.split(",");
+				} else {
+					entity.accessedBy = [];
+				}
+				break;
+			case "Method":
+				entity.signature = element.signature;
+				
+				let pathParts = entity.qualifiedName.split("_");
+				let pathString = pathParts[0];
+				let path = pathString.split(".");
+				path = path.splice(0, path.length - 1);
+				let methodSignature = entity.signature.split(" ");
+				methodSignature = methodSignature.splice(1, methodSignature.length);
+				
+				entity.qualifiedName = "";
+				path.forEach(function(pathPart){
+					entity.qualifiedName = entity.qualifiedName + pathPart + ".";
+				});
+				methodSignature.forEach(function(methodSignaturePart){
+					entity.qualifiedName = entity.qualifiedName + methodSignaturePart + " ";
+				});
+				
+				entity.qualifiedName = entity.qualifiedName.trim();
+				
+				if(element.calls){
+					entity.calls = element.calls.split(",");
+				} else {
+					entity.calls = [];
+				}
+				if(element.calledBy){
+					entity.calledBy = element.calledBy.split(",");
+				} else {
+					entity.calledBy = [];
+				}
+				if(element.accesses){						
+					entity.accesses = element.accesses.split(",");
+				} else {
+					entity.accesses = [];
+				}
+				break;				
+			default: 
+				return;
+		}
+
+		return entitiesById.set(entity.id, entity);
 	}
 	
 	function removeEntity(id){
@@ -634,7 +612,7 @@ element.type.substring(element.type.indexOf(".") + 1),
 	}
 	
 	return {
-        initialize					: initialize,
+        createEntities				: createEntities,
 		reset						: reset,
 		states						: states,
 		

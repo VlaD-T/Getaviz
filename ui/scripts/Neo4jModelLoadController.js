@@ -11,7 +11,7 @@ var neo4jModelLoadController = (function () {
         events.filtered.off.subscribe(checkAndLoadNodesById); // packageExplorer - by showing the element
     };
 
-    function loadStartData() {
+    function getStartData() {
         console.log(controllerConfig.loadStartData);
     };
 
@@ -80,6 +80,6 @@ var neo4jModelLoadController = (function () {
 
     return {
         initialize: initialize,
-        loadStartData: loadStartData
+        getStartData: getStartData
     };
 })();

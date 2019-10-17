@@ -39,10 +39,10 @@ function initializeApplication(metaDataJson){
 	//create entity model
 	if (canvas.localName === 'a-scene') { // for A-Frame
 		// let rootPackages = await 
-		neo4jModelLoadController.loadStartData();
-		model.initialize(metaDataJson); // must be replaced
+		neo4jModelLoadController.getStartData();
+		model.createEntities(metaDataJson); // must be replaced
 	} else {
-		model.initialize(metaDataJson);
+		model.createEntities(metaDataJson);
 	}
 
 	if(setup.loadPopUp){
