@@ -42,8 +42,7 @@ var model = (function() {
                 element.antipattern,
                 element.roles,
 				element.isTransparent,
-				element.version,
-				element.mustBeTransparent // for new elements, which are not loaded yet
+				element.version
 			);
 			
 			entity.isTransparent = false;
@@ -428,7 +427,18 @@ var model = (function() {
 		});
 	}
 	
-	
+	/*
+element.type.substring(element.type.indexOf(".") + 1), 
+				element.id, 
+				element.name, 
+				element.qualifiedName, 
+				element.belongsTo,
+                element.antipattern,
+                element.roles,
+				element.isTransparent,
+				element.version,
+				element.mustBeTransparent // for new elements, which are not loaded yet
+	*/
 	
 	function createEntity(type, id, name, qualifiedName, belongsTo){
 		let entity = {

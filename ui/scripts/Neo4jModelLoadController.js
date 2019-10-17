@@ -1,6 +1,8 @@
 var neo4jModelLoadController = (function () {
 
     let controllerConfig = {
+        url: 'http://localhost:7474/db/data/transaction/commit',
+        loadStartData: 'rootPackages'
     };
 
     function initialize(setupConfig) {
@@ -9,9 +11,20 @@ var neo4jModelLoadController = (function () {
         events.filtered.off.subscribe(checkAndLoadNodesById); // packageExplorer - by showing the element
     };
 
-    function activate() {
-        // ToDo: load main packages
+    function loadStartData() {
+        console.log(controllerConfig.loadStartData);
     };
+
+    async function loadRootPackages() {
+        const payload = {
+            'statements': [
+                // neo4j requires keyword "statement", so leave as is
+                { 'statement': `MATCH (n) WHERE n.nodeHashId ="${nodeId}" RETURN n` }
+            ]
+        }
+
+        let response = await getNeo4jData(payload);
+    }
 
     async function checkAndLoadNodesById(applicationEvent) {
         try {
@@ -40,7 +53,6 @@ var neo4jModelLoadController = (function () {
     }
 
     async function loadNodeById(nodeId) {
-        const url = 'http://localhost:7474/db/data/transaction/commit';
         const payload = {
             'statements': [
                 // neo4j requires keyword "statement", so leave as is
@@ -48,8 +60,13 @@ var neo4jModelLoadController = (function () {
             ]
         }
 
+        let response = await getNeo4jData(payload);
+        return response;
+    }
+
+    async function getNeo4jData(payload) {
         // Receive all the data and proceed
-        let response = await fetch(url, {
+        let response = await fetch(controllerConfig.url, {
             method: 'POST', 
             body: JSON.stringify(payload), 
             headers: {
@@ -63,6 +80,6 @@ var neo4jModelLoadController = (function () {
 
     return {
         initialize: initialize,
-        activate: activate
+        loadStartData: loadStartData
     };
 })();

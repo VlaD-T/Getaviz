@@ -19,7 +19,7 @@ $(document).ready(function () {
 		});		
 	}
 	//load famix data
-	$.getJSON( metaDataJsonUrl, initializeApplication);
+	$.getJSON(metaDataJsonUrl, initializeApplication);
 });
 
 function initializeApplication(metaDataJson){
@@ -30,14 +30,20 @@ function initializeApplication(metaDataJson){
 		return;
 	}
 
-	//create entity model
-	model.initialize(metaDataJson);
-
 	actionController.initialize();
 	canvasManipulator.initialize();
 
 	//initialize application
 	application.initialize();
+
+	//create entity model
+	if (canvas.localName === 'a-scene') { // for A-Frame
+		// let rootPackages = await 
+		neo4jModelLoadController.loadStartData();
+		model.initialize(metaDataJson); // must be replaced
+	} else {
+		model.initialize(metaDataJson);
+	}
 
 	if(setup.loadPopUp){
 		$("#RootLoadPopUp").jqxWindow("close");		

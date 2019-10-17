@@ -13,7 +13,8 @@
         },	
         {   name: "aframeModelLoadController"
         },
-        {   name: "neo4jModelLoadController"
+        {   name: "neo4jModelLoadController",
+            loadStartData: "all" //all, rootPackages
         },
 		
 		{	name:	"emailController",
