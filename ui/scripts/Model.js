@@ -11,7 +11,7 @@ var model = (function() {
 		componentSelected : { name: "componentSelected" },
 		antipattern     : { name: "antipattern" },
 		versionSelected : { name: "versionSelected" },
-		addedToDOM		: { name: "addedToDOM" }
+		loaded  		: { name: "loaded" }
     };
 
 	let entitiesById = new Map();
@@ -223,10 +223,13 @@ var model = (function() {
 			});		
 		});
 
+		let applicationEvent = {			
+			sender: 	model,
+			entities:   elements
+		};
+		events.loaded.on.publish(applicationEvent);
 		return packageExplorerController.reset();
-    }
-	
-	
+    }	
 	
 	
 	function reset(){
@@ -457,9 +460,9 @@ var model = (function() {
 		return parents;
 	}
 
-	function changeAddedToDOMState(id) {
+	function changeEntityLoadedState(id) {
 		let entity = entitiesById.get(id);
-		entity.addedToDOM = true;
+		entity.loaded = true;
 		return entitiesById.set(entity.id, entity);
 	}
 	
@@ -469,12 +472,13 @@ var model = (function() {
 	
 	function getEntityById(id){
 		let entity = entitiesById.get(id);
-		if (entity.addedToDOM) {
-			return entity;
-		} else {
-			neo4jModelLoadController.changeStateAndLoadNodeById(id);
-			return entity;
-		}
+		return entity;
+		// if (entity.addedToDOM) {
+		// 	return entity;
+		// } else {
+		// 	neo4jModelLoadController.changeStateAndLoadNodeById(id);
+		// 	return entity;
+		// }
 	}
 
     function getIssuesById(id){
@@ -640,7 +644,7 @@ var model = (function() {
 		createEntity				: createEntity,
 		removeEntity				: removeEntity,
 
-		changeAddedToDOMState		: changeAddedToDOMState,
+		changeEntityLoadedState		: changeEntityLoadedState,
 		addVersion                  : addVersion,
 		removeVersion               : removeVersion,
 		addIssue					: addIssue,

@@ -9,6 +9,7 @@ var neo4jModelLoadController = (function () {
         application.transferConfigParams(setupConfig, controllerConfig);
         // events.selected.on.subscribe(checkAndLoadNodesById); // packageExplorer - by activating the element
         // events.filtered.off.subscribe(checkAndLoadNodesById); // packageExplorer - by showing the element
+        events.loaded.on.subscribe(changeStateAndLoadElements);
     };
 
     async function getStartData() {
@@ -29,52 +30,52 @@ var neo4jModelLoadController = (function () {
         return response;
     };
 
-    
-    async function changeStateAndLoadNodeById(entityID) {
-        try {
-            if (!entityID) {
-                return;
-            }
-
-            let results = await loadNodeById(entityID);
-            for (result of results) {
-                // There may be some empty entites, like buildingSegments. They don't have any data, so we can't create an element for them.
-                if (result.data[0]) {
-                    canvasManipulator.appendAframeElementWithProperties(result.data[0]);
-                }
-            }
-
-            model.changeAddedToDOMState(entityID); //Change the status, so that we don't create the same DOM element again. 
-        } catch (error) {
-            console.error(error);
-        }
-    };
-
-    // async function checkAndLoadNodesById(applicationEvent) {
+    // async function changeStateAndLoadNodeById(entityId) {
     //     try {
-    //         for (entity of applicationEvent.entities) {
-    //             //Element must be in entities, but not in DOM. 
-    //             let alreadyAddedToDOM = await checkIfElementIsInDOM(entity.id);
-    //             if (alreadyAddedToDOM) {
-    //                 continue;
-    //             }
+    //         if (!entityId) {
+    //             return;
+    //         }
 
-    //             model.changeAddedToDOMStatus(entity.id); //Change the status, so that we don't create the same DOM element again. 
-    //             let results = await loadNodeById(entity.id);
-    //             for (result of results) {
-    //                 // There may be some empty entites, like buildingSegments. They don't have any data, so we can't create an element for them.
-    //                 if (result.data[0]) {
-    //                     canvasManipulator.appendAframeElementWithProperties(result.data[0]);
-    //                 }
+    //         let results = await loadNodeById(entityId);
+    //         for (result of results) {
+    //             // There may be some empty entites, like buildingSegments. They don't have any data, so we can't create an element for them.
+    //             if (result.data[0]) {
+    //                 canvasManipulator.appendAframeElementWithProperties(result.data[0]);
     //             }
     //         }
+
+    //         model.changeEntityLoadedState(entityId); //Change the status, so that we don't create the same DOM element again. 
     //     } catch (error) {
     //         console.error(error);
     //     }
     // };
 
+    async function changeStateAndLoadElements(applicationEvent) {
+        try {
+            for (entity of applicationEvent.entities) {
+                //Element must be in entities, but not in DOM. 
+                let isInDOM = await checkIfElementIsInDOM(entity.id);
+                if (isInDOM) {
+                    continue;
+                }
+
+                let results = await loadNodeById(entity.id);
+                for (result of results) {
+                    // There may be some empty entites, like buildingSegments. They don't have any data, so we can't create an element for them.
+                    if (result.data[0]) {
+                        canvasManipulator.appendAframeElementWithProperties(result.data[0]);
+                    }
+                }
+
+                model.changeEntityLoadedState(entity.id); //Change the status, so that we don't create the same DOM element again. 
+            }
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
     async function checkIfElementIsInDOM(nodeId) {
-        return model.getEntityById(nodeId).addedToDOM;
+        return model.getEntityById(nodeId).loaded;
     }
 
     async function loadNodeById(nodeId) {
@@ -106,6 +107,7 @@ var neo4jModelLoadController = (function () {
     return {
         initialize: initialize,
         getStartData: getStartData,
-        changeStateAndLoadNodeById: changeStateAndLoadNodeById
+        // changeStateAndLoadNodeById: changeStateAndLoadNodeById,
+        // changeStateAndLoadElements: changeStateAndLoadElements
     };
 })();
