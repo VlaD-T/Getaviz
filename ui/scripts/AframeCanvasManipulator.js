@@ -41,7 +41,9 @@ var canvasManipulator = (function () {
                 Object.keys(this.schema).forEach(key => {
                     this.el.setAttribute(`${key}`, this.data[key]);                
                 })
-                // this.el.setAttribute('visible', 'false');
+
+                // Per default set new element to be invisible. This parameter will be changed via other controllers, like relationsController.
+                this.el.setAttribute('visible', 'false');
             }
         });
     }
