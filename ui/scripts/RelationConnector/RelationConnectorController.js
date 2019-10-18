@@ -96,9 +96,7 @@ var relationConnectorController = function(){
 		//remove relation entities
 		relations.forEach(function(relation){
 			 model.removeEntity(relation);
-		});
-		
-		
+		});		
 		
 		//publish removed entities
 		var applicationEvent = {			

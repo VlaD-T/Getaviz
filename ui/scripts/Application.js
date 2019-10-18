@@ -18,14 +18,12 @@ $(document).ready(function () {
 			resizable: false
 		});		
 	}
-	
+
 	// timeout, to make sure the scene is loaded
 	setTimeout(function(){initializeApplication(metaDataJsonUrl);}, 1000);
 });
 
 async function initializeApplication(metaDataJsonUrl){
-	let canvas = document.getElementById(canvasId);
-
 	actionController.initialize();
 	canvasManipulator.initialize();
 
@@ -33,14 +31,15 @@ async function initializeApplication(metaDataJsonUrl){
 	application.initialize();
 
 	//create entity model
-	if (canvas.localName === 'a-scene') { // for A-Frame
-		// let startData = await neo4jModelLoadController.getStartData();
-		// model.createEntities(startData);
-
+	if (setup.useMetaDataFile == true) { 
 		let response = await fetch(metaDataJsonUrl);
 		let data = await response.json()
 		await model.createEntities(data);
-	} else {
+	} else { // Load data from Neo4j
+		// let startData = await neo4jModelLoadController.getStartData();
+		// model.createEntities(startData);
+
+		// Testing the normal behavior. Will be removed for a-frame.
 		let response = await fetch(metaDataJsonUrl);
 		let data = await response.json()
 		await model.createEntities(data);
@@ -53,8 +52,6 @@ async function initializeApplication(metaDataJsonUrl){
 
 
 var application = (function() {
-	
-
 	var controllerFileFolder = "scripts/";
 	
 	var controllers = new Map();

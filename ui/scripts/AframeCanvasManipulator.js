@@ -41,6 +41,7 @@ var canvasManipulator = (function () {
                 Object.keys(this.schema).forEach(key => {
                     this.el.setAttribute(`${key}`, this.data[key]);                
                 })
+                // this.el.setAttribute('visible', 'false');
             }
         });
     }
@@ -249,15 +250,12 @@ var canvasManipulator = (function () {
     }
 
     function getElementIds() { 
-        let allEntities = model.getAllEntities();
+        let sceneArray = document.querySelectorAll('.city-element')
         let elementIds = [];
-        // set opacity for not loaded elements, so that they appear transparent after any other element was selected 
-        allEntities.forEach(entity => {
-            elementIds.push(entity.id);
-            if (!entity.isLoaded) {
-                entity.mustBeTransparent = true;
-            }
-        })
+        sceneArray.forEach(sceneElement => {
+            elementIds.push(sceneElement.id);
+        });
+
         return elementIds;
     }
 
