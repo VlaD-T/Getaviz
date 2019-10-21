@@ -25,17 +25,17 @@ var model = (function() {
 	let paths = [];
 	let labels = [];
 
-	async function createEntities(elements) {            
+	function createEntities(elements) {            
 		//create initial entites from famix elements 
-		// elements.forEach(function(element) {
-			for (element of elements) {
+		elements.forEach(function(element) {
+			// for (element of elements) {
 			
 			if(element.type === undefined){
 				console.log("element.type undefined");
 			}
 
-			await createEntity(element);
-		};
+			createEntity(element);
+		});
 
 		//set object references
 		entitiesById.forEach(function(entity) {
@@ -244,7 +244,7 @@ var model = (function() {
 		});
 	}
 
-	async function createEntity(element){
+	function createEntity(element){
 		let entity = {
 			type: element.type.substring(element.type.indexOf(".") + 1),
 			id: element.id, 
@@ -448,7 +448,6 @@ var model = (function() {
 		};
 		entitiesById.set(entity.id, entity);
 		events.loaded.on.publish(applicationEvent);
-		//return entitiesById.set(entity.id, entity);
 	}
 	
 	function removeEntity(id){

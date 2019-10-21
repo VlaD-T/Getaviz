@@ -55,11 +55,7 @@ var neo4jModelLoadController = (function () {
 
     function checkIfElementIsInDOM(nodeId) {
         entity = model.getEntityById(nodeId)
-        if (entity) {
-            return model.getEntityById(nodeId).loaded;
-        } else {
-            return false;
-        }
+        return entity ? entity.loaded : false
     }
 
     async function loadNodeById(nodeId) {
@@ -90,8 +86,6 @@ var neo4jModelLoadController = (function () {
 
     return {
         initialize: initialize,
-        getStartData: getStartData,
-        // changeStateAndLoadNodeById: changeStateAndLoadNodeById,
-        // changeStateAndLoadElements: changeStateAndLoadElements
+        getStartData: getStartData
     };
 })();
