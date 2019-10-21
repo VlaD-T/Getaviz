@@ -104,3 +104,8 @@ td {
     padding: 400px;
     text-align: center;
 }
+
+/* .hidden{
+    cursor: none;
+} */
+/* document.querySelector('[visible=""]');  */

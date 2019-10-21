@@ -42,8 +42,8 @@ var canvasManipulator = (function () {
                     this.el.setAttribute(`${key}`, this.data[key]);                
                 })
 
-                // Per default set new element to be invisible. This parameter will be changed via other controllers, like relationsController.
-                this.el.setAttribute('visible', 'false');
+                // Per default set new element to be invisible. This parameter will be changed via other controllers, like packageExplorer.
+                this.el.setAttribute('visible', true);
             }
         });
     }

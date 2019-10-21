@@ -7,8 +7,6 @@ var neo4jModelLoadController = (function () {
 
     function initialize(setupConfig) {
         application.transferConfigParams(setupConfig, controllerConfig);
-        // events.selected.on.subscribe(checkAndLoadNodesById); // packageExplorer - by activating the element
-        // events.filtered.off.subscribe(checkAndLoadNodesById); // packageExplorer - by showing the element
         events.loaded.on.subscribe(changeStateAndLoadElements);
     };
 
@@ -30,31 +28,11 @@ var neo4jModelLoadController = (function () {
         return response;
     };
 
-    // async function changeStateAndLoadNodeById(entityId) {
-    //     try {
-    //         if (!entityId) {
-    //             return;
-    //         }
-
-    //         let results = await loadNodeById(entityId);
-    //         for (result of results) {
-    //             // There may be some empty entites, like buildingSegments. They don't have any data, so we can't create an element for them.
-    //             if (result.data[0]) {
-    //                 canvasManipulator.appendAframeElementWithProperties(result.data[0]);
-    //             }
-    //         }
-
-    //         model.changeEntityLoadedState(entityId); //Change the status, so that we don't create the same DOM element again. 
-    //     } catch (error) {
-    //         console.error(error);
-    //     }
-    // };
-
     async function changeStateAndLoadElements(applicationEvent) {
         try {
             for (entity of applicationEvent.entities) {
                 //Element must be in entities, but not in DOM. 
-                let isInDOM = await checkIfElementIsInDOM(entity.id);
+                let isInDOM = checkIfElementIsInDOM(entity.id);
                 if (isInDOM) {
                     continue;
                 }
@@ -63,6 +41,7 @@ var neo4jModelLoadController = (function () {
                 for (result of results) {
                     // There may be some empty entites, like buildingSegments. They don't have any data, so we can't create an element for them.
                     if (result.data[0]) {
+                        console.log('append Element')
                         canvasManipulator.appendAframeElementWithProperties(result.data[0]);
                     }
                 }
@@ -74,8 +53,13 @@ var neo4jModelLoadController = (function () {
         }
     };
 
-    async function checkIfElementIsInDOM(nodeId) {
-        return model.getEntityById(nodeId).loaded;
+    function checkIfElementIsInDOM(nodeId) {
+        entity = model.getEntityById(nodeId)
+        if (entity) {
+            return model.getEntityById(nodeId).loaded;
+        } else {
+            return false;
+        }
     }
 
     async function loadNodeById(nodeId) {

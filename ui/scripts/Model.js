@@ -27,14 +27,15 @@ var model = (function() {
 
 	async function createEntities(elements) {            
 		//create initial entites from famix elements 
-		elements.forEach(function(element) {
+		// elements.forEach(function(element) {
+			for (element of elements) {
 			
 			if(element.type === undefined){
 				console.log("element.type undefined");
 			}
 
-			createEntity(element);
-		});
+			await createEntity(element);
+		};
 
 		//set object references
 		entitiesById.forEach(function(entity) {
@@ -223,11 +224,13 @@ var model = (function() {
 			});		
 		});
 
-		let applicationEvent = {			
-			sender: 	model,
-			entities:   elements
-		};
-		events.loaded.on.publish(applicationEvent);
+		// Add Element to DOM and refresh controllers
+		// let applicationEvent = {			
+		// 	sender: 	model,
+		// 	entities:   elements
+		// };
+		// events.loaded.on.publish(applicationEvent);
+		console.log('Package reset')
 		return packageExplorerController.reset();
     }	
 	
@@ -241,7 +244,7 @@ var model = (function() {
 		});
 	}
 
-	function createEntity(element){
+	async function createEntity(element){
 		let entity = {
 			type: element.type.substring(element.type.indexOf(".") + 1),
 			id: element.id, 
@@ -437,7 +440,15 @@ var model = (function() {
 				return;
 		}
 
-		return entitiesById.set(entity.id, entity);
+		// Add Element to DOM and refresh controllers
+		let elements = [entity]
+		let applicationEvent = {			
+			sender: 	model,
+			entities:   elements
+		};
+		entitiesById.set(entity.id, entity);
+		events.loaded.on.publish(applicationEvent);
+		//return entitiesById.set(entity.id, entity);
 	}
 	
 	function removeEntity(id){
