@@ -50,7 +50,7 @@ public class City2AFrame {
 						+ config.getBuildingTypeAsString() + "\' RETURN d,p")
 				.forEachRemaining((record) -> {
 					//districts.append(toDistrict(record.get("d").asNode(), record.get("p").asNode()));
-					writeAframePropertiesToNeo4jNode(record.get("d").asNode(), toDistrict2(record.get("d").asNode(), record.get("p").asNode()));
+					writeAframePropertiesToNeo4jNode(record.get("d").asNode(), toJSONDistrict(record.get("d").asNode(), record.get("p").asNode()));
 				});
 
 		if (config.getBuildingType() == BuildingType.CITY_ORIGINAL || config.isShowBuildingBase()) {
@@ -59,7 +59,7 @@ public class City2AFrame {
 							+ config.getBuildingTypeAsString() + "\' RETURN b,p")
 					.forEachRemaining((record) -> {
 						//buildings.append(toBuilding(record.get("b").asNode(), record.get("p").asNode()));
-						writeAframePropertiesToNeo4jNode(record.get("b").asNode(), toBuilding2(record.get("b").asNode(), record.get("p").asNode()));
+						writeAframePropertiesToNeo4jNode(record.get("b").asNode(), toJSONBuilding(record.get("b").asNode(), record.get("p").asNode()));
 					});
 		}
 
@@ -91,8 +91,7 @@ public class City2AFrame {
 				"MATCH (n) \n" +
 				"WHERE ID(n) = " + node.id() + "\n" +
 				"SET n.nodeHashId = \'" + entity.get("hash").asString() + "\' \n" +
-				"SET n.aframeProperty = \'" + aframeProperty + "\' \n" +
-				"RETURN n"
+				"SET n.aframeProperty = \'" + aframeProperty + "\' \n"
 		);
 	}
 
@@ -147,7 +146,7 @@ public class City2AFrame {
 	}
 
 	// For tests (write as property and not as an element)
-	private String toDistrict2(Node district, Node position) {
+	private String toJSONDistrict(Node district, Node position) {
 		Node entity = connector.getVisualizedEntity(district.id());
 		StringBuilder builder = new StringBuilder();
 		builder.append("{");
@@ -166,7 +165,7 @@ public class City2AFrame {
 	}
 
 	// For tests (write as property and not as an element)
-	private String toBuilding2(Node building, Node position) {
+	private String toJSONBuilding(Node building, Node position) {
 		Node entity = connector.getVisualizedEntity(building.id());
 		StringBuilder builder = new StringBuilder();
 		builder.append("{");

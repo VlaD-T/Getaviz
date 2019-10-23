@@ -103,8 +103,7 @@ var model = (function() {
 					});
 					entity.reaches = reaches;
 					let antipatterns = [];
-					entity.antipattern.forEach(function(antipatternID
-					) {
+					entity.antipattern.forEach(function(antipatternID) {
 						let antipattern = entitiesById.get(antipatternID.trim());
 						if(antipattern !== undefined) {
 							antipatterns.push(antipattern);
@@ -113,8 +112,7 @@ var model = (function() {
 					entity.antipattern = antipatterns;
 					
 					let roles = [];
-					entity.roles.forEach(function(roleID
-					) {
+					entity.roles.forEach(function(roleID) {
 						//var role = entitiesById.get(roleID.trim());
 						const role = roleID.trim();
 						if(role !== undefined) {

@@ -5,6 +5,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
+import com.sun.org.apache.xpath.internal.objects.XString;
 import org.apache.commons.lang3.StringUtils;
 import org.getaviz.generator.database.Labels;
 import org.getaviz.generator.SettingsConfiguration;
@@ -89,6 +91,15 @@ public class JQA2JSON {
 		return builder.toString();
 	}
 
+	// It is possible to use metadata.json file and neo4j to receive the required information now.
+	private void writeMetadataToNeo4jNode(Node node, String metadata) {
+		connector.executeWrite(
+				"MATCH (n) \n" +
+						"WHERE ID(n) = " + node.id() + "\n" +
+						"SET n.metadata = \'" + metadata + "\' \n"
+		);
+	}
+
 	private String toMetaDataNamespace(Node namespace) {
 		StatementResult parentHash = connector
 				.executeRead("MATCH (parent:Package)-[:CONTAINS]->(namespace) WHERE ID(namespace) = " + namespace.id()
@@ -108,6 +119,13 @@ public class JQA2JSON {
 		builder.append("\n");
 		builder.append("\"belongsTo\":     \"" + belongsTo + "\"");
 		builder.append("\n");
+
+		StringBuilder metadata = new StringBuilder();
+		metadata.append("{");
+		metadata.append(builder.toString());
+		metadata.append("}");
+
+		writeMetadataToNeo4jNode(namespace, metadata.toString());
 		return builder.toString();
 	}
 
@@ -139,6 +157,13 @@ public class JQA2JSON {
 		builder.append("\n");
 		builder.append("\"belongsTo\":     \"" + belongsTo + "\"");
 		builder.append("\n");
+
+		StringBuilder metadata = new StringBuilder();
+		metadata.append("{");
+		metadata.append(builder.toString());
+		metadata.append("}");
+
+		writeMetadataToNeo4jNode(c, metadata.toString());
 		return builder.toString();
 	}
 
@@ -174,6 +199,13 @@ public class JQA2JSON {
 		builder.append("\n");
 		builder.append("\"belongsTo\":     \"" + belongsTo + "\"");
 		builder.append("\n");
+
+		StringBuilder metadata = new StringBuilder();
+		metadata.append("{");
+		metadata.append(builder.toString());
+		metadata.append("}");
+
+		writeMetadataToNeo4jNode(attribute, metadata.toString());
 		return builder.toString();
 	}
 
@@ -210,6 +242,13 @@ public class JQA2JSON {
 		builder.append("\n");
 		builder.append("\"belongsTo\":     \"" + belongsTo + "\"");
 		builder.append("\n");
+
+		StringBuilder metadata = new StringBuilder();
+		metadata.append("{");
+		metadata.append(builder.toString());
+		metadata.append("}");
+
+		writeMetadataToNeo4jNode(method, metadata.toString());
 		return builder.toString();
 	}
 
@@ -233,6 +272,13 @@ public class JQA2JSON {
 	    builder.append("\n");
 	    builder.append("\"belongsTo\":     \"" + belongsTo + "\"");
 	    builder.append("\n");
+
+		StringBuilder metadata = new StringBuilder();
+		metadata.append("{");
+		metadata.append(builder.toString());
+		metadata.append("}");
+
+		writeMetadataToNeo4jNode(e, metadata.toString());
 	    return builder.toString();
 	}
 
@@ -254,6 +300,13 @@ public class JQA2JSON {
 	    builder.append("\n");
 	    builder.append("\"belongsTo\":     \"" + belongsTo + "\"");
 	    builder.append("\n");
+
+		StringBuilder metadata = new StringBuilder();
+		metadata.append("{");
+		metadata.append(builder.toString());
+		metadata.append("}");
+
+		writeMetadataToNeo4jNode(ev, metadata.toString());
 	    return builder.toString();
 	}
 
@@ -281,6 +334,13 @@ public class JQA2JSON {
 	    builder.append("\n");
 	    builder.append("\"belongsTo\":     \"" + belongsTo + "\"");
 	    builder.append("\n");
+
+		StringBuilder metadata = new StringBuilder();
+		metadata.append("{");
+		metadata.append(builder.toString());
+		metadata.append("}");
+
+		writeMetadataToNeo4jNode(annotation, metadata.toString());
 	    return builder.toString();
 	}
 
