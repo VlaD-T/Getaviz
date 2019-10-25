@@ -13,7 +13,7 @@ var neo4jModelLoadController = (function () {
     function initialize(setupConfig) {
         application.transferConfigParams(setupConfig, controllerConfig);
         events.loaded.on.subscribe(changeStateAndLoadElements);
-        events.loaded.off.subscribe(updateLoadSpinner);
+        events.loaded.off.subscribe(updateLoadSpinner(-1));
         if (controllerConfig.showLoadSpinner) {
             createLoadSpinner();
         }
@@ -66,6 +66,7 @@ var neo4jModelLoadController = (function () {
                     continue;
                 }
 
+                updateLoadSpinner(1);
                 let results = await loadNodeById(entity.id);
                 for (result of results) {
                     // There may be some empty entites, like buildingSegments. They don't have any data, so we can't create an element for them.
