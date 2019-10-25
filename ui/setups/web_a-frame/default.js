@@ -13,7 +13,8 @@
 			logEventConsole		: false
         },	
         {   name: "neo4jModelLoadController",
-            loadStartData: "rootPackages" //all, rootPackages
+            loadStartData: "rootPackages", //all, rootPackages
+            showLoadSpinner: true
         },
 		
 		{	name:	"emailController",

@@ -2,13 +2,42 @@ var neo4jModelLoadController = (function () {
 
     let controllerConfig = {
         url: 'http://localhost:7474/db/data/transaction/commit',
-        loadStartData: 'rootPackages'
+        loadStartData: 'rootPackages',
+        showLoadSpinner: true
     };
+
+    let loaderController = {
+        dataToLoad = 0
+    }
 
     function initialize(setupConfig) {
         application.transferConfigParams(setupConfig, controllerConfig);
         events.loaded.on.subscribe(changeStateAndLoadElements);
+        events.loaded.off.subscribe(updateLoadSpinner);
+        if (controllerConfig.showLoadSpinner) {
+            createLoadSpinner();
+        }
     };
+
+    function createLoadSpinner() {
+        let loader = document.createElement('div');
+        loader.id = 'loaderController';
+        loader.className = 'hidden';
+        loader.innerHTML = '<div class="loaderController-roller"><div class="loader">Loading...</div><div id="loaderController-data"></div>';
+        document.body.appendChild(loader);
+    }
+
+    function updateLoadSpinner(payload) { // payload = +- 1;
+        let loader = document.getElementById('loaderController');
+        loaderController.dataToLoad += payload;
+        if (loaderController.dataToLoad !== 0) {
+            loader.classList.remove('hidden');
+            let loaderData = document.getElementById('loaderController-data');
+            loaderData.innerHTML = `Loading elements: ${loaderController.dataToLoad}`;
+        } else {
+            loader.classList.add('hidden');
+        }
+    }
 
     async function getStartData() {
         let payload = {}
