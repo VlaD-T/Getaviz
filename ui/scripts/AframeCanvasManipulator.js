@@ -44,7 +44,6 @@ var canvasManipulator = (function () {
 
                 // Per default set new element to be invisible. This parameter will be changed via other controllers, like packageExplorer.
                 this.el.setAttribute('visible', true);
-                events.loaded.off.publish();
             }
         });
     }
@@ -270,6 +269,13 @@ var canvasManipulator = (function () {
         entityEl.setAttribute('set-aframe-attributes', aframeObject); // this attributes will be set after element is created
         let sceneEl = document.querySelector('a-scene');
         sceneEl.appendChild(entityEl);
+
+        //publish entity loaded
+        let applicationEvent = {			
+            sender: canvasManipulator,
+            value: 'loaded'
+        };
+        events.loaded.off.publish(applicationEvent);
     }
 
     return {

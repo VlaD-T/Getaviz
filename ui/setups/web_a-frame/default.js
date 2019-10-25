@@ -14,7 +14,7 @@
         },	
         {   name: "neo4jModelLoadController",
             loadStartData: "rootPackages", //all, rootPackages
-            showLoadSpinner: true
+            showLoadSpinner: false
         },
 		
 		{	name:	"emailController",

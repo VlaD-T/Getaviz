@@ -3,17 +3,23 @@ var neo4jModelLoadController = (function () {
     let controllerConfig = {
         url: 'http://localhost:7474/db/data/transaction/commit',
         loadStartData: 'rootPackages',
-        showLoadSpinner: true
+        showLoadSpinner: false
     };
 
     let loaderController = {
-        dataToLoad = 0
-    }
+        dataToLoad: 0
+    };
+
+    //Add to loader
+    let loaderApplicationEvent = {			
+        sender: neo4jModelLoadController,
+        value: 'toLoad'
+    };
 
     function initialize(setupConfig) {
         application.transferConfigParams(setupConfig, controllerConfig);
         events.loaded.on.subscribe(changeStateAndLoadElements);
-        events.loaded.off.subscribe(updateLoadSpinner(-1));
+        events.loaded.off.subscribe(updateLoadSpinner);
         if (controllerConfig.showLoadSpinner) {
             createLoadSpinner();
         }
@@ -28,8 +34,11 @@ var neo4jModelLoadController = (function () {
     }
 
     function updateLoadSpinner(payload) { // payload = +- 1;
+        if (!controllerConfig.showLoadSpinner) {
+            return;
+        }
         let loader = document.getElementById('loaderController');
-        loaderController.dataToLoad += payload;
+        payload.value === 'toLoad'? loaderController.dataToLoad ++ : loaderController.dataToLoad--
         if (loaderController.dataToLoad !== 0) {
             loader.classList.remove('hidden');
             let loaderData = document.getElementById('loaderController-data');
@@ -66,13 +75,19 @@ var neo4jModelLoadController = (function () {
                     continue;
                 }
 
-                updateLoadSpinner(1);
+                loaderApplicationEvent.value = 'toLoad'
+                updateLoadSpinner(loaderApplicationEvent);
+
                 let results = await loadNodeById(entity.id);
                 for (result of results) {
                     // There may be some empty entites, like buildingSegments. They don't have any data, so we can't create an element for them.
                     if (result.data[0]) {
-                        console.log('append Element')
+                        // console.log('append Element') // to test event loop
+                        // Start drawing element
                         canvasManipulator.appendAframeElementWithProperties(result.data[0]);
+                    } else {
+                        loaderApplicationEvent.value = 'loaded'
+                        updateLoadSpinner(loaderApplicationEvent);
                     }
                 }
 
