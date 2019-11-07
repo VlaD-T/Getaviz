@@ -1,7 +1,7 @@
 ﻿var setup = {
 
     loadPopUp: true,
-    useMetaDataFile: true,
+    useMetaDataFile: false,
 
 		
 	controllers: [	
@@ -14,7 +14,7 @@
         },	
         {   name: "neo4jModelLoadController",
             loadStartData: "rootPackages", //all, rootPackages
-            showLoadSpinner: false
+            showLoadSpinner: true
         },
 		
 		{	name:	"emailController",

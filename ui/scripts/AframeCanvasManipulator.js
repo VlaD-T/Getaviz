@@ -43,7 +43,7 @@ var canvasManipulator = (function () {
                 })
 
                 // Per default set new element to be invisible. This parameter will be changed via other controllers, like packageExplorer.
-                this.el.setAttribute('visible', true);
+                this.el.setAttribute('visible', false);
             }
         });
     }

@@ -195,6 +195,10 @@ var canvasHoverController = (function() {
 	
 	function onEntityUnhover(applicationEvent) {
 		var entity = applicationEvent.entities[0];
+
+		if(entity.isTransparent === true) {
+			return;
+		}
 		
 		if(entity.marked && entity.selected){
 			canvasManipulator.highlightEntities([entity], controllerConfig.hoverColor);	

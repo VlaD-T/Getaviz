@@ -56,14 +56,27 @@ var neo4jModelLoadController = (function () {
                 'statements': [
                     // neo4j requires keyword "statement", so leave as is
                     { 'statement': `MATCH (p:Package) WHERE NOT (:Package)-[:CONTAINS]->(p) RETURN p` }
+                    // { 'statement': `MATCH (p:Package) RETURN p` }
                 ]
             }
         } else { // load all
             console.log('Load everything');
         }
 
+        // If no elements found
         let response = await getNeo4jData(payload);
-        return response;
+        let data = [];
+        if (!response[0].data.length) {
+            return data;
+        }
+
+        // Add all metadata information from response
+        for (object of response[0].data) {
+            let metadataProperty = object.row[0].metadata;
+            let metadataObject = JSON.parse(`${metadataProperty}`); // create an object
+            data.push(metadataObject);
+        }
+        return data; // proceed with Model.js
     };
 
     async function changeStateAndLoadElements(applicationEvent) {
