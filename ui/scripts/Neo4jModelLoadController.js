@@ -48,8 +48,9 @@ var neo4jModelLoadController = (function () {
         }
     }
 
+    // Get entites on launch. Either rootPackages or all (depends on settings)
     async function getStartData() {
-        let payload = {}
+        let payload = {};
         if (controllerConfig.loadStartData === 'rootPackages') {
             console.log('Load root packages');
             payload = {
@@ -78,6 +79,11 @@ var neo4jModelLoadController = (function () {
             data.push(metadataObject);
         }
         return data; // proceed with Model.js
+    };
+
+    async function getChildNodes(nodeId) {
+        let payload = {};
+        let childRelations = ['CONTAINS', 'HAS']
     };
 
     async function changeStateAndLoadElements(applicationEvent) {
