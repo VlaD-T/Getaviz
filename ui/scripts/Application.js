@@ -30,7 +30,7 @@ async function initializeApplication(metaDataJsonUrl){
 	//initialize application
 	application.initialize();
 
-	//create entity model
+	// add entities
 	if (setup.useMetaDataFile == true) { 
 		let response = await fetch(metaDataJsonUrl);
 		let data = await response.json()

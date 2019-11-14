@@ -70,8 +70,9 @@ var neo4jModelLoadController = (function () {
             return data;
         }
 
-        // Add all metadata information from response
+        // Add all metadata information from response (may be more root packages)
         for (object of response[0].data) {
+            console.log(object)
             let metadataProperty = object.row[0].metadata;
             let metadataObject = JSON.parse(`${metadataProperty}`); // create an object
             data.push(metadataObject);
@@ -95,7 +96,7 @@ var neo4jModelLoadController = (function () {
                 for (result of results) {
                     // There may be some empty entites, like buildingSegments. They don't have any data, so we can't create an element for them.
                     if (result.data[0]) {
-                        // console.log('append Element') // to test event loop
+                        // console.log('append Element') // to test an event loop
                         // Start drawing element
                         canvasManipulator.appendAframeElementWithProperties(result.data[0]);
                     } else {

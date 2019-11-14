@@ -32,7 +32,6 @@
 	    <script type="text/javascript" src="scripts/RelationConnector/AframeRelationConnectorController.js"></script>
 	    <script type="text/javascript" src="scripts/CanvasHover/AframeCanvasHoverController.js"></script>
         <script type="text/javascript" src="scripts/camera-beta.js"></script>
-        <script type="text/javascript" src="scripts/Neo4jModelLoadController.js"></script>
 EOT;
         $canvasId = "aframe-canvas";
         $visMode = "aframe";
@@ -167,7 +166,8 @@ EOT;
     <script type="text/javascript" src="scripts/Filter/FilterController.js"></script>
 
     <!--user interface-->
-	<script type="text/javascript" src="scripts/DefaultLogger.js"></script>
+    <script type="text/javascript" src="scripts/DefaultLogger.js"></script>
+    <script type="text/javascript" src="scripts/Neo4jModelLoadController.js"></script>
 	<script type="text/javascript" src="scripts/Model.js"></script>	
 	<script type="text/javascript" src="scripts/Events.js"></script>
 
