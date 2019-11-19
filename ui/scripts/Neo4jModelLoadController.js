@@ -18,8 +18,9 @@ var neo4jModelLoadController = (function () {
 
     function initialize(setupConfig) {
         application.transferConfigParams(setupConfig, controllerConfig);
-        events.loaded123.on.subscribe(changeStateAndLoadElements);
-        events.loaded123.off.subscribe(updateLoadSpinner);
+        events.loadedNew.on.subscribe(changeStateAndLoadElements);
+        // events.loadedNew.off.subscribe(changeStateAndLoadElements);
+        // events.loadedNew.off.subscribe(updateLoadSpinner);
         if (controllerConfig.showLoadSpinner) {
             createLoadSpinner();
         }
@@ -123,7 +124,8 @@ var neo4jModelLoadController = (function () {
                 // if (isInDOM) {
                 //     continue;
                 // }
-                if (entity.loaded123) {
+                if (entity.loadedNew) {
+                    console.log(entity.id, ' : ', entity.loadedNew);
                     continue;
                 }
 

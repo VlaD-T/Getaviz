@@ -11,7 +11,8 @@ var model = (function() {
 		componentSelected : { name: "componentSelected" },
 		antipattern     : { name: "antipattern" },
 		versionSelected : { name: "versionSelected" },
-		loaded123  		: { name: "loaded" }
+		// loaded123  		: { name: "loaded123" },
+		loadedNew		: { name: "loadedNew" }
     };
 
 	let entitiesById = new Map();
@@ -133,35 +134,35 @@ var model = (function() {
 			}
 		});
 
-        //set all parents attribute
-		entitiesById.forEach(function(entity) {
-			entity.allParents = getAllParentsOfEntity(entity);
-		});
+        // //set all parents attribute
+		// entitiesById.forEach(function(entity) {
+		// 	entity.allParents = getAllParentsOfEntity(entity);
+		// });
 			
 						
-		//subscribe for changing status of entities on events
-		let eventArray = Object.keys(states);
-		eventArray.forEach(function(eventName){
+		// //subscribe for changing status of entities on events
+		// let eventArray = Object.keys(states);
+		// eventArray.forEach(function(eventName){
 			
-			let event = events[eventName];
+		// 	let event = events[eventName];
 			
-			let eventMap = new Map();
-			eventEntityMap.set(event, eventMap);
+		// 	let eventMap = new Map();
+		// 	eventEntityMap.set(event, eventMap);
 			
-			event.on.subscribe(function(applicationEvent){
-				applicationEvent.entities.forEach(function(entity){
-					entity[event.name] = true;				
-					eventMap.set(entity.id, entity);
-				});				
-			});		
+		// 	event.on.subscribe(function(applicationEvent){
+		// 		applicationEvent.entities.forEach(function(entity){
+		// 			entity[event.name] = true;				
+		// 			eventMap.set(entity.id, entity);
+		// 		});				
+		// 	});		
 			
-			event.off.subscribe(function(applicationEvent){
-				applicationEvent.entities.forEach(function(entity){
-					entity[event.name] = false;
-					eventMap.delete(entity.id);
-				});
-			});		
-		});
+		// 	event.off.subscribe(function(applicationEvent){
+		// 		applicationEvent.entities.forEach(function(entity){
+		// 			entity[event.name] = false;
+		// 			eventMap.delete(entity.id);
+		// 		});
+		// 	});		
+		// });
 
 		// Add Element to DOM and refresh controllers
 		// let applicationEvent = {			
@@ -170,7 +171,7 @@ var model = (function() {
 		// };
 		// events.loaded.on.publish(applicationEvent);
 		console.log('Package reset')
-		return packageExplorerController.reset();
+		// return packageExplorerController.reset();
     }	
 	
 	
@@ -203,8 +204,6 @@ var model = (function() {
 		statesArray.forEach(function(stateName){
 			entity[stateName] = false;
 		});
-
-		// entity.loaded = false;
 		
 		switch(entity.type) {
 			case "Project" :
@@ -281,13 +280,14 @@ var model = (function() {
 		}
 
 		// Add Element to DOM and refresh controllers
+		entity.loadedNew = "test";
 		let elements = [entity]
 		let applicationEvent = {			
 			sender: 	model,
 			entities:   elements
 		};
 		entitiesById.set(entity.id, entity);
-		events.loaded123.on.publish(applicationEvent);
+		events.loadedNew.on.publish(applicationEvent);
 	}
 	
 	function removeEntity(id){
