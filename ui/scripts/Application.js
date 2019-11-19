@@ -34,15 +34,9 @@ async function initializeApplication(metaDataJsonUrl){
 	if (setup.useMetaDataFile == true) { 
 		let response = await fetch(metaDataJsonUrl);
 		let data = await response.json()
-		await model.createEntities(data);
+		model.createEntities(data);
 	} else { // Load data from Neo4j
-		let startData = await neo4jModelLoadController.getStartData();
-		await model.createEntities(startData);
-
-		// // Testing the normal behavior. Will be removed for a-frame.
-		// let response = await fetch(metaDataJsonUrl);
-		// let data = await response.json()
-		// await model.createEntities(data);
+		neo4jModelLoadController.getStartData();
 	}
 
 	if(setup.loadPopUp){

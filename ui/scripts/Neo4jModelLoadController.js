@@ -18,8 +18,8 @@ var neo4jModelLoadController = (function () {
 
     function initialize(setupConfig) {
         application.transferConfigParams(setupConfig, controllerConfig);
-        events.loaded.on.subscribe(changeStateAndLoadElements);
-        events.loaded.off.subscribe(updateLoadSpinner);
+        events.loaded123.on.subscribe(changeStateAndLoadElements);
+        events.loaded123.off.subscribe(updateLoadSpinner);
         if (controllerConfig.showLoadSpinner) {
             createLoadSpinner();
         }
@@ -56,42 +56,74 @@ var neo4jModelLoadController = (function () {
             payload = {
                 'statements': [
                     // neo4j requires keyword "statement", so leave as is
-                    { 'statement': `MATCH (p:Package) WHERE NOT (:Package)-[:CONTAINS]->(p) RETURN p` }
-                    // { 'statement': `MATCH (p:Package) RETURN p` }
+                    // { 'statement': `MATCH (p:Package) WHERE NOT (:Package)-[:CONTAINS]->(p) RETURN p` }
+                    { 'statement': `MATCH (p:Package) RETURN p` }
                 ]
             }
         } else { // load all
             console.log('Load everything');
         }
 
-        // If no elements found
+        let response = await getNeo4jData(payload);
+        let data = [];
+        let childNodes = [];
+        if (!response[0].data.length) {
+            return;
+        }
+
+        // Add all metadata information from response (may be more root packages)
+        for (object of response[0].data) {
+            // console.log(object)
+            let metadataProperty = object.row[0].metadata;
+            let metadataObject = JSON.parse(`${metadataProperty}`); // create an object
+            data.push(metadataObject);
+
+            // Get any child node to show the expand sign
+            let singleChildNode = await getChildNodes(object.row[0].hash, 1);
+            childNodes.push(...singleChildNode);
+        }
+
+        model.createEntities(data)
+        model.createEntities(childNodes);
+        // return data; // proceed with Model.js
+    };
+
+    async function getChildNodes(parentNodeHash, limitNum) {
+        let limit = '';
+        if (limitNum > 0) {
+            limit = `LIMIT ${limitNum}`;
+        }
+        let payload = {
+            'statements': [
+                // neo4j requires keyword "statement", so leave as is
+                { 'statement': `MATCH (parent)-[:DECLARES|HAS|CONTAINS]->(child) WHERE parent.hash = "${parentNodeHash}" AND EXISTS(child.hash) RETURN child ${limit}` }
+            ]
+        };
+
         let response = await getNeo4jData(payload);
         let data = [];
         if (!response[0].data.length) {
             return data;
         }
 
-        // Add all metadata information from response (may be more root packages)
         for (object of response[0].data) {
-            console.log(object)
             let metadataProperty = object.row[0].metadata;
             let metadataObject = JSON.parse(`${metadataProperty}`); // create an object
             data.push(metadataObject);
         }
-        return data; // proceed with Model.js
-    };
 
-    async function getChildNodes(nodeId) {
-        let payload = {};
-        let childRelations = ['CONTAINS', 'HAS']
-    };
+        return data;
+    }
 
     async function changeStateAndLoadElements(applicationEvent) {
         try {
             for (entity of applicationEvent.entities) {
                 //Element must be in entities, but not in DOM. 
-                let isInDOM = checkIfElementIsInDOM(entity.id);
-                if (isInDOM) {
+                // let isInDOM = checkIfElementIsInDOM(entity.id);
+                // if (isInDOM) {
+                //     continue;
+                // }
+                if (entity.loaded123) {
                     continue;
                 }
 
@@ -109,9 +141,9 @@ var neo4jModelLoadController = (function () {
                         loaderApplicationEvent.value = 'loaded'
                         updateLoadSpinner(loaderApplicationEvent);
                     }
-                }
 
-                model.changeEntityLoadedState(entity.id); //Change the status, so that we don't create the same DOM element again. 
+                    // model.changeEntityLoadedState(entity.id); //Change the status, so that we don't create the same DOM element again. 
+                }
             }
         } catch (error) {
             console.error(error);

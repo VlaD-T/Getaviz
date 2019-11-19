@@ -1,6 +1,7 @@
 ﻿var setup = {
 
-	loadPopUp: true,
+    loadPopUp: true,
+    useMetaDataFile: false,
 
 		
 	controllers: [	

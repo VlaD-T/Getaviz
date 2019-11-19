@@ -112,7 +112,9 @@ var packageExplorerController = (function() {
            }
 			if(item !== undefined) {
                 items.push(item);
-            }
+			}
+			
+			// console.log(item)
 		});
 		
 		//Sortierung nach Typ und Alphanumerisch

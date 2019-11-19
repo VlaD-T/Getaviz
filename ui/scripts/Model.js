@@ -11,7 +11,7 @@ var model = (function() {
 		componentSelected : { name: "componentSelected" },
 		antipattern     : { name: "antipattern" },
 		versionSelected : { name: "versionSelected" },
-		loaded  		: { name: "loaded" }
+		loaded123  		: { name: "loaded" }
     };
 
 	let entitiesById = new Map();
@@ -29,7 +29,11 @@ var model = (function() {
 		//create initial entites from famix elements 
 		elements.forEach(function(element) {
 			// for (element of elements) {
-			
+			let entityExists = getEntityById(element.id);
+			if (entityExists) {
+				return;
+			}
+
 			if(element.type === undefined){
 				console.log("element.type undefined");
 			}
@@ -37,7 +41,7 @@ var model = (function() {
 			createEntity(element);
 		});
 
-		//set object references
+		//set object references - if set wrong, package Explorer will show wrong structure
 		entitiesById.forEach(function(entity) {
 			
 			if(entity.belongsTo === undefined || entity.belongsTo === "root" ){
@@ -60,20 +64,7 @@ var model = (function() {
                 case "text":
                     break;
 				case "issue":
-					break;
-                            
-                case "component":
-                    let components = [];
-                    entity.components.forEach(function(componentId) {
-                       const relatedEntity = entitiesById.get(componentId.trim());
-                       if(relatedEntity !== undefined) {
-                           components.push(relatedEntity);
-                       }
-                    });
-                    entity.components = components;
-                    break;
-                                
-                                
+					break;                              
 				case "Class":
 					superTypes = [];
 					entity.superTypes.forEach(function(superTypeId){
@@ -91,58 +82,9 @@ var model = (function() {
 							subTypes.push(relatedEntity);
 						}
 					});
-					entity.subTypes = subTypes;
-                                        
-                    let reaches = [];
-					entity.reaches.forEach(function(reachesId){
-						const relatedEntity = entitiesById.get(reachesId.trim());
-						if(relatedEntity !== undefined){
-							reaches.push(relatedEntity);
-							relatedEntity.reachedBy.push(entity);
-						}
-					});
-					entity.reaches = reaches;
-					let antipatterns = [];
-					entity.antipattern.forEach(function(antipatternID) {
-						let antipattern = entitiesById.get(antipatternID.trim());
-						if(antipattern !== undefined) {
-							antipatterns.push(antipattern);
-						}
-					});
-					entity.antipattern = antipatterns;
-					
-					let roles = [];
-					entity.roles.forEach(function(roleID) {
-						//var role = entitiesById.get(roleID.trim());
-						const role = roleID.trim();
-						if(role !== undefined) {
-							roles.push(role);
-						}
-					});
-					entity.roles = roles;
-					
-					break;
-				
-				case  "ParameterizableClass":
-					superTypes = [];
-					entity.superTypes.forEach(function(superTypeId){
-						let relatedEntity = entitiesById.get(superTypeId.trim());
-						if(relatedEntity !== undefined){
-							superTypes.push(relatedEntity);
-						}
-					});
-					entity.superTypes = superTypes;
-					
-					subTypes = [];
-					entity.subTypes.forEach(function(subTypesId){
-						let relatedEntity = entitiesById.get(subTypesId.trim());
-						if(relatedEntity !== undefined){
-							subTypes.push(relatedEntity);
-						}
-					});
-					entity.subTypes = subTypes;		
-					
-					break;			
+					entity.subTypes = subTypes;	
+
+					break;		
 				
 				case "Attribute":	
 					let accessedBy = [];
@@ -195,8 +137,7 @@ var model = (function() {
 		entitiesById.forEach(function(entity) {
 			entity.allParents = getAllParentsOfEntity(entity);
 		});
-		
-						
+			
 						
 		//subscribe for changing status of entities on events
 		let eventArray = Object.keys(states);
@@ -262,68 +203,12 @@ var model = (function() {
 		statesArray.forEach(function(stateName){
 			entity[stateName] = false;
 		});
+
+		// entity.loaded = false;
 		
 		switch(entity.type) {
-			case "text":
-				entity.versions = element.versions.split(",");
-				for(let i = 0; i < entity.versions.length; ++i) {
-					entity.versions[i] = entity.versions[i].trim();
-				}
-				entity.versions.forEach(function(version){
-					if(version !== undefined) {
-						if(entitiesByVersion.has(version)) {
-							let map = entitiesByVersion.get(version);
-							map.push(entity);
-							entitiesByVersion.set(version, map);
-						} else {
-							addVersion(version);
-							let map = [];
-							map.push(entity);
-							entitiesByVersion.set(version, map);
-						}
-					}
-				});
-				labels.push(entity);
-				break;
-			case "issue":
-				entity.open = (element.open === "true");
-				entity.security = (element.security === "true");
-				entity.qualifiedName = entity.id;
-				issues.push(entity);
-				issuesById.set(entity.id, entity);
-				break;
-
-			case "path":
-				entity.start = element.start;
-				entity.end = element.end;
-				entity.role = element.role;
-				paths.push(entity);
-				break;
-			case "stk":
-				entity.versions = element.versions.split(",");
-				for(let i = 0; i < entity.versions.length; ++i) {
-					entity.versions[i] = entity.versions[i].trim();
-				}
-				return;
-			case "component": 
-				entity.components = element.components.split(",");
-				entity.versions = element.versions.split(",");
-				return;
 			case "Project" :
 			case "Namespace":
-				entity.version = element.version;
-				if(entity.version !== undefined) {
-					if(entitiesByVersion.has(entity.version)) {
-						let map = entitiesByVersion.get(entity.version);
-						map.push(entity);
-						entitiesByVersion.set(entity.version, map);
-					} else {
-						addVersion(entity.version);
-						let map = [];
-						map.push(entity);
-						entitiesByVersion.set(entity.version, map);
-					}
-				}
 				break;
 
 			case "Class":
@@ -335,62 +220,19 @@ var model = (function() {
 					entity.reaches = [];
 				}
 				entity.reachedBy = [];
-									if(entity.antipattern !== false) {
-										entity.antipattern = element.antipattern.split(",");
-									} else {
-										entity.antipattern = [];
-									}
-									if(entity.roles !== undefined) {
-										entity.roles = element.roles.split(",");
-									} else {
-										entity.roles = [];
-									}
-									entity.component = element.component;
-				entity.version = element.version;
-				entity.betweennessCentrality = element.betweennessCentrality;
-				entity.changeFrequency = element.changeFrequency;
-				if(entity.version !== undefined) {
-					if(entitiesByVersion.has(entity.version)) {
-						let map = entitiesByVersion.get(entity.version);
-						map.push(entity);
-						entitiesByVersion.set(entity.version, map);
-					} else {
-						addVersion(entity.version);
-						let map = [];
-						map.push(entity);
-						entitiesByVersion.set(entity.version, map);
-					}
-				}
-				if(element.issues !== undefined) {
-					entity.issues = element.issues.split(",");
+				if(entity.antipattern !== false) {
+					entity.antipattern = element.antipattern.split(",");
 				} else {
-					entity.issues = [];
+					entity.antipattern = [];
 				}
-				  for(let i = 0; i < entity.issues.length; ++i) {
-					entity.issues[i] = entity.issues[i].trim();
+				if(entity.roles !== undefined) {
+					entity.roles = element.roles.split(",");
+				} else {
+					entity.roles = [];
 				}
-				entity.issues.forEach(function(issue) {
-					if(entitiesByIssue.has(issue)) {
-						let map = entitiesByIssue.get(issue);
-						map.push(entity);
-						entitiesByIssue.set(issue, map);
-					} else {
-						addIssue(issue);
-						let map = [];
-						map.push(entity);
-						entitiesByIssue.set(issue, map);
-					}
-				});
-				entity.numberOfOpenIssues = element.numberOfOpenIssues;
-				entity.numberOfClosedIssues = element.numberOfClosedIssues;
-				entity.numberOfClosedSecurityIssues = element.numberOfClosedSecurityIssues;
-				entity.numberOfOpenSecurityIssues = element.numberOfOpenSecurityIssues;
-
+				entity.component = element.component;
 				break;
-			case  "ParameterizableClass":
-				entity.superTypes = element.subClassOf.split(",");
-				entity.subTypes = element.superClassOf.split(",");
-				break;			
+			
 			case "Attribute":
 				if(element.accessedBy){
 					entity.accessedBy = element.accessedBy.split(",");
@@ -445,7 +287,7 @@ var model = (function() {
 			entities:   elements
 		};
 		entitiesById.set(entity.id, entity);
-		events.loaded.on.publish(applicationEvent);
+		events.loaded123.on.publish(applicationEvent);
 	}
 	
 	function removeEntity(id){
@@ -481,12 +323,6 @@ var model = (function() {
 	function getEntityById(id){
 		let entity = entitiesById.get(id);
 		return entity;
-		// if (entity.addedToDOM) {
-		// 	return entity;
-		// } else {
-		// 	neo4jModelLoadController.changeStateAndLoadNodeById(id);
-		// 	return entity;
-		// }
 	}
 
     function getIssuesById(id){
