@@ -25,7 +25,7 @@ var model = (function() {
 	let paths = [];
 	let labels = [];
 
-
+	// Called from Application.js, because Event.js is loaded after Model.js
 	function initEntityEvents() {
 		//subscribe for changing status of entities on events
 		let eventArray = Object.keys(states);
@@ -177,7 +177,6 @@ var model = (function() {
 			entity.allParents = getAllParentsOfEntity(entity);
 		});				
 
-		console.log('Package reset')
 		return packageExplorerController.reset();
     }	
 	

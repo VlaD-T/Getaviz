@@ -185,7 +185,8 @@ var packageExplorerController = (function() {
             },
             callback: {
                 onCheck: zTreeOnCheck,
-                onClick: zTreeOnClick
+				onClick: zTreeOnClick,
+				beforeExpand: zTreeBeforeExpand
             },
             view:{
                 showLine: false,
@@ -231,7 +232,18 @@ var packageExplorerController = (function() {
 			entities: [model.getEntityById(treeNode.id)]
 		};
 		events.selected.on.publish(applicationEvent);
-    }
+	}
+	
+	function zTreeBeforeExpand(event, treeId, treeNode) {
+		// let nodes = tree.
+
+		// let applicationEvent = {
+		// 	sender: packageExplorerController,
+		// 	entities: [model.getEntityById(treeNode.id)]
+		// };
+		console.log('Tree expanded')
+		// required node id: treeId.id -> launch child node loading
+	}
 	
 	function onEntitySelected(applicationEvent) {
         if(applicationEvent.sender !== packageExplorerController) {

@@ -58,15 +58,15 @@ var neo4jModelLoadController = (function () {
             payload = {
                 'statements': [
                     // neo4j requires keyword "statement", so leave as is
-                    { 'statement': `MATCH (p:Package) WHERE NOT (:Package)-[:CONTAINS]->(p) RETURN p` }
-                    // { 'statement': `MATCH (p:Package) RETURN p` }
+                    // { 'statement': `MATCH (p:Package) WHERE NOT (:Package)-[:CONTAINS]->(p) RETURN p` }
+                    { 'statement': `MATCH (p:Package) RETURN p` }
                 ]
             }
         } else { // load everything
             console.log('Load everything');
         }
 
-        let response = await getNeo4jData(payload);
+        let response = await getNeo4jDataFromQuery(payload);
         let data = [];
         let childNodes = [];
         if (!response[0].data.length) {
@@ -101,7 +101,7 @@ var neo4jModelLoadController = (function () {
             ]
         };
 
-        let response = await getNeo4jData(payload);
+        let response = await getNeo4jDataFromQuery(payload);
         let data = [];
         if (!response[0].data.length) {
             return data;
@@ -137,20 +137,13 @@ var neo4jModelLoadController = (function () {
                     } else {
                         loaderApplicationEvent.value = 'loaded'
                         updateLoadSpinner(loaderApplicationEvent);
-                    }
-
-                    // model.changeEntityLoadedState(entity.id); //Change the status, so that we don't create the same DOM element again. 
+                    } 
                 }
             }
         } catch (error) {
             console.error(error);
         }
     };
-
-    // function checkIfElementIsInDOM(nodeId) {
-    //     entity = model.getEntityById(nodeId)
-    //     return entity ? entity.loaded : false
-    // }
 
     async function loadNodeById(nodeId) {
         const payload = {
@@ -160,11 +153,11 @@ var neo4jModelLoadController = (function () {
             ]
         }
 
-        let response = await getNeo4jData(payload);
+        let response = await getNeo4jDataFromQuery(payload);
         return response;
     }
 
-    async function getNeo4jData(payload) {
+    async function getNeo4jDataFromQuery(payload) {
         // Receive all the data and proceed
         let response = await fetch(controllerConfig.url, {
             method: 'POST', 
