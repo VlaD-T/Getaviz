@@ -88,6 +88,9 @@ var application = (function() {
 			return;
 		}
 
+		//initialize Events for entities
+		model.initEntityEvents();
+
 		//initialize controllers
 		setup.controllers.forEach(function(controller){
 			loadAndInitializeController(controller);

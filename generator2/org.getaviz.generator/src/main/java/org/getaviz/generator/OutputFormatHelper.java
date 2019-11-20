@@ -159,6 +159,8 @@ public class OutputFormatHelper {
 		builder.append("\n");
 		builder.append("\t\t    \t mouse-cursor=\"\"");
 		builder.append("\n");
+		builder.append("\t\t    \t raycaster=\"objects: .visible\"");
+		builder.append("\n");
 		builder.append("\t\t   \t\t >");
 		builder.append("\n");
 		builder.append("\t\t     </a-entity>");

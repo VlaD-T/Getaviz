@@ -11,8 +11,7 @@ var model = (function() {
 		componentSelected : { name: "componentSelected" },
 		antipattern     : { name: "antipattern" },
 		versionSelected : { name: "versionSelected" },
-		// loaded123  		: { name: "loaded123" },
-		loadedNew		: { name: "loadedNew" }
+		loaded			: { name: "loaded" }
     };
 
 	let entitiesById = new Map();
@@ -26,12 +25,39 @@ var model = (function() {
 	let paths = [];
 	let labels = [];
 
-	function createEntities(elements) {            
+
+	function initEntityEvents() {
+		//subscribe for changing status of entities on events
+		let eventArray = Object.keys(states);
+		eventArray.forEach(function(eventName){
+			
+			let event = events[eventName];
+			
+			let eventMap = new Map();
+			eventEntityMap.set(event, eventMap);
+			
+			event.on.subscribe(function(applicationEvent){
+				applicationEvent.entities.forEach(function(entity){
+					entity[event.name] = true;				
+					eventMap.set(entity.id, entity);
+				});				
+			});		
+			
+			event.off.subscribe(function(applicationEvent){
+				applicationEvent.entities.forEach(function(entity){
+					entity[event.name] = false;
+					eventMap.delete(entity.id);
+				});
+			});		
+		});
+	}
+
+	function createEntities(elements) {
+		let newEntities = [];            
 		//create initial entites from famix elements 
 		elements.forEach(function(element) {
-			// for (element of elements) {
-			let entityExists = getEntityById(element.id);
-			if (entityExists) {
+			let entityAlreadyInModel = getEntityById(element.id);
+			if (entityAlreadyInModel) {
 				return;
 			}
 
@@ -39,14 +65,26 @@ var model = (function() {
 				console.log("element.type undefined");
 			}
 
-			createEntity(element);
+			let entity = createEntity(element);
+			newEntities.push(entity);
+
+			// Add Element to DOM and refresh controllers
+			let elements = [entity]
+			let applicationEvent = {			
+				sender: 	model,
+				entities:   elements
+			};
+			entitiesById.set(entity.id, entity);
+			events.loaded.on.publish(applicationEvent);
 		});
 
 		//set object references - if set wrong, package Explorer will show wrong structure
-		entitiesById.forEach(function(entity) {
-			
+		newEntities.forEach(function(entity) {
+
 			if(entity.belongsTo === undefined || entity.belongsTo === "root" ){
 				delete entity.belongsTo;
+			} else if (typeof (entity.belongsTo) === 'object') {
+
 			} else {
 				let parent = entitiesById.get(entity.belongsTo);
 				if(parent === undefined)		{
@@ -134,44 +172,13 @@ var model = (function() {
 			}
 		});
 
-        // //set all parents attribute
-		// entitiesById.forEach(function(entity) {
-		// 	entity.allParents = getAllParentsOfEntity(entity);
-		// });
-			
-						
-		// //subscribe for changing status of entities on events
-		// let eventArray = Object.keys(states);
-		// eventArray.forEach(function(eventName){
-			
-		// 	let event = events[eventName];
-			
-		// 	let eventMap = new Map();
-		// 	eventEntityMap.set(event, eventMap);
-			
-		// 	event.on.subscribe(function(applicationEvent){
-		// 		applicationEvent.entities.forEach(function(entity){
-		// 			entity[event.name] = true;				
-		// 			eventMap.set(entity.id, entity);
-		// 		});				
-		// 	});		
-			
-		// 	event.off.subscribe(function(applicationEvent){
-		// 		applicationEvent.entities.forEach(function(entity){
-		// 			entity[event.name] = false;
-		// 			eventMap.delete(entity.id);
-		// 		});
-		// 	});		
-		// });
+        //set all parents attribute
+		newEntities.forEach(function(entity) {
+			entity.allParents = getAllParentsOfEntity(entity);
+		});				
 
-		// Add Element to DOM and refresh controllers
-		// let applicationEvent = {			
-		// 	sender: 	model,
-		// 	entities:   elements
-		// };
-		// events.loaded.on.publish(applicationEvent);
 		console.log('Package reset')
-		// return packageExplorerController.reset();
+		return packageExplorerController.reset();
     }	
 	
 	
@@ -279,21 +286,12 @@ var model = (function() {
 				return;
 		}
 
-		// Add Element to DOM and refresh controllers
-		entity.loadedNew = "test";
-		let elements = [entity]
-		let applicationEvent = {			
-			sender: 	model,
-			entities:   elements
-		};
-		entitiesById.set(entity.id, entity);
-		events.loadedNew.on.publish(applicationEvent);
+		return entity;
 	}
 	
 	function removeEntity(id){
 		entitiesById.delete(id);
 	}
-	
 	
 	
 	function getAllParentsOfEntity(entity){
@@ -311,9 +309,9 @@ var model = (function() {
 	}
 
 	function changeEntityLoadedState(id) {
-		let entity = entitiesById.get(id);
-		entity.loaded = true;
-		return entitiesById.set(entity.id, entity);
+		// let entity = entitiesById.get(id);
+		// entity.loaded = true;
+		// return entitiesById.set(entity.id, entity);
 	}
 	
 	function getAllEntities(){
@@ -467,6 +465,7 @@ var model = (function() {
 	}
 	
 	return {
+		initEntityEvents			: initEntityEvents,
         createEntities				: createEntities,
 		reset						: reset,
 		states						: states,

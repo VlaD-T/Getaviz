@@ -13,7 +13,7 @@
 			logEventConsole		: false
         },	
         {   name: "neo4jModelLoadController",
-            loadStartData: "rootPackages", //all, rootPackages
+            loadStartData: "rootPackages", //rootPackages, everything
             showLoadSpinner: true
         },
 		

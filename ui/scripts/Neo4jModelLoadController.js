@@ -18,14 +18,15 @@ var neo4jModelLoadController = (function () {
 
     function initialize(setupConfig) {
         application.transferConfigParams(setupConfig, controllerConfig);
-        events.loadedNew.on.subscribe(changeStateAndLoadElements);
-        // events.loadedNew.off.subscribe(changeStateAndLoadElements);
-        // events.loadedNew.off.subscribe(updateLoadSpinner);
+        events.loaded.on.subscribe(loadElementsAndChangeState);
+        events.loaded.off.subscribe(updateLoadSpinner);
         if (controllerConfig.showLoadSpinner) {
             createLoadSpinner();
         }
     };
 
+    // Spinner to show loading process of entites 
+    // starts with loading from Neo4j and ends with creating a Model in AframeCanvasManipulator
     function createLoadSpinner() {
         let loader = document.createElement('div');
         loader.id = 'loaderController';
@@ -49,7 +50,7 @@ var neo4jModelLoadController = (function () {
         }
     }
 
-    // Get entites on launch. Either rootPackages or all (depends on settings)
+    // Get entites on launch. Either rootPackages or everything (depends on settings)
     async function getStartData() {
         let payload = {};
         if (controllerConfig.loadStartData === 'rootPackages') {
@@ -57,11 +58,11 @@ var neo4jModelLoadController = (function () {
             payload = {
                 'statements': [
                     // neo4j requires keyword "statement", so leave as is
-                    // { 'statement': `MATCH (p:Package) WHERE NOT (:Package)-[:CONTAINS]->(p) RETURN p` }
-                    { 'statement': `MATCH (p:Package) RETURN p` }
+                    { 'statement': `MATCH (p:Package) WHERE NOT (:Package)-[:CONTAINS]->(p) RETURN p` }
+                    // { 'statement': `MATCH (p:Package) RETURN p` }
                 ]
             }
-        } else { // load all
+        } else { // load everything
             console.log('Load everything');
         }
 
@@ -86,7 +87,6 @@ var neo4jModelLoadController = (function () {
 
         model.createEntities(data)
         model.createEntities(childNodes);
-        // return data; // proceed with Model.js
     };
 
     async function getChildNodes(parentNodeHash, limitNum) {
@@ -116,16 +116,11 @@ var neo4jModelLoadController = (function () {
         return data;
     }
 
-    async function changeStateAndLoadElements(applicationEvent) {
+    async function loadElementsAndChangeState(applicationEvent) {
         try {
             for (entity of applicationEvent.entities) {
-                //Element must be in entities, but not in DOM. 
-                // let isInDOM = checkIfElementIsInDOM(entity.id);
-                // if (isInDOM) {
-                //     continue;
-                // }
-                if (entity.loadedNew) {
-                    console.log(entity.id, ' : ', entity.loadedNew);
+                // Entity is already in DOM or will be added soon. 
+                if (entity.loaded) {
                     continue;
                 }
 
@@ -152,10 +147,10 @@ var neo4jModelLoadController = (function () {
         }
     };
 
-    function checkIfElementIsInDOM(nodeId) {
-        entity = model.getEntityById(nodeId)
-        return entity ? entity.loaded : false
-    }
+    // function checkIfElementIsInDOM(nodeId) {
+    //     entity = model.getEntityById(nodeId)
+    //     return entity ? entity.loaded : false
+    // }
 
     async function loadNodeById(nodeId) {
         const payload = {

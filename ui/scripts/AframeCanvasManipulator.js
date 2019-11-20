@@ -275,7 +275,7 @@ var canvasManipulator = (function () {
             sender: canvasManipulator,
             value: 'loaded'
         };
-        events.loaded123.off.publish(applicationEvent);
+        events.loaded.off.publish(applicationEvent);
     }
 
     return {

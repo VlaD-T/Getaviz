@@ -168,8 +168,9 @@ EOT;
     <!--user interface-->
     <script type="text/javascript" src="scripts/DefaultLogger.js"></script>
     <script type="text/javascript" src="scripts/Neo4jModelLoadController.js"></script>
-	<script type="text/javascript" src="scripts/Model.js"></script>	
-	<script type="text/javascript" src="scripts/Events.js"></script>
+    <script type="text/javascript" src="scripts/Model.js"></script>	
+    <script type="text/javascript" src="scripts/Events.js"></script>
+	
 
     <?php echo $loadVisualizationSpecificScripts; ?>
 
