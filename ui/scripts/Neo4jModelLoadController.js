@@ -20,10 +20,12 @@ var neo4jModelLoadController = (function () {
         application.transferConfigParams(setupConfig, controllerConfig);
         events.loaded.on.subscribe(loadElementsAndChangeState);
         events.loaded.off.subscribe(updateLoadSpinner);
+        events.childsLoaded.on.subscribe(getChildMetaDataOnExpand);
         if (controllerConfig.showLoadSpinner) {
             createLoadSpinner();
         }
     };
+
 
     // Spinner to show loading process of entites 
     // starts with loading from Neo4j and ends with creating a Model in AframeCanvasManipulator
@@ -35,7 +37,7 @@ var neo4jModelLoadController = (function () {
         document.body.appendChild(loader);
     }
 
-    function updateLoadSpinner(payload) { // payload = +- 1;
+    function updateLoadSpinner(payload) { // payload = toLoad / loaded;
         if (!controllerConfig.showLoadSpinner) {
             return;
         }
@@ -50,8 +52,9 @@ var neo4jModelLoadController = (function () {
         }
     }
 
-    // Get entites on launch. Either rootPackages or everything (depends on settings)
-    async function getStartData() {
+
+    // Get metadata on launch. Either rootPackages or everything (depends on settings)
+    async function getStartMetaData() {
         let payload = {};
         if (controllerConfig.loadStartData === 'rootPackages') {
             console.log('Load root packages');
@@ -66,7 +69,7 @@ var neo4jModelLoadController = (function () {
             console.log('Load everything');
         }
 
-        let response = await getNeo4jDataFromQuery(payload);
+        let response = await getNeo4jData(payload);
         let data = [];
         let childNodes = [];
         if (!response[0].data.length) {
@@ -81,18 +84,28 @@ var neo4jModelLoadController = (function () {
             data.push(metadataObject);
 
             // Get any child node to show the expand sign
-            let singleChildNode = await getChildNodes(object.row[0].hash, 1);
+            let singleChildNode = await getChildNodesMetaData(object.row[0].hash, true);
             childNodes.push(...singleChildNode);
         }
 
-        model.createEntities(data)
-        model.createEntities(childNodes);
+        model.createEntities(data, true)
+        model.createEntities(childNodes, true);
     };
 
-    async function getChildNodes(parentNodeHash, limitNum) {
+    // Get MetaData for Child node
+    async function getChildMetaDataOnExpand(applicationEvent) {
+        let data = await getChildNodesMetaData(applicationEvent.entity.id, false);
+        model.createEntities(data, false); // 0 - to load all child nodes
+        // applicationEvent.tree.expandNode(applicationEvent.treeId, true, false, true, false);
+        // return false;
+    };
+
+
+    // Get MetaData for Child node
+    async function getChildNodesMetaData(parentNodeHash, limitOne) {
         let limit = '';
-        if (limitNum > 0) {
-            limit = `LIMIT ${limitNum}`;
+        if (limitOne == true) {
+            limit = `LIMIT 1`;
         }
         let payload = {
             'statements': [
@@ -101,7 +114,7 @@ var neo4jModelLoadController = (function () {
             ]
         };
 
-        let response = await getNeo4jDataFromQuery(payload);
+        let response = await getNeo4jData(payload);
         let data = [];
         if (!response[0].data.length) {
             return data;
@@ -116,6 +129,7 @@ var neo4jModelLoadController = (function () {
         return data;
     }
 
+    // For given Node in Model load it's A-Frame code and create the element in DOM
     async function loadElementsAndChangeState(applicationEvent) {
         try {
             for (entity of applicationEvent.entities) {
@@ -127,7 +141,7 @@ var neo4jModelLoadController = (function () {
                 loaderApplicationEvent.value = 'toLoad'
                 updateLoadSpinner(loaderApplicationEvent);
 
-                let results = await loadNodeById(entity.id);
+                let results = await getAframeCodeById(entity.id);
                 for (result of results) {
                     // There may be some empty entites, like buildingSegments. They don't have any data, so we can't create an element for them.
                     if (result.data[0]) {
@@ -145,7 +159,9 @@ var neo4jModelLoadController = (function () {
         }
     };
 
-    async function loadNodeById(nodeId) {
+    // Getting A-Frame code for node
+    // This function is called for each new node from metaData from Model.js (createEntities) separately.
+    async function getAframeCodeById(nodeId) {
         const payload = {
             'statements': [
                 // neo4j requires keyword "statement", so leave as is
@@ -153,12 +169,12 @@ var neo4jModelLoadController = (function () {
             ]
         }
 
-        let response = await getNeo4jDataFromQuery(payload);
+        let response = await getNeo4jData(payload);
         return response;
     }
 
-    async function getNeo4jDataFromQuery(payload) {
-        // Receive all the data and proceed
+    // Universal method to load data from Neo4j using imported query
+    async function getNeo4jData(payload) {
         let response = await fetch(controllerConfig.url, {
             method: 'POST', 
             body: JSON.stringify(payload), 
@@ -173,6 +189,7 @@ var neo4jModelLoadController = (function () {
 
     return {
         initialize: initialize,
-        getStartData: getStartData
+        getStartMetaData: getStartMetaData,
+        getChildMetaDataOnExpand: getChildMetaDataOnExpand
     };
 })();

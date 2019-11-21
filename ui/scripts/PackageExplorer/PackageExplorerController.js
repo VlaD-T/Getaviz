@@ -1,264 +1,420 @@
-var packageExplorerController = (function() {
-    
+var packageExplorerController = (function () {
+
 	let packageExplorerTreeID = "packageExplorerTree";
 	let jQPackageExplorerTree = "#packageExplorerTree";
-	
+
 	let tree;
 
 	let controllerConfig = {
-		projectIcon: 	"scripts/PackageExplorer/images/project.png",
-		packageIcon: 	"scripts/PackageExplorer/images/package.png",
-		typeIcon: 		"scripts/PackageExplorer/images/type.png",
-		fieldIcon: 		"scripts/PackageExplorer/images/field.png",
-		methodIcon:		"scripts/PackageExplorer/images/method.png",
-        elementsSelectable: true
+		projectIcon: "scripts/PackageExplorer/images/project.png",
+		packageIcon: "scripts/PackageExplorer/images/package.png",
+		typeIcon: "scripts/PackageExplorer/images/type.png",
+		fieldIcon: "scripts/PackageExplorer/images/field.png",
+		methodIcon: "scripts/PackageExplorer/images/method.png",
+		elementsSelectable: true
 	};
-	
-	function initialize(setupConfig){
-        application.transferConfigParams(setupConfig, controllerConfig);
-    }
-	
-	function activate(rootDiv){
-        //create zTree div-container
+
+	function initialize(setupConfig) {
+		application.transferConfigParams(setupConfig, controllerConfig);
+	}
+
+	function activate(rootDiv) {
+		//create zTree div-container
 		let zTreeDiv = document.createElement("DIV");
 		zTreeDiv.id = "zTreeDiv";
-				
+
 		let packageExplorerTreeUL = document.createElement("UL");
 		packageExplorerTreeUL.id = packageExplorerTreeID;
 		packageExplorerTreeUL.setAttribute("class", "ztree");
-				
+
 		zTreeDiv.appendChild(packageExplorerTreeUL);
 		rootDiv.appendChild(zTreeDiv);
-				
+
 		//create zTree
 		prepareTreeView();
 		events.selected.on.subscribe(onEntitySelected);
-    }
-	
-	function reset(){
+	}
+
+	function reset() {
 		prepareTreeView();
 	}
-    
-    function prepareTreeView() {
-        
-        let entities = model.getAllEntities();
-        let items = [];
-		
+
+	function addTreeNode(entities) {
+		let items = [];
+
 		//build items for ztree
-		entities.forEach(function(entity) {
-			
-			var item;
-			
-			if(entity.belongsTo === undefined){
+		entities.forEach(function (entity) {
+
+			let item;
+
+			if (entity.belongsTo === undefined) {
 				//rootpackages
-				if(entity.type !== "issue") {
-					if(entity.type === "Namespace") {
-                        item = {
-                            id: entity.id,
-                            open: false,
-                            checked: false,
-                            parentId: "",
-                            name: entity.name,
-                            icon: controllerConfig.packageIcon,
-                            iconSkin: "zt"
-                        };
-                    } else {
-                        item = {
-                            id: entity.id,
-                            open: true,
-                            checked: false,
-                            parentId: "",
-                            name: entity.name,
-                            icon: controllerConfig.projectIcon,
-                            iconSkin: "zt"
-                        };
-                    }
-                }
-            } else {	
-				switch(entity.type) {
+				if (entity.type !== "issue") {
+					if (entity.type === "Namespace") {
+						item = {
+							id: entity.id,
+							open: false,
+							checked: false,
+							parentId: "",
+							name: entity.name,
+							icon: controllerConfig.packageIcon,
+							iconSkin: "zt"
+						};
+					} else {
+						item = {
+							id: entity.id,
+							open: true,
+							checked: false,
+							parentId: "",
+							name: entity.name,
+							icon: controllerConfig.projectIcon,
+							iconSkin: "zt"
+						};
+					}
+				}
+			} else {
+				switch (entity.type) {
 					case "Project":
-						item = { id: entity.id, open: true, checked: false, parentId: entity.belongsTo.id, name: entity.name, icon: controllerConfig.projectIcon, iconSkin: "zt"};
+						item = { id: entity.id, open: true, checked: false, parentId: entity.belongsTo.id, name: entity.name, icon: controllerConfig.projectIcon, iconSkin: "zt" };
 						break;
 					case "Namespace":
-						item = { id: entity.id, open: false, checked: false, parentId: entity.belongsTo.id, name: entity.name, icon: controllerConfig.packageIcon, iconSkin: "zt"};
+						item = { id: entity.id, open: false, checked: false, parentId: entity.belongsTo.id, name: entity.name, icon: controllerConfig.packageIcon, iconSkin: "zt" };
 						break;
 					case "Class":
-                        if(entity.id.endsWith("_2") || entity.id.endsWith("_3")){
-                            break;
-                        };
-						item = { id: entity.id, open: false, checked: false, parentId: entity.belongsTo.id, name: entity.name, icon: controllerConfig.typeIcon, iconSkin: "zt"};
+						if (entity.id.endsWith("_2") || entity.id.endsWith("_3")) {
+							break;
+						};
+						item = { id: entity.id, open: false, checked: false, parentId: entity.belongsTo.id, name: entity.name, icon: controllerConfig.typeIcon, iconSkin: "zt" };
 						break;
-					case  "ParameterizableClass":
-						item = { id: entity.id, open: false, checked: false, parentId: entity.belongsTo.id, name: entity.name, icon: controllerConfig.typeIcon, iconSkin: "zt"};
+					case "ParameterizableClass":
+						item = { id: entity.id, open: false, checked: false, parentId: entity.belongsTo.id, name: entity.name, icon: controllerConfig.typeIcon, iconSkin: "zt" };
 						break;
 					case "Enum":
-						item = { id: entity.id, open: false, checked: false, parentId: entity.belongsTo.id, name: entity.name, icon: controllerConfig.typeIcon, iconSkin: "zt"};
+						item = { id: entity.id, open: false, checked: false, parentId: entity.belongsTo.id, name: entity.name, icon: controllerConfig.typeIcon, iconSkin: "zt" };
 						break;
 					case "EnumValue":
-						item = { id: entity.id, open: false, checked: false, parentId: entity.belongsTo.id, name: entity.name, icon: controllerConfig.fieldIcon, iconSkin: "zt"};
+						item = { id: entity.id, open: false, checked: false, parentId: entity.belongsTo.id, name: entity.name, icon: controllerConfig.fieldIcon, iconSkin: "zt" };
 						break;
 					case "Attribute":
-						item = { id: entity.id, open: false, checked: false, parentId: entity.belongsTo.id, name: entity.name, icon: controllerConfig.fieldIcon, iconSkin: "zt"};
+						item = { id: entity.id, open: false, checked: false, parentId: entity.belongsTo.id, name: entity.name, icon: controllerConfig.fieldIcon, iconSkin: "zt" };
 						break;
 					case "Method":
-						item = { id: entity.id, open: false, checked: false, parentId: entity.belongsTo.id, name: entity.name, icon: controllerConfig.methodIcon, iconSkin: "zt"};
+						item = { id: entity.id, open: false, checked: false, parentId: entity.belongsTo.id, name: entity.name, icon: controllerConfig.methodIcon, iconSkin: "zt" };
 						break;
-					
-					default: 
-						events.log.warning.publish({ text: "FamixElement not in tree: " + entity.type});
+
+					default:
+						events.log.warning.publish({ text: "FamixElement not in tree: " + entity.type });
 
 						return;
 				}
-           }
-			if(item !== undefined) {
-                items.push(item);
 			}
-			
-			// console.log(item)
-		});
-		
-		//Sortierung nach Typ und Alphanumerisch
-		items.sort(
-			function(a,b) {
-				
-				var sortStringA = "";
-				switch(a.icon){
-					case controllerConfig.packageIcon:
-						sortStringA = "1" + a.name.toUpperCase();
-						break;
-					case controllerConfig.typeIcon:
-						sortStringA = "2" + a.name.toUpperCase();
-						break;
-					case controllerConfig.fieldIcon:
-						sortStringA = "3" + a.name.toUpperCase();
-						break;
-					case controllerConfig.methodIcon:
-						sortStringA = "4" + a.name.toUpperCase();
-						break;
-					default:
-						sortStringA = "0" + a.name.toUpperCase();
-				}
-				
-				var sortStringB = "";
-				switch(b.icon){
-					case controllerConfig.packageIcon:
-						sortStringB = "1" + b.name.toUpperCase();
-						break;
-					case controllerConfig.typeIcon:
-						sortStringB = "2" + b.name.toUpperCase();
-						break;
-					case controllerConfig.fieldIcon:
-						sortStringB = "3" + b.name.toUpperCase();
-						break;
-					case controllerConfig.methodIcon:
-						sortStringB = "4" + b.name.toUpperCase();
-						break;
-					default:
-						sortStringB = "0" + b.name.toUpperCase();
-						break;
-				}
 
-				if (sortStringA < sortStringB){
-					return -1;
-				}
-				if (sortStringA > sortStringB){
-					return 1;
-				}			
-				
-				return 0;
+			if (item !== undefined) {
+				items.push(item);
 			}
-		);
+
+		},
+
+
+			//Sortierung nach Typ und Alphanumerisch
+			items.sort(
+				function (a, b) {
+
+					var sortStringA = "";
+					switch (a.icon) {
+						case controllerConfig.packageIcon:
+							sortStringA = "1" + a.name.toUpperCase();
+							break;
+						case controllerConfig.typeIcon:
+							sortStringA = "2" + a.name.toUpperCase();
+							break;
+						case controllerConfig.fieldIcon:
+							sortStringA = "3" + a.name.toUpperCase();
+							break;
+						case controllerConfig.methodIcon:
+							sortStringA = "4" + a.name.toUpperCase();
+							break;
+						default:
+							sortStringA = "0" + a.name.toUpperCase();
+					}
+
+					var sortStringB = "";
+					switch (b.icon) {
+						case controllerConfig.packageIcon:
+							sortStringB = "1" + b.name.toUpperCase();
+							break;
+						case controllerConfig.typeIcon:
+							sortStringB = "2" + b.name.toUpperCase();
+							break;
+						case controllerConfig.fieldIcon:
+							sortStringB = "3" + b.name.toUpperCase();
+							break;
+						case controllerConfig.methodIcon:
+							sortStringB = "4" + b.name.toUpperCase();
+							break;
+						default:
+							sortStringB = "0" + b.name.toUpperCase();
+							break;
+					}
+
+					if (sortStringA < sortStringB) {
+						return -1;
+					}
+					if (sortStringA > sortStringB) {
+						return 1;
+					}
+
+					return 0;
+				}
+			)
+		)
+
+		items.forEach(item => {
+			// tree.updateNode(item)
+			tree.addNodes(null, item)
+		})
+		// tree.addNodes(items);
+		let nodes = tree.getNodes();
+		console.log(nodes)
+		tree.refresh();
+	};
+
+	function prepareTreeView() {
+
+		// let entities = model.getAllEntities();
+		let items = [];
+
+		// //build items for ztree
+		// entities.forEach(function(entity) {
+
+		// 	let item;
+
+		// 	if(entity.belongsTo === undefined){
+		// 		//rootpackages
+		// 		if(entity.type !== "issue") {
+		// 			if(entity.type === "Namespace") {
+		//                 item = {
+		//                     id: entity.id,
+		//                     open: false,
+		//                     checked: false,
+		//                     parentId: "",
+		//                     name: entity.name,
+		//                     icon: controllerConfig.packageIcon,
+		//                     iconSkin: "zt"
+		//                 };
+		//             } else {
+		//                 item = {
+		//                     id: entity.id,
+		//                     open: true,
+		//                     checked: false,
+		//                     parentId: "",
+		//                     name: entity.name,
+		//                     icon: controllerConfig.projectIcon,
+		//                     iconSkin: "zt"
+		//                 };
+		//             }
+		//         }
+		//     } else {	
+		// 		switch(entity.type) {
+		// 			case "Project":
+		// 				item = { id: entity.id, open: true, checked: false, parentId: entity.belongsTo.id, name: entity.name, icon: controllerConfig.projectIcon, iconSkin: "zt"};
+		// 				break;
+		// 			case "Namespace":
+		// 				item = { id: entity.id, open: false, checked: false, parentId: entity.belongsTo.id, name: entity.name, icon: controllerConfig.packageIcon, iconSkin: "zt"};
+		// 				break;
+		// 			case "Class":
+		//                 if(entity.id.endsWith("_2") || entity.id.endsWith("_3")){
+		//                     break;
+		//                 };
+		// 				item = { id: entity.id, open: false, checked: false, parentId: entity.belongsTo.id, name: entity.name, icon: controllerConfig.typeIcon, iconSkin: "zt"};
+		// 				break;
+		// 			case  "ParameterizableClass":
+		// 				item = { id: entity.id, open: false, checked: false, parentId: entity.belongsTo.id, name: entity.name, icon: controllerConfig.typeIcon, iconSkin: "zt"};
+		// 				break;
+		// 			case "Enum":
+		// 				item = { id: entity.id, open: false, checked: false, parentId: entity.belongsTo.id, name: entity.name, icon: controllerConfig.typeIcon, iconSkin: "zt"};
+		// 				break;
+		// 			case "EnumValue":
+		// 				item = { id: entity.id, open: false, checked: false, parentId: entity.belongsTo.id, name: entity.name, icon: controllerConfig.fieldIcon, iconSkin: "zt"};
+		// 				break;
+		// 			case "Attribute":
+		// 				item = { id: entity.id, open: false, checked: false, parentId: entity.belongsTo.id, name: entity.name, icon: controllerConfig.fieldIcon, iconSkin: "zt"};
+		// 				break;
+		// 			case "Method":
+		// 				item = { id: entity.id, open: false, checked: false, parentId: entity.belongsTo.id, name: entity.name, icon: controllerConfig.methodIcon, iconSkin: "zt"};
+		// 				break;
+
+		// 			default: 
+		// 				events.log.warning.publish({ text: "FamixElement not in tree: " + entity.type});
+
+		// 				return;
+		// 		}
+		//    }
+		// 	if(item !== undefined) {
+		//         items.push(item);
+		// 	}
+
+		// 	// console.log(item)
+		// });
+
+		// //Sortierung nach Typ und Alphanumerisch
+		// items.sort(
+		// 	function(a,b) {
+
+		// 		var sortStringA = "";
+		// 		switch(a.icon){
+		// 			case controllerConfig.packageIcon:
+		// 				sortStringA = "1" + a.name.toUpperCase();
+		// 				break;
+		// 			case controllerConfig.typeIcon:
+		// 				sortStringA = "2" + a.name.toUpperCase();
+		// 				break;
+		// 			case controllerConfig.fieldIcon:
+		// 				sortStringA = "3" + a.name.toUpperCase();
+		// 				break;
+		// 			case controllerConfig.methodIcon:
+		// 				sortStringA = "4" + a.name.toUpperCase();
+		// 				break;
+		// 			default:
+		// 				sortStringA = "0" + a.name.toUpperCase();
+		// 		}
+
+		// 		var sortStringB = "";
+		// 		switch(b.icon){
+		// 			case controllerConfig.packageIcon:
+		// 				sortStringB = "1" + b.name.toUpperCase();
+		// 				break;
+		// 			case controllerConfig.typeIcon:
+		// 				sortStringB = "2" + b.name.toUpperCase();
+		// 				break;
+		// 			case controllerConfig.fieldIcon:
+		// 				sortStringB = "3" + b.name.toUpperCase();
+		// 				break;
+		// 			case controllerConfig.methodIcon:
+		// 				sortStringB = "4" + b.name.toUpperCase();
+		// 				break;
+		// 			default:
+		// 				sortStringB = "0" + b.name.toUpperCase();
+		// 				break;
+		// 		}
+
+		// 		if (sortStringA < sortStringB){
+		// 			return -1;
+		// 		}
+		// 		if (sortStringA > sortStringB){
+		// 			return 1;
+		// 		}			
+
+		// 		return 0;
+		// 	}
+		// );
 
 		//zTree settings
 		var settings = {
-            check: {
-                enable: controllerConfig.elementsSelectable,
-                chkboxType: {"Y": "ps", "N": "s"}
-            },
-            data: {
-                simpleData: {
-                enable:true,
-                idKey: "id",
-                pIdKey: "parentId",
-                rootPId: ""
-                }
-            },
-            callback: {
-                onCheck: zTreeOnCheck,
+			check: {
+				enable: controllerConfig.elementsSelectable,
+				chkboxType: { "Y": "ps", "N": "s" }
+			},
+			data: {
+				simpleData: {
+					enable: true,
+					idKey: "id",
+					pIdKey: "parentId",
+					rootPId: ""
+				}
+			},
+			callback: {
+				onCheck: zTreeOnCheck,
 				onClick: zTreeOnClick,
-				beforeExpand: zTreeBeforeExpand
-            },
-            view:{
-                showLine: false,
-                showIcon: true,
-                selectMulti: false
-            }
+				beforeExpand: zTreeBeforeExpand,
 
-        };		
-		
+			},
+			view: {
+				showLine: false,
+				showIcon: true,
+				selectMulti: false
+			}
+
+		};
+
 		//create zTree
-        tree = $.fn.zTree.init( $(jQPackageExplorerTree), settings, items);
-    }
-    
-	
+		tree = $.fn.zTree.init($(jQPackageExplorerTree), settings, items);
+	}
+
+
 	function zTreeOnCheck(event, treeId, treeNode) {
-        var nodes = tree.getChangeCheckedNodes();
-        
+		var nodes = tree.getChangeCheckedNodes();
+
 		var entities = [];
-		nodes.forEach(function(node){
+		nodes.forEach(function (node) {
 			node.checkedOld = node.checked; //fix zTree bug on getChangeCheckedNodes	
 			entities.push(model.getEntityById(node.id));
 		});
-								
-		var applicationEvent = {			
-			sender: 	packageExplorerController,
-			entities:	entities
+
+		var applicationEvent = {
+			sender: packageExplorerController,
+			entities: entities
 		};
-		
-		if (!treeNode.checked){
+
+		if (!treeNode.checked) {
 			events.filtered.on.publish(applicationEvent);
 		} else {
 			events.filtered.off.publish(applicationEvent);
-		}		
-    }
+		}
+	}
 
-    function zTreeOnClick(treeEvent, treeId, treeNode) {
-		// Tried to activate node on click, doesn't work that simple. Left as TODO. 
-		// let node = tree.getSelectedNodes();
-		// tree.checkNode(node);
-
-        var applicationEvent = {
+	function zTreeOnClick(treeEvent, treeId, treeNode) {
+		var applicationEvent = {
 			sender: packageExplorerController,
 			entities: [model.getEntityById(treeNode.id)]
 		};
 		events.selected.on.publish(applicationEvent);
 	}
-	
-	function zTreeBeforeExpand(event, treeId, treeNode) {
-		// let nodes = tree.
 
-		// let applicationEvent = {
-		// 	sender: packageExplorerController,
-		// 	entities: [model.getEntityById(treeNode.id)]
-		// };
-		console.log('Tree expanded')
-		// required node id: treeId.id -> launch child node loading
+	// Before expand load all child nodes (metadata)
+	function zTreeBeforeExpand(event, treeId, treeNode) {
+		let entity = model.getEntityById(treeId.id)
+
+		if (entity.childsLoaded) {
+			return true;
+		}
+
+		let applicationEvent = {
+			sender: packageExplorerController,
+			entity: entity,
+			tree: tree,
+			treeId: treeId
+		};
+		// events.childsLoaded.on.publish(applicationEvent);
+		tree.expandNode(treeId, true, false, true, false);
+		events.childsLoaded.on.publish(applicationEvent);
+		// neo4jModelLoadController.getChildMetaDataOnExpand(applicationEvent);
+		return false;
+
+		console.log('expand Tree')
+		// tree.expandAll(true); // works
+		tree.expandNode(treeId, true, false, true, false);  // works without childLoaded.on
+		return false;
+		// neo4jModelLoadController.getChildMetaDataOnExpand(applicationEvent);
+
+		// tree.expandNode(treeId.id, true, true, true);
+		// return false;
 	}
-	
+
 	function onEntitySelected(applicationEvent) {
-        if(applicationEvent.sender !== packageExplorerController) {
+		if (applicationEvent.sender !== packageExplorerController) {
 			var entity = applicationEvent.entities[0];
-			var item = tree.getNodeByParam("id", entity.id, null);            
+			var item = tree.getNodeByParam("id", entity.id, null);
 			tree.selectNode(item, false);
-        }
+		}
 	}
-	
-	
-	
-	
-	
-	
-	
+
+
+
+
+
+
+
 	/*
     function zTreeOnCheck(event, treeId, treeNode) {
         		
@@ -314,10 +470,11 @@ var packageExplorerController = (function() {
         }
     }
 	*/
-    
-    return {
-        initialize: initialize,
+
+	return {
+		initialize: initialize,
 		activate: activate,
-		reset: reset
-    };
+		reset: reset,
+		addTreeNode: addTreeNode
+	};
 })();

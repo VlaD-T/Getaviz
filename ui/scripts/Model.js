@@ -11,7 +11,8 @@ var model = (function() {
 		componentSelected : { name: "componentSelected" },
 		antipattern     : { name: "antipattern" },
 		versionSelected : { name: "versionSelected" },
-		loaded			: { name: "loaded" }
+		loaded			: { name: "loaded" }, // Element is added to DOM
+		childsLoaded	: { name: "childsLoaded" }, // For entity (is in DOM) all child nodes are also loaded
     };
 
 	let entitiesById = new Map();
@@ -52,7 +53,7 @@ var model = (function() {
 		});
 	}
 
-	function createEntities(elements) {
+	function createEntities(elements, resetPackageExpl = false) {
 		let newEntities = [];            
 		//create initial entites from famix elements 
 		elements.forEach(function(element) {
@@ -177,7 +178,10 @@ var model = (function() {
 			entity.allParents = getAllParentsOfEntity(entity);
 		});				
 
-		return packageExplorerController.reset();
+		// if (resetPackageExpl) {
+		// 	return packageExplorerController.reset();
+		// }	
+		packageExplorerController.addTreeNode(newEntities)
     }	
 	
 	
