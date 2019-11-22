@@ -40,7 +40,7 @@ var packageExplorerController = (function () {
 	}
 
 	function addTreeNode(entities) {
-		let items = [];
+		let items = new Map();
 
 		//build items for ztree
 		entities.forEach(function (entity) {
@@ -110,50 +110,53 @@ var packageExplorerController = (function () {
 			}
 
 			if (item !== undefined) {
-				items.push(item);
+				// items.push(item);
+				items.set(entity.id, item);
 			}
+		});
 
-		},
 
-
-			//Sortierung nach Typ und Alphanumerisch
-			items.sort(
+		// Sortierung nach Typ und Alphanumerisch
+		items = new Map([...items.entries()].sort(
 				function (a, b) {
 
-					var sortStringA = "";
-					switch (a.icon) {
+					// we have map, so "a" and "b" are arrays of key[0] and value[1]
+					let entryA = a[1] // get value from entry
+					let sortStringA = "";
+					switch (entryA.icon) {
 						case controllerConfig.packageIcon:
-							sortStringA = "1" + a.name.toUpperCase();
+							sortStringA = "1" + entryA.name.toUpperCase();
 							break;
 						case controllerConfig.typeIcon:
-							sortStringA = "2" + a.name.toUpperCase();
+							sortStringA = "2" + entryA.name.toUpperCase();
 							break;
 						case controllerConfig.fieldIcon:
-							sortStringA = "3" + a.name.toUpperCase();
+							sortStringA = "3" + entryA.name.toUpperCase();
 							break;
 						case controllerConfig.methodIcon:
-							sortStringA = "4" + a.name.toUpperCase();
+							sortStringA = "4" + entryA.name.toUpperCase();
 							break;
 						default:
-							sortStringA = "0" + a.name.toUpperCase();
+							sortStringA = "0" + entryA.name.toUpperCase();
 					}
 
-					var sortStringB = "";
-					switch (b.icon) {
+					let entryB = b[1] // get value from entry
+					let sortStringB = "";
+					switch (entryB.icon) {
 						case controllerConfig.packageIcon:
-							sortStringB = "1" + b.name.toUpperCase();
+							sortStringB = "1" + entryB.name.toUpperCase();
 							break;
 						case controllerConfig.typeIcon:
-							sortStringB = "2" + b.name.toUpperCase();
+							sortStringB = "2" + entryB.name.toUpperCase();
 							break;
 						case controllerConfig.fieldIcon:
-							sortStringB = "3" + b.name.toUpperCase();
+							sortStringB = "3" + entryB.name.toUpperCase();
 							break;
 						case controllerConfig.methodIcon:
-							sortStringB = "4" + b.name.toUpperCase();
+							sortStringB = "4" + entryB.name.toUpperCase();
 							break;
 						default:
-							sortStringB = "0" + b.name.toUpperCase();
+							sortStringB = "0" + entryB.name.toUpperCase();
 							break;
 					}
 
@@ -167,147 +170,39 @@ var packageExplorerController = (function () {
 					return 0;
 				}
 			)
-		)
+		);
 
-		items.forEach(item => {
-			// tree.updateNode(item)
-			tree.addNodes(null, item)
-		})
-		// tree.addNodes(items);
-		let nodes = tree.getNodes();
-		console.log(nodes)
-		tree.refresh();
+		// Add items to explorer, but to build a proper tree make sure, that parent node is already there.
+		items.forEach((value, key) => {
+			// We don't need duplicates
+			let nodeAlreadyAdded = tree.getNodeByParam("id", key, null);
+			if (nodeAlreadyAdded) {
+				return;
+			}
+
+			// Make sure parrent is already added, to make a proper tree
+			// case 1: no parent. Means root package
+			if (!value.parentId) {
+				return tree.addNodes(null, value);
+			}
+
+			// case 2: has parent. Check if parrent is there. If not, add first. 
+			if (value.parentId) {
+				let parentAlreadyAdded = tree.getNodeByParam("id", value.parentId, null);
+				if (!parentAlreadyAdded) {
+					let parent = items.get(value.parentId);
+					tree.addNodes(null, parent);
+				}
+
+				// get index of parent, to place the node in the right place
+				let parent = tree.getNodeByParam("id", value.parentId, null); 
+				return tree.addNodes(parent, parent.getIndex(), value, true);
+			}
+		});
 	};
 
 	function prepareTreeView() {
-
-		// let entities = model.getAllEntities();
 		let items = [];
-
-		// //build items for ztree
-		// entities.forEach(function(entity) {
-
-		// 	let item;
-
-		// 	if(entity.belongsTo === undefined){
-		// 		//rootpackages
-		// 		if(entity.type !== "issue") {
-		// 			if(entity.type === "Namespace") {
-		//                 item = {
-		//                     id: entity.id,
-		//                     open: false,
-		//                     checked: false,
-		//                     parentId: "",
-		//                     name: entity.name,
-		//                     icon: controllerConfig.packageIcon,
-		//                     iconSkin: "zt"
-		//                 };
-		//             } else {
-		//                 item = {
-		//                     id: entity.id,
-		//                     open: true,
-		//                     checked: false,
-		//                     parentId: "",
-		//                     name: entity.name,
-		//                     icon: controllerConfig.projectIcon,
-		//                     iconSkin: "zt"
-		//                 };
-		//             }
-		//         }
-		//     } else {	
-		// 		switch(entity.type) {
-		// 			case "Project":
-		// 				item = { id: entity.id, open: true, checked: false, parentId: entity.belongsTo.id, name: entity.name, icon: controllerConfig.projectIcon, iconSkin: "zt"};
-		// 				break;
-		// 			case "Namespace":
-		// 				item = { id: entity.id, open: false, checked: false, parentId: entity.belongsTo.id, name: entity.name, icon: controllerConfig.packageIcon, iconSkin: "zt"};
-		// 				break;
-		// 			case "Class":
-		//                 if(entity.id.endsWith("_2") || entity.id.endsWith("_3")){
-		//                     break;
-		//                 };
-		// 				item = { id: entity.id, open: false, checked: false, parentId: entity.belongsTo.id, name: entity.name, icon: controllerConfig.typeIcon, iconSkin: "zt"};
-		// 				break;
-		// 			case  "ParameterizableClass":
-		// 				item = { id: entity.id, open: false, checked: false, parentId: entity.belongsTo.id, name: entity.name, icon: controllerConfig.typeIcon, iconSkin: "zt"};
-		// 				break;
-		// 			case "Enum":
-		// 				item = { id: entity.id, open: false, checked: false, parentId: entity.belongsTo.id, name: entity.name, icon: controllerConfig.typeIcon, iconSkin: "zt"};
-		// 				break;
-		// 			case "EnumValue":
-		// 				item = { id: entity.id, open: false, checked: false, parentId: entity.belongsTo.id, name: entity.name, icon: controllerConfig.fieldIcon, iconSkin: "zt"};
-		// 				break;
-		// 			case "Attribute":
-		// 				item = { id: entity.id, open: false, checked: false, parentId: entity.belongsTo.id, name: entity.name, icon: controllerConfig.fieldIcon, iconSkin: "zt"};
-		// 				break;
-		// 			case "Method":
-		// 				item = { id: entity.id, open: false, checked: false, parentId: entity.belongsTo.id, name: entity.name, icon: controllerConfig.methodIcon, iconSkin: "zt"};
-		// 				break;
-
-		// 			default: 
-		// 				events.log.warning.publish({ text: "FamixElement not in tree: " + entity.type});
-
-		// 				return;
-		// 		}
-		//    }
-		// 	if(item !== undefined) {
-		//         items.push(item);
-		// 	}
-
-		// 	// console.log(item)
-		// });
-
-		// //Sortierung nach Typ und Alphanumerisch
-		// items.sort(
-		// 	function(a,b) {
-
-		// 		var sortStringA = "";
-		// 		switch(a.icon){
-		// 			case controllerConfig.packageIcon:
-		// 				sortStringA = "1" + a.name.toUpperCase();
-		// 				break;
-		// 			case controllerConfig.typeIcon:
-		// 				sortStringA = "2" + a.name.toUpperCase();
-		// 				break;
-		// 			case controllerConfig.fieldIcon:
-		// 				sortStringA = "3" + a.name.toUpperCase();
-		// 				break;
-		// 			case controllerConfig.methodIcon:
-		// 				sortStringA = "4" + a.name.toUpperCase();
-		// 				break;
-		// 			default:
-		// 				sortStringA = "0" + a.name.toUpperCase();
-		// 		}
-
-		// 		var sortStringB = "";
-		// 		switch(b.icon){
-		// 			case controllerConfig.packageIcon:
-		// 				sortStringB = "1" + b.name.toUpperCase();
-		// 				break;
-		// 			case controllerConfig.typeIcon:
-		// 				sortStringB = "2" + b.name.toUpperCase();
-		// 				break;
-		// 			case controllerConfig.fieldIcon:
-		// 				sortStringB = "3" + b.name.toUpperCase();
-		// 				break;
-		// 			case controllerConfig.methodIcon:
-		// 				sortStringB = "4" + b.name.toUpperCase();
-		// 				break;
-		// 			default:
-		// 				sortStringB = "0" + b.name.toUpperCase();
-		// 				break;
-		// 		}
-
-		// 		if (sortStringA < sortStringB){
-		// 			return -1;
-		// 		}
-		// 		if (sortStringA > sortStringB){
-		// 			return 1;
-		// 		}			
-
-		// 		return 0;
-		// 	}
-		// );
 
 		//zTree settings
 		var settings = {
