@@ -53,7 +53,7 @@ var model = (function() {
 		});
 	}
 
-	function createEntities(elements, resetPackageExpl = false) {
+	function createEntities(elements) {
 		let newEntities = [];            
 		//create initial entites from famix elements 
 		elements.forEach(function(element) {

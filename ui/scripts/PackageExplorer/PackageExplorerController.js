@@ -39,6 +39,90 @@ var packageExplorerController = (function () {
 		prepareTreeView();
 	}
 
+	function prepareTreeView() {
+		let items = [];
+
+		//zTree settings
+		var settings = {
+			check: {
+				enable: controllerConfig.elementsSelectable,
+				chkboxType: { "Y": "ps", "N": "s" }
+			},
+			data: {
+				simpleData: {
+					enable: true,
+					idKey: "id",
+					pIdKey: "parentId",
+					rootPId: ""
+				}
+			},
+			callback: {
+				onCheck: zTreeOnCheck,
+				onClick: zTreeOnClick,
+				beforeExpand: zTreeBeforeExpand,
+
+			},
+			view: {
+				showLine: false,
+				showIcon: true,
+				selectMulti: false
+			}
+
+		};
+
+		//create zTree
+		tree = $.fn.zTree.init($(jQPackageExplorerTree), settings, items);
+	}
+
+
+	function zTreeOnCheck(event, treeId, treeNode) {
+		var nodes = tree.getChangeCheckedNodes();
+
+		var entities = [];
+		nodes.forEach(function (node) {
+			node.checkedOld = node.checked; //fix zTree bug on getChangeCheckedNodes	
+			entities.push(model.getEntityById(node.id));
+		});
+
+		var applicationEvent = {
+			sender: packageExplorerController,
+			entities: entities
+		};
+
+		if (!treeNode.checked) {
+			events.filtered.on.publish(applicationEvent);
+		} else {
+			events.filtered.off.publish(applicationEvent);
+		}
+	}
+
+	function zTreeOnClick(treeEvent, treeId, treeNode) {
+		var applicationEvent = {
+			sender: packageExplorerController,
+			entities: [model.getEntityById(treeNode.id)]
+		};
+		events.selected.on.publish(applicationEvent);
+	}
+
+	// Before expand load all child nodes (metadata)
+	function zTreeBeforeExpand(event, treeId, treeNode) {
+		let entity = model.getEntityById(treeId.id)
+		if (entity.childsLoaded) {
+			return true; // true to expand the list
+		}
+
+		let applicationEvent = {
+			sender: packageExplorerController,
+			entity: entity,
+			tree: tree,
+			treeId: treeId
+		};
+
+		events.childsLoaded.on.publish(applicationEvent);
+		tree.expandNode(treeId, true, false, true, false);
+		return false; // tree.expandNode already opens the list, so return false to leave it open
+	}
+
 	function addTreeNode(entities) {
 		let items = new Map();
 
@@ -114,7 +198,6 @@ var packageExplorerController = (function () {
 				items.set(entity.id, item);
 			}
 		});
-
 
 		// Sortierung nach Typ und Alphanumerisch
 		items = new Map([...items.entries()].sort(
@@ -196,105 +279,11 @@ var packageExplorerController = (function () {
 
 				// get index of parent, to place the node in the right place
 				let parent = tree.getNodeByParam("id", value.parentId, null); 
-				return tree.addNodes(parent, parent.getIndex(), value, true);
+				const newNodeIndex = -1; // add to the end of list
+				return tree.addNodes(parent, newNodeIndex, value, true);
 			}
 		});
 	};
-
-	function prepareTreeView() {
-		let items = [];
-
-		//zTree settings
-		var settings = {
-			check: {
-				enable: controllerConfig.elementsSelectable,
-				chkboxType: { "Y": "ps", "N": "s" }
-			},
-			data: {
-				simpleData: {
-					enable: true,
-					idKey: "id",
-					pIdKey: "parentId",
-					rootPId: ""
-				}
-			},
-			callback: {
-				onCheck: zTreeOnCheck,
-				onClick: zTreeOnClick,
-				beforeExpand: zTreeBeforeExpand,
-
-			},
-			view: {
-				showLine: false,
-				showIcon: true,
-				selectMulti: false
-			}
-
-		};
-
-		//create zTree
-		tree = $.fn.zTree.init($(jQPackageExplorerTree), settings, items);
-	}
-
-
-	function zTreeOnCheck(event, treeId, treeNode) {
-		var nodes = tree.getChangeCheckedNodes();
-
-		var entities = [];
-		nodes.forEach(function (node) {
-			node.checkedOld = node.checked; //fix zTree bug on getChangeCheckedNodes	
-			entities.push(model.getEntityById(node.id));
-		});
-
-		var applicationEvent = {
-			sender: packageExplorerController,
-			entities: entities
-		};
-
-		if (!treeNode.checked) {
-			events.filtered.on.publish(applicationEvent);
-		} else {
-			events.filtered.off.publish(applicationEvent);
-		}
-	}
-
-	function zTreeOnClick(treeEvent, treeId, treeNode) {
-		var applicationEvent = {
-			sender: packageExplorerController,
-			entities: [model.getEntityById(treeNode.id)]
-		};
-		events.selected.on.publish(applicationEvent);
-	}
-
-	// Before expand load all child nodes (metadata)
-	function zTreeBeforeExpand(event, treeId, treeNode) {
-		let entity = model.getEntityById(treeId.id)
-
-		if (entity.childsLoaded) {
-			return true;
-		}
-
-		let applicationEvent = {
-			sender: packageExplorerController,
-			entity: entity,
-			tree: tree,
-			treeId: treeId
-		};
-		// events.childsLoaded.on.publish(applicationEvent);
-		tree.expandNode(treeId, true, false, true, false);
-		events.childsLoaded.on.publish(applicationEvent);
-		// neo4jModelLoadController.getChildMetaDataOnExpand(applicationEvent);
-		return false;
-
-		console.log('expand Tree')
-		// tree.expandAll(true); // works
-		tree.expandNode(treeId, true, false, true, false);  // works without childLoaded.on
-		return false;
-		// neo4jModelLoadController.getChildMetaDataOnExpand(applicationEvent);
-
-		// tree.expandNode(treeId.id, true, true, true);
-		// return false;
-	}
 
 	function onEntitySelected(applicationEvent) {
 		if (applicationEvent.sender !== packageExplorerController) {

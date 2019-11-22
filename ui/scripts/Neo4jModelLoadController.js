@@ -88,23 +88,20 @@ var neo4jModelLoadController = (function () {
             childNodes.push(...singleChildNode);
         }
 
-        model.createEntities(data, true)
-        model.createEntities(childNodes, true);
+        model.createEntities(data)
+        model.createEntities(childNodes);
     };
 
     // Get MetaData for Child node
     async function getChildMetaDataOnExpand(applicationEvent) {
         let data = await getChildNodesMetaData(applicationEvent.entity.id, false);
-        model.createEntities(data, false); // 0 - to load all child nodes
-        // applicationEvent.tree.expandNode(applicationEvent.treeId, true, false, true, false);
-        // return false;
+        model.createEntities(data); 
     };
-
 
     // Get MetaData for Child node
     async function getChildNodesMetaData(parentNodeHash, limitOne) {
         let limit = '';
-        if (limitOne == true) {
+        if (limitOne) {
             limit = `LIMIT 1`;
         }
         let payload = {
