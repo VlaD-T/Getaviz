@@ -84,7 +84,7 @@ var packageExplorerController = (function () {
 			let entity = model.getEntityById(node.id)
 			if (!entity.dummyForExpand) {
 				entities.push(model.getEntityById(node.id));
-			}			
+			}
 		});
 
 		var applicationEvent = {
@@ -107,7 +107,7 @@ var packageExplorerController = (function () {
 		events.selected.on.publish(applicationEvent);
 	}
 
-	// Before expand load all child nodes and remove dummyForExpand state (metadata)
+	// Before expand load all child nodes and remove dummyForExpand state (entity state)
 	function zTreeBeforeExpand(event, treeId, treeNode) {
 		let entity = model.getEntityById(treeId.id)
 		if (entity.childsLoaded) {
@@ -125,9 +125,9 @@ var packageExplorerController = (function () {
 	}
 
 	function addTreeNode(entities) {
-		let items = new Map();
 
 		//build items for ztree
+		let items = new Map();
 		entities.forEach(function (entity) {
 
 			let item;
@@ -195,69 +195,15 @@ var packageExplorerController = (function () {
 			}
 
 			if (item !== undefined) {
-				// items.push(item);
 				items.set(entity.id, item);
 			}
 		});
 
-		// Sortierung nach Typ und Alphanumerisch
-		items = new Map([...items.entries()].sort(
-				function (a, b) {
+		// Sort by type and name (ASC)
+		items = getSortedMap(items);
 
-					// we have map, so "a" and "b" are arrays of key[0] and value[1]
-					let entryA = a[1] // get value from entry
-					let sortStringA = "";
-					switch (entryA.icon) {
-						case controllerConfig.packageIcon:
-							sortStringA = "1" + entryA.name.toUpperCase();
-							break;
-						case controllerConfig.typeIcon:
-							sortStringA = "2" + entryA.name.toUpperCase();
-							break;
-						case controllerConfig.fieldIcon:
-							sortStringA = "3" + entryA.name.toUpperCase();
-							break;
-						case controllerConfig.methodIcon:
-							sortStringA = "4" + entryA.name.toUpperCase();
-							break;
-						default:
-							sortStringA = "0" + entryA.name.toUpperCase();
-					}
-
-					let entryB = b[1] // get value from entry
-					let sortStringB = "";
-					switch (entryB.icon) {
-						case controllerConfig.packageIcon:
-							sortStringB = "1" + entryB.name.toUpperCase();
-							break;
-						case controllerConfig.typeIcon:
-							sortStringB = "2" + entryB.name.toUpperCase();
-							break;
-						case controllerConfig.fieldIcon:
-							sortStringB = "3" + entryB.name.toUpperCase();
-							break;
-						case controllerConfig.methodIcon:
-							sortStringB = "4" + entryB.name.toUpperCase();
-							break;
-						default:
-							sortStringB = "0" + entryB.name.toUpperCase();
-							break;
-					}
-
-					if (sortStringA < sortStringB) {
-						return -1;
-					}
-					if (sortStringA > sortStringB) {
-						return 1;
-					}
-
-					return 0;
-				}
-			)
-		);
-
-		// Add items to explorer, but to build a proper tree make sure, that parent node is already there.
-		items.forEach((value, key) => {
+		// Add items to explorer. To build a proper tree make sure, that parent node is already there.
+		items.forEach((value, key, index) => {
 			// We don't need duplicates
 			let nodeAlreadyAdded = tree.getNodeByParam("id", key, null);
 			if (nodeAlreadyAdded) {
@@ -278,13 +224,94 @@ var packageExplorerController = (function () {
 					tree.addNodes(null, parent);
 				}
 
-				// get index of parent, to place the node in the right place
-				let parent = tree.getNodeByParam("id", value.parentId, null); 
-				const newNodeIndex = -1; // add to the end of list
+				// Parent node is there, so now add child node.
+				let parent = tree.getNodeByParam("id", value.parentId, null); // new get because of the possible insertion
+				let newNodeIndex = -1; // per default add to the end of the list
+
+				// In case there are child nodes in current parent, find the right place to insert this new child-node
+				let existingChildNodes = parent.children;
+				if (existingChildNodes) {
+					// We need only child nodes of this parent
+					let sortExistingChildNodes = new Map();
+					existingChildNodes.forEach(node => {
+						sortExistingChildNodes.set(node.id, node); // insert existing child nodes
+					});
+					sortExistingChildNodes.set(key, value);	// insert current child node
+					sortExistingChildNodes = getSortedMap(sortExistingChildNodes);
+
+					// Array because we have to find the index
+					let itemsArray = Array.from(sortExistingChildNodes.entries());
+					for (let i = 0; i < itemsArray.length; i++) {
+						let item = itemsArray[i];
+						if (item[0] == key) { // item[0] because of the array. Represents key. 
+							newNodeIndex = i;
+							break;
+						}
+					}
+				}
+				
 				return tree.addNodes(parent, newNodeIndex, value, true);
 			}
 		});
 	};
+
+	// Sortierung nach Typ und Alphanumerisch
+	function getSortedMap(items) {
+		items = new Map([...items.entries()].sort(
+			function (a, b) {
+
+				// we have map, so "a" and "b" are arrays of key[0] and value[1]
+				let entryA = a[1] // get value from entry
+				let sortStringA = "";
+				switch (entryA.icon) {
+					case controllerConfig.packageIcon:
+						sortStringA = "1" + entryA.name.toUpperCase();
+						break;
+					case controllerConfig.typeIcon:
+						sortStringA = "2" + entryA.name.toUpperCase();
+						break;
+					case controllerConfig.fieldIcon:
+						sortStringA = "3" + entryA.name.toUpperCase();
+						break;
+					case controllerConfig.methodIcon:
+						sortStringA = "4" + entryA.name.toUpperCase();
+						break;
+					default:
+						sortStringA = "0" + entryA.name.toUpperCase();
+				}
+
+				let entryB = b[1] // get value from entry
+				let sortStringB = "";
+				switch (entryB.icon) {
+					case controllerConfig.packageIcon:
+						sortStringB = "1" + entryB.name.toUpperCase();
+						break;
+					case controllerConfig.typeIcon:
+						sortStringB = "2" + entryB.name.toUpperCase();
+						break;
+					case controllerConfig.fieldIcon:
+						sortStringB = "3" + entryB.name.toUpperCase();
+						break;
+					case controllerConfig.methodIcon:
+						sortStringB = "4" + entryB.name.toUpperCase();
+						break;
+					default:
+						sortStringB = "0" + entryB.name.toUpperCase();
+						break;
+				}
+
+				if (sortStringA < sortStringB) {
+					return -1;
+				}
+				if (sortStringA > sortStringB) {
+					return 1;
+				}
+
+				return 0;
+			}
+		));
+		return items;
+	}
 
 	function onEntitySelected(applicationEvent) {
 		if (applicationEvent.sender !== packageExplorerController) {

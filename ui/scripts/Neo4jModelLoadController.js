@@ -102,8 +102,11 @@ var neo4jModelLoadController = (function () {
             return childNodesMetadata;
         }
 
-        for(parentNode of parentNodes) {
+        for (parentNode of parentNodes) {
             let childNodes = await getNeo4jChildNodes(parentNode.id, limitOne);
+            if (!childNodes) {
+                continue;
+            }
 
             for (childNode of childNodes) {
                 childNodesMetadata.push(childNode);
