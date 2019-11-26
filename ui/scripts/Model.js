@@ -12,7 +12,8 @@ var model = (function() {
 		antipattern     : { name: "antipattern" },
 		versionSelected : { name: "versionSelected" },
 		loaded			: { name: "loaded" }, // Element is added to DOM
-		childsLoaded	: { name: "childsLoaded" }, // For entity (is in DOM) all child nodes are also loaded
+		childsLoaded	: { name: "childsLoaded" }, // if true, all child nodes are also loaded
+		dummyForExpand  : { name: "dummyForExpand" } // if true, element won't be visible
     };
 
 	let entitiesById = new Map();
@@ -310,12 +311,6 @@ var model = (function() {
 	
 		return parents;
 	}
-
-	function changeEntityLoadedState(id) {
-		// let entity = entitiesById.get(id);
-		// entity.loaded = true;
-		// return entitiesById.set(entity.id, entity);
-	}
 	
 	function getAllEntities(){
 		return entitiesById;
@@ -490,7 +485,6 @@ var model = (function() {
 		createEntity				: createEntity,
 		removeEntity				: removeEntity,
 
-		changeEntityLoadedState		: changeEntityLoadedState,
 		addVersion                  : addVersion,
 		removeVersion               : removeVersion,
 		addIssue					: addIssue,

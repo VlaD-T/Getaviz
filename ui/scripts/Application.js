@@ -36,7 +36,7 @@ async function initializeApplication(metaDataJsonUrl){
 		let data = await response.json()
 		model.createEntities(data);
 	} else { // Load data from Neo4j
-		neo4jModelLoadController.getStartMetaData();
+		neo4jModelLoadController.loadStartMetaData();
 	}
 
 	if(setup.loadPopUp){

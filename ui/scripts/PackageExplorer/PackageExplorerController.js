@@ -80,8 +80,11 @@ var packageExplorerController = (function () {
 
 		var entities = [];
 		nodes.forEach(function (node) {
-			node.checkedOld = node.checked; //fix zTree bug on getChangeCheckedNodes	
-			entities.push(model.getEntityById(node.id));
+			node.checkedOld = node.checked; //fix zTree bug on getChangeCheckedNodes
+			let entity = model.getEntityById(node.id)
+			if (!entity.dummyForExpand) {
+				entities.push(model.getEntityById(node.id));
+			}			
 		});
 
 		var applicationEvent = {
@@ -104,7 +107,7 @@ var packageExplorerController = (function () {
 		events.selected.on.publish(applicationEvent);
 	}
 
-	// Before expand load all child nodes (metadata)
+	// Before expand load all child nodes and remove dummyForExpand state (metadata)
 	function zTreeBeforeExpand(event, treeId, treeNode) {
 		let entity = model.getEntityById(treeId.id)
 		if (entity.childsLoaded) {
@@ -113,9 +116,7 @@ var packageExplorerController = (function () {
 
 		let applicationEvent = {
 			sender: packageExplorerController,
-			entity: entity,
-			tree: tree,
-			treeId: treeId
+			entity: entity
 		};
 
 		events.childsLoaded.on.publish(applicationEvent);
