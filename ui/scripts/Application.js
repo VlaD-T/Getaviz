@@ -27,6 +27,12 @@ async function initializeApplication(metaDataJsonUrl){
 	actionController.initialize();
 	canvasManipulator.initialize();
 
+	//initialize Events for entities
+	model.initEntityEvents();
+
+	// initialize neo4jModelLoadController
+	neo4jModelLoadController.initialize();
+
 	//initialize application
 	application.initialize();
 
@@ -87,9 +93,6 @@ var application = (function() {
 			events.log.error.publish({ text: "No UI config in setup found"});
 			return;
 		}
-
-		//initialize Events for entities
-		model.initEntityEvents();
 
 		//initialize controllers
 		setup.controllers.forEach(function(controller){

@@ -82,9 +82,7 @@ var packageExplorerController = (function () {
 		nodes.forEach(function (node) {
 			node.checkedOld = node.checked; //fix zTree bug on getChangeCheckedNodes
 			let entity = model.getEntityById(node.id)
-			if (!entity.dummyForExpand) {
-				entities.push(model.getEntityById(node.id));
-			}
+				entities.push(entity);
 		});
 
 		var applicationEvent = {
@@ -124,6 +122,7 @@ var packageExplorerController = (function () {
 		return false; // tree.expandNode already opens the list, so return false to leave it open
 	}
 
+	// Currently called from Model.js 
 	function addTreeNode(entities) {
 
 		//build items for ztree
@@ -228,7 +227,7 @@ var packageExplorerController = (function () {
 				let parent = tree.getNodeByParam("id", value.parentId, null); // new get because of the possible insertion
 				let newNodeIndex = -1; // per default add to the end of the list
 
-				// In case there are child nodes in current parent, find the right place to insert this new child-node
+				// In case there are child nodes in the current parent, find the right place to insert this new child-node
 				let existingChildNodes = parent.children;
 				if (existingChildNodes) {
 					// We need only child nodes of this parent
@@ -243,7 +242,7 @@ var packageExplorerController = (function () {
 					let itemsArray = Array.from(sortExistingChildNodes.entries());
 					for (let i = 0; i < itemsArray.length; i++) {
 						let item = itemsArray[i];
-						if (item[0] == key) { // item[0] because of the array. Represents key. 
+						if (item[0] == key) { // item[0] because of the array. Represents the key. 
 							newNodeIndex = i;
 							break;
 						}

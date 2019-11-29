@@ -12,8 +12,7 @@ var model = (function() {
 		antipattern     : { name: "antipattern" },
 		versionSelected : { name: "versionSelected" },
 		loaded			: { name: "loaded" }, // Element is added to DOM
-		childsLoaded	: { name: "childsLoaded" }, // if true, all child nodes are also loaded
-		dummyForExpand  : { name: "dummyForExpand" } // if true, element won't be visible
+		childsLoaded	: { name: "childsLoaded" } // if true, all child nodes are also loaded
     };
 
 	let entitiesById = new Map();
@@ -68,16 +67,8 @@ var model = (function() {
 			}
 
 			let entity = createEntity(element);
-			newEntities.push(entity);
-
-			// Add Element to DOM and refresh controllers
-			let elements = [entity]
-			let applicationEvent = {			
-				sender: 	model,
-				entities:   elements
-			};
 			entitiesById.set(entity.id, entity);
-			events.loaded.on.publish(applicationEvent);
+			newEntities.push(entity);
 		});
 
 		//set object references - if set wrong, package Explorer will show wrong structure
@@ -179,9 +170,15 @@ var model = (function() {
 			entity.allParents = getAllParentsOfEntity(entity);
 		});				
 
-		// if (resetPackageExpl) {
-		// 	return packageExplorerController.reset();
-		// }	
+		// Add Element to DOM and refresh controllers
+		// let elements = [newEntities]
+		let applicationEvent = {			
+			sender: 	model,
+			entities:   newEntities
+		};
+		
+		events.loaded.on.publish(applicationEvent);
+
 		packageExplorerController.addTreeNode(newEntities)
     }	
 	
@@ -210,10 +207,9 @@ var model = (function() {
 		};
 		
 		entity.isTransparent = false;
-		
 		const statesArray = Object.keys(states);
 		statesArray.forEach(function(stateName){
-			entity[stateName] = false;
+			return entity[stateName] = false;
 		});
 		
 		switch(entity.type) {

@@ -1,14 +1,14 @@
 var neo4jModelLoadController = (function () {
 
+    //  Default config (Fallback in case it's a new setup without a proper config)
     let controllerConfig = {
         url: 'http://localhost:7474/db/data/transaction/commit',
         loadStartData: 'rootPackages',
-        showLoadSpinner: false
+        showLoadSpinner: true
     };
 
     // Count may jump from 300 to 100 because of the empty entites, like buildingSegments.
     // Loader is impacted by Neo4j requests and entity creation:
-    // 
     let loaderController = {
         dataToLoad: 0
     };
@@ -20,8 +20,11 @@ var neo4jModelLoadController = (function () {
     };
 
 
-    function initialize(setupConfig) {
-        application.transferConfigParams(setupConfig, controllerConfig);
+    function initialize() {
+        // Override config with ones from setup
+        if (setup.neo4jModelLoadConfig) {
+            controllerConfig = {...controllerConfig, ...setup.neo4jModelLoadConfig}
+        }
         events.loaded.on.subscribe(loadElementsAndChangeState);
         events.loaded.off.subscribe(updateLoadSpinner);
         events.childsLoaded.on.subscribe(onNodeExpandGetChildrenMeta);
@@ -34,6 +37,7 @@ var neo4jModelLoadController = (function () {
 
     // Spinner to show loading process of entites 
     // starts with loading from Neo4j and ends with creating a Model in AframeCanvasManipulator
+    // Loader is added to a new container on top of everything
     function createLoadSpinner() {
         let loader = document.createElement('div');
         loader.id = 'loaderController';
@@ -42,7 +46,7 @@ var neo4jModelLoadController = (function () {
         document.body.appendChild(loader);
     }
 
-    function updateLoadSpinner(payload) { // payload = toLoad / loaded;
+    function updateLoadSpinner(payload) { // payload = toLoad || loaded;
         if (!controllerConfig.showLoadSpinner) {
             return;
         }
@@ -60,24 +64,20 @@ var neo4jModelLoadController = (function () {
 
     // Get metadata on launch. Either rootPackages or everything (depends on settings)
     async function loadStartMetaData() {
-        let payload = {};
-        let loadOneChild;
-        if (controllerConfig.loadStartData === 'rootPackages') {
-            loadOneChild = true;
-            payload = {
-                'statements': [
-                    // neo4j requires keyword "statement", so leave as is
-                    { 'statement': `MATCH (p:Package) WHERE NOT (:Package)-[:CONTAINS]->(p) RETURN p` }
-                ]
-            }
-        } else { // load everything
+        // Select root packages (loadStartData === 'rootPackages')
+        let loadOneChild = true;
+        let statement = `MATCH (p:Package) WHERE NOT (:Package)-[:CONTAINS]->(p) RETURN p`;
+
+        if (controllerConfig.loadStartData === 'everything') {
             loadOneChild = false;
-            payload = {
-                'statements': [
-                    // neo4j requires keyword "statement", so leave as is
-                    { 'statement': `MATCH (p:Package) RETURN p` }
-                ]
-            }
+            statement = `MATCH (p:Package) RETURN p`;
+        }
+
+        let payload = {
+            'statements': [
+                // neo4j requires keyword "statement", so leave as is
+                { 'statement': `${statement}` }
+            ]
         }
 
         let parentNodes = await getMetadataForParentNodes(payload);
@@ -89,8 +89,16 @@ var neo4jModelLoadController = (function () {
 
     // Returning parent nodes metadata, prepared to be inserted into model.js
     async function getMetadataForParentNodes(payload) {
+        loaderApplicationEvent.value = 'toLoad'
+        updateLoadSpinner(loaderApplicationEvent);
+
         let response = await getNeo4jData(payload);
         let data = await getMetadataFromResponse(response);
+
+        if (data) {
+            loaderApplicationEvent.value = 'loaded'
+            updateLoadSpinner(loaderApplicationEvent);
+        }
         return data;
     }
 
@@ -121,9 +129,6 @@ var neo4jModelLoadController = (function () {
     async function onNodeExpandGetChildrenMeta(applicationEvent) {
         let entity = model.getEntityById(applicationEvent.entity.id)
         entity.childsLoaded = true;
-        entity.children.forEach(child => {
-            return child.dummyForExpand = false;
-        });
         let parentNodes = await getNeo4jChildNodes(applicationEvent.entity.id, false); // parent nodes inside selected node
         let childNodes = await getMetadataForChildNodes(parentNodes, true); // select single child to show expand sign
         model.createEntities(parentNodes); 
@@ -215,9 +220,6 @@ var neo4jModelLoadController = (function () {
 
     // Universal method to load data from Neo4j using imported query
     async function getNeo4jData(payload) {
-        loaderApplicationEvent.value = 'toLoad'
-        updateLoadSpinner(loaderApplicationEvent);
-
         let response = await fetch(controllerConfig.url, {
             method: 'POST', 
             body: JSON.stringify(payload), 
@@ -227,9 +229,6 @@ var neo4jModelLoadController = (function () {
         });
 
         let data = await response.json();
-
-        loaderApplicationEvent.value = 'loaded'
-        updateLoadSpinner(loaderApplicationEvent);
         return data.results;
     }
 

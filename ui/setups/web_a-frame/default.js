@@ -2,6 +2,12 @@
 
     loadPopUp: true,
     useMetaDataFile: false,
+    // Override config for neo4jModelLoadController
+    neo4jModelLoadConfig: {
+        url: 'http://localhost:7474/db/data/transaction/commit',
+        loadStartData: "everything", //rootPackages, everything
+        showLoadSpinner: true
+    },
 
 		
 	controllers: [	
@@ -11,12 +17,7 @@
 			logInfoConsole		: false,
 			logActionConsole	: false,
 			logEventConsole		: false
-        },	
-        {   name: "neo4jModelLoadController",
-            loadStartData: "rootPackages", //rootPackages, everything
-            showLoadSpinner: true
-        },
-		
+        },			
 		{	name:	"emailController",
 		
 			createHeadSection: false
