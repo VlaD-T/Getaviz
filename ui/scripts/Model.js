@@ -27,7 +27,7 @@ var model = (function() {
 	let labels = [];
 
 	// Called from Application.js, because Event.js is loaded after Model.js
-	function initEntityEvents() {
+	function initialize() {
 		//subscribe for changing status of entities on events
 		let eventArray = Object.keys(states);
 		eventArray.forEach(function(eventName){
@@ -53,7 +53,7 @@ var model = (function() {
 		});
 	}
 
-	function createEntities(elements) {
+	function createEntities(elements = []) {
 		let newEntities = [];            
 		//create initial entites from famix elements 
 		elements.forEach(function(element) {
@@ -178,8 +178,6 @@ var model = (function() {
 		};
 		
 		events.loaded.on.publish(applicationEvent);
-
-		packageExplorerController.addTreeNode(newEntities)
     }	
 	
 	
@@ -459,7 +457,7 @@ var model = (function() {
 	}
 	
 	return {
-		initEntityEvents			: initEntityEvents,
+		initialize					: initialize,
         createEntities				: createEntities,
 		reset						: reset,
 		states						: states,

@@ -28,7 +28,7 @@ async function initializeApplication(metaDataJsonUrl){
 	canvasManipulator.initialize();
 
 	//initialize Events for entities
-	model.initEntityEvents();
+	model.initialize();
 
 	// initialize neo4jModelLoadController
 	neo4jModelLoadController.initialize();

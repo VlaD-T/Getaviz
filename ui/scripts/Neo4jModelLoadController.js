@@ -1,4 +1,4 @@
-var neo4jModelLoadController = (function () {
+let neo4jModelLoadController = (function () {
 
     //  Default config (Fallback in case it's a new setup without a proper config)
     let controllerConfig = {
@@ -10,13 +10,9 @@ var neo4jModelLoadController = (function () {
     // Count may jump from 300 to 100 because of the empty entites, like buildingSegments.
     // Loader is impacted by Neo4j requests and entity creation:
     let loaderController = {
-        dataToLoad: 0
-    };
-
-    // Loader standard parameters
-    let loaderApplicationEvent = {			
-        sender: neo4jModelLoadController,
-        value: 'toLoad'
+        dataToLoad: 0,
+        toLoad: 'toLoad',
+        loaded: 'loaded'
     };
 
 
@@ -26,7 +22,6 @@ var neo4jModelLoadController = (function () {
             controllerConfig = {...controllerConfig, ...setup.neo4jModelLoadConfig}
         }
         events.loaded.on.subscribe(loadElementsAndChangeState);
-        events.loaded.off.subscribe(updateLoadSpinner);
         events.childsLoaded.on.subscribe(onNodeExpandGetChildrenMeta);
 
         if (controllerConfig.showLoadSpinner) {
@@ -51,7 +46,7 @@ var neo4jModelLoadController = (function () {
             return;
         }
         let loader = document.getElementById('loaderController');
-        payload.value === 'toLoad'? loaderController.dataToLoad ++ : loaderController.dataToLoad --
+        payload === loaderController.toLoad ? loaderController.dataToLoad ++ : loaderController.dataToLoad --
         if (loaderController.dataToLoad !== 0) { // show loader
             loader.classList.remove('hidden');
             let loaderData = document.getElementById('loaderController-data');
@@ -64,23 +59,16 @@ var neo4jModelLoadController = (function () {
 
     // Get metadata on launch. Either rootPackages or everything (depends on settings)
     async function loadStartMetaData() {
-        // Select root packages (loadStartData === 'rootPackages')
+        // Select root packages ('rootPackages')
         let loadOneChild = true;
-        let statement = `MATCH (p:Package) WHERE NOT (:Package)-[:CONTAINS]->(p) RETURN p`;
+        let cypherQuery = `MATCH (p:Package) WHERE NOT (:Package)-[:CONTAINS]->(p) RETURN p`;
 
         if (controllerConfig.loadStartData === 'everything') {
             loadOneChild = false;
-            statement = `MATCH (p:Package) RETURN p`;
+            cypherQuery = `MATCH (p:Package) RETURN p`;
         }
 
-        let payload = {
-            'statements': [
-                // neo4j requires keyword "statement", so leave as is
-                { 'statement': `${statement}` }
-            ]
-        }
-
-        let parentNodes = await getMetadataForParentNodes(payload);
+        let parentNodes = await getMetadataForParentNodes(cypherQuery);
         let childNodes = await getMetadataForChildNodes(parentNodes, loadOneChild);
         model.createEntities(parentNodes)
         model.createEntities(childNodes);
@@ -88,23 +76,16 @@ var neo4jModelLoadController = (function () {
 
 
     // Returning parent nodes metadata, prepared to be inserted into model.js
-    async function getMetadataForParentNodes(payload) {
-        loaderApplicationEvent.value = 'toLoad'
-        updateLoadSpinner(loaderApplicationEvent);
-
-        let response = await getNeo4jData(payload);
-        let data = await getMetadataFromResponse(response);
-
-        if (data) {
-            loaderApplicationEvent.value = 'loaded'
-            updateLoadSpinner(loaderApplicationEvent);
-        }
+    async function getMetadataForParentNodes(cypherQuery) {
+        let response = await getNeo4jData(cypherQuery);
+        let data = await getMetadataFromResponse(response);        
         return data;
     }
 
 
     // Get child nodes metadata + one or all child node of this node.
     async function getMetadataForChildNodes(parentNodes, limitOne) {
+        updateLoadSpinner(loaderController.toLoad);
         let childNodesMetadata = [];
         if (!parentNodes) {
             return childNodesMetadata;
@@ -121,6 +102,7 @@ var neo4jModelLoadController = (function () {
             }
         }
 
+        updateLoadSpinner(loaderController.loaded);
         return childNodesMetadata;
     }
 
@@ -129,8 +111,8 @@ var neo4jModelLoadController = (function () {
     async function onNodeExpandGetChildrenMeta(applicationEvent) {
         let entity = model.getEntityById(applicationEvent.entity.id)
         entity.childsLoaded = true;
-        let parentNodes = await getNeo4jChildNodes(applicationEvent.entity.id, false); // parent nodes inside selected node
-        let childNodes = await getMetadataForChildNodes(parentNodes, true); // select single child to show expand sign
+        let parentNodes = await getNeo4jChildNodes(applicationEvent.entity.id, false); // parent nodes inside of the selected node
+        let childNodes = await getMetadataForChildNodes(parentNodes, true); // select single child to show the expand sign
         model.createEntities(parentNodes); 
         model.createEntities(childNodes); 
     };
@@ -142,14 +124,9 @@ var neo4jModelLoadController = (function () {
         if (limitOne) {
             limit = `LIMIT 1`;
         }
-        let payload = {
-            'statements': [
-                // neo4j requires keyword "statement", so leave as is
-                { 'statement': `MATCH (parent)-[:DECLARES|HAS|CONTAINS]->(child) WHERE parent.hash = "${parentNodeHash}" AND EXISTS(child.hash) RETURN child ${limit}` }
-            ]
-        };
+        const cypherQuery = `MATCH (parent)-[:DECLARES|HAS|CONTAINS]->(child) WHERE parent.hash = "${parentNodeHash}" AND EXISTS(child.hash) RETURN child ${limit}`;
 
-        let response = await getNeo4jData(payload);
+        let response = await getNeo4jData(cypherQuery);
         let data = await getMetadataFromResponse(response);
         return data;
     }
@@ -174,67 +151,72 @@ var neo4jModelLoadController = (function () {
 
     // For given Node in Model load it's A-Frame code and create the element in DOM
     async function loadElementsAndChangeState(applicationEvent) {
-        try {
-            for (entity of applicationEvent.entities) {
-                // Entity is already in DOM or will be added soon. 
-                if (entity.loaded) {
-                    continue;
-                }
-
-                loaderApplicationEvent.value = 'toLoad'
-                updateLoadSpinner(loaderApplicationEvent);
-
-                let results = await getAframeCodeById(entity.id);
-                for (result of results) {
-                    // There may be some empty entites, like buildingSegments. They don't have any data, so we can't create an element for them.
-                    if (result.data[0]) {
-                        // console.log('append Element') // to test an event loop
-                        // Start drawing element
-                        canvasManipulator.appendAframeElementWithProperties(result.data[0]);
-                    } else {
-                        loaderApplicationEvent.value = 'loaded'
-                        updateLoadSpinner(loaderApplicationEvent);
-                    } 
-                }
+        // Prepare cypherQuery will all the node ids
+        let whereStatement = null;
+        applicationEvent.entities.forEach(entity => {
+            if (whereStatement == null) {
+                return whereStatement = `WHERE n.nodeHashId = "${entity.id}"`;
             }
+
+            return whereStatement += ` OR n.nodeHashId = "${entity.id}"`;
+        });
+
+        if (!whereStatement) {
+            return;                
+        }
+
+        const cypherQuery = `MATCH (n) ${whereStatement} AND EXISTS(n.aframeProperty) RETURN n`;
+
+        updateLoadSpinner(loaderController.toLoad); // firstly add one, because of the getNeo4jData
+        let response = await getNeo4jData(cypherQuery);
+        if (!response) {
+            return;
+        }
+
+        let elements = response[0].data;
+        for (element of elements) {
+            updateLoadSpinner(loaderController.toLoad); // second add, because of the appendAframeElementWithProperties
+            // There may be some empty entites, like buildingSegments. They don't have any data, so we can't create an element for them.
+            if (element) {
+                canvasManipulator.appendAframeElementWithProperties(element); // Start drawing the element
+            } else {
+                updateLoadSpinner(loaderController.loaded);
+            }
+        }
+        updateLoadSpinner(loaderController.loaded);
+    }
+
+
+    // Universal method to load a data from Neo4j using imported cypher-query
+    async function getNeo4jData(cypherQuery) {
+        const payload = {
+            'statements': [
+                // neo4j requires keyword "statement", so leave as is
+                { 'statement': `${cypherQuery}` }
+            ]
+        }
+
+        try {
+            let response = await fetch(controllerConfig.url, {
+                method: 'POST', 
+                body: JSON.stringify(payload), 
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+    
+            let data = await response.json();
+            return data.results;
         } catch (error) {
             console.error(error);
         }
     }
 
 
-    // Getting A-Frame code for node
-    // This function is called for each new node from metaData from Model.js (createEntities) separately.
-    async function getAframeCodeById(nodeId) {
-        const payload = {
-            'statements': [
-                // neo4j requires keyword "statement", so leave as is
-                { 'statement': `MATCH (n) WHERE n.nodeHashId ="${nodeId}" AND EXISTS(n.aframeProperty) RETURN n` }
-            ]
-        }
-
-        let response = await getNeo4jData(payload);
-        return response;
-    }
-
-
-    // Universal method to load data from Neo4j using imported query
-    async function getNeo4jData(payload) {
-        let response = await fetch(controllerConfig.url, {
-            method: 'POST', 
-            body: JSON.stringify(payload), 
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        });
-
-        let data = await response.json();
-        return data.results;
-    }
-
-
     return {
         initialize: initialize,
-        loadStartMetaData: loadStartMetaData
+        loadStartMetaData: loadStartMetaData,
+        updateLoadSpinner: updateLoadSpinner,
+        loaderController: loaderController
     };
 })();

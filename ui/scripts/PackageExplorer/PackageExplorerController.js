@@ -16,6 +16,7 @@ var packageExplorerController = (function () {
 
 	function initialize(setupConfig) {
 		application.transferConfigParams(setupConfig, controllerConfig);
+		events.loaded.on.subscribe(addTreeNode);
 	}
 
 	function activate(rootDiv) {
@@ -123,11 +124,11 @@ var packageExplorerController = (function () {
 	}
 
 	// Currently called from Model.js 
-	function addTreeNode(entities) {
-
+	function addTreeNode(applicationEvent) {
+		
 		//build items for ztree
 		let items = new Map();
-		entities.forEach(function (entity) {
+		applicationEvent.entities.forEach(function (entity) {
 
 			let item;
 

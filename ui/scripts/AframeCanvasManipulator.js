@@ -270,12 +270,7 @@ var canvasManipulator = (function () {
         let sceneEl = document.querySelector('a-scene');
         sceneEl.appendChild(entityEl);
 
-        //publish entity loaded
-        let applicationEvent = {			
-            sender: canvasManipulator,
-            value: 'loaded'
-        };
-        events.loaded.off.publish(applicationEvent);
+        neo4jModelLoadController.updateLoadSpinner(neo4jModelLoadController.loaderController.loaded);
     }
 
     return {

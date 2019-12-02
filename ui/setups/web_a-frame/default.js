@@ -5,7 +5,7 @@
     // Override config for neo4jModelLoadController
     neo4jModelLoadConfig: {
         url: 'http://localhost:7474/db/data/transaction/commit',
-        loadStartData: "everything", //rootPackages, everything
+        loadStartData: "rootPackages", //rootPackages, everything
         showLoadSpinner: true
     },
 
