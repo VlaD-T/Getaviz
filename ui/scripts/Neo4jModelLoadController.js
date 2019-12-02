@@ -70,8 +70,7 @@ let neo4jModelLoadController = (function () {
 
         let parentNodes = await getMetadataForParentNodes(cypherQuery);
         let childNodes = await getMetadataForChildNodes(parentNodes, loadOneChild);
-        model.createEntities(parentNodes)
-        model.createEntities(childNodes);
+        model.createEntities([...parentNodes, ...childNodes]);
     }
 
 
@@ -113,8 +112,7 @@ let neo4jModelLoadController = (function () {
         entity.childsLoaded = true;
         let parentNodes = await getNeo4jChildNodes(applicationEvent.entity.id, false); // parent nodes inside of the selected node
         let childNodes = await getMetadataForChildNodes(parentNodes, true); // select single child to show the expand sign
-        model.createEntities(parentNodes); 
-        model.createEntities(childNodes); 
+        model.createEntities([...parentNodes, ...childNodes]);
     };
 
 
