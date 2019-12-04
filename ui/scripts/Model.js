@@ -2,6 +2,7 @@ var model = (function() {
 
 	//states
 	const states = {
+		// TODO: wasSelected, wasExpanded
 		selected 		: { name: "selected" },
 		marked 			: { name: "marked" },
 		hovered 		: { name: "hovered" },
@@ -12,7 +13,11 @@ var model = (function() {
 		antipattern     : { name: "antipattern" },
 		versionSelected : { name: "versionSelected" },
 		loaded			: { name: "loaded" }, // Element is added to DOM
-		childsLoaded	: { name: "childsLoaded" } // if true, all child nodes are also loaded
+		/* früher in neo4j für jedes Element bei der Erstellung geprüft. Jetzt können das nicht machen, weil wir array rein schmeißen 
+		und für alle das Wert gleich auf true gesetz wird. */
+		wasExpanded	: { name: "wasExpanded" }, // if true, all child nodes are also loaded (first level children)
+		/*Problem: wie prüfen wir, ob alles geladen ist? */
+		wasChecked : { name: "wasChecked" }
     };
 
 	let entitiesById = new Map();

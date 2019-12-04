@@ -77,16 +77,28 @@ var packageExplorerController = (function () {
 
 
 	function zTreeOnCheck(event, treeId, treeNode) {
-		var nodes = tree.getChangeCheckedNodes();
+		let entities = [];
 
-		var entities = [];
+		// First of all get all the child nodes, if this is first check for this node
+		let wasChecked = model.getEntityById(treeNode.id).wasChecked;
+		if (!wasChecked) {
+			let applicationEvent = {
+				sender: packageExplorerController,
+				entity: treeNode
+			}
+
+			events.wasChecked.on.publish(applicationEvent);
+		}
+
+		// Process with changing check state
+		let nodes = tree.getChangeCheckedNodes();
 		nodes.forEach(function (node) {
 			node.checkedOld = node.checked; //fix zTree bug on getChangeCheckedNodes
 			let entity = model.getEntityById(node.id)
 				entities.push(entity);
 		});
 
-		var applicationEvent = {
+		let applicationEvent = {
 			sender: packageExplorerController,
 			entities: entities
 		};
@@ -109,7 +121,7 @@ var packageExplorerController = (function () {
 	// Before expand load all child nodes and remove dummyForExpand state (entity state)
 	function zTreeBeforeExpand(event, treeId, treeNode) {
 		let entity = model.getEntityById(treeId.id)
-		if (entity.childsLoaded) {
+		if (entity.wasExpanded) {
 			return true; // true to expand the list
 		}
 
@@ -118,7 +130,7 @@ var packageExplorerController = (function () {
 			entity: entity
 		};
 
-		events.childsLoaded.on.publish(applicationEvent);
+		events.wasExpanded.on.publish(applicationEvent);
 		tree.expandNode(treeId, true, false, true, false);
 		return false; // tree.expandNode already opens the list, so return false to leave it open
 	}

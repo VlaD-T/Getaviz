@@ -22,7 +22,8 @@ let neo4jModelLoadController = (function () {
             controllerConfig = {...controllerConfig, ...setup.neo4jModelLoadConfig}
         }
         events.loaded.on.subscribe(loadElementsAndChangeState);
-        events.childsLoaded.on.subscribe(onNodeExpandGetChildrenMeta);
+        events.wasExpanded.on.subscribe(onNodeExpand);
+        events.wasChecked.on.subscribe(onNodeCheck);
 
         if (controllerConfig.showLoadSpinner) {
             createLoadSpinner();
@@ -106,10 +107,44 @@ let neo4jModelLoadController = (function () {
     }
 
 
-    // Get MetaData for Child node on node expand
-    async function onNodeExpandGetChildrenMeta(applicationEvent) {
+    function onNodeCheck(applicationEvent) {
         let entity = model.getEntityById(applicationEvent.entity.id)
-        entity.childsLoaded = true;
+        entity.wasChecked = true;
+        let data = loadNodesRecursively(entity)
+    }
+
+    async function loadNodesRecursively(entity) {
+        let data = [];
+        // Exclude already loaded nodes from query
+        let whereStatement = null;
+        entity.children.forEach(child => {
+            // If was already checked, we don't need these node anymore
+            if (child.wasChecked) {
+                if (!whereStatement) {
+                    return whereStatement = `child.hash = "${child.id}"`;
+                }
+                return whereStatement += `OR child.hash = "${child.id}"`;
+            }
+        });
+
+        // Kinderknoten ziehen (direkte Kinder)
+        const cypherQuery = `MATCH (parent)-[:DECLARES|HAS|CONTAINS]->(child)
+                             WHERE parent.hash = "${entity.id}" 
+                             AND EXISTS(child.hash) 
+                             AND NOT (${whereStatement})
+                             RETURN child`;
+        let response = await getNeo4jData(cypherQuery);
+        entity.children.forEach(child => {
+            loadNodesRecursively(child)
+        });
+        console.log(response);
+    }
+
+
+    // Get MetaData for Child node on node expand
+    async function onNodeExpand(applicationEvent) {
+        let entity = model.getEntityById(applicationEvent.entity.id)
+        entity.wasExpanded = true;
         let parentNodes = await getNeo4jChildNodes(applicationEvent.entity.id, false); // parent nodes inside of the selected node
         let childNodes = await getMetadataForChildNodes(parentNodes, true); // select single child to show the expand sign
         model.createEntities([...parentNodes, ...childNodes]);
@@ -134,7 +169,7 @@ let neo4jModelLoadController = (function () {
     async function getMetadataFromResponse(response) {
         let data = [];
         if (!response[0].data.length) {
-            return;
+            return data;
         }
 
         for (object of response[0].data) {
@@ -149,21 +184,19 @@ let neo4jModelLoadController = (function () {
 
     // For given Node in Model load it's A-Frame code and create the element in DOM
     async function loadElementsAndChangeState(applicationEvent) {
-        // Prepare cypherQuery will all the node ids
+        // Prepare cypherQuery with all the nodes ids
         let whereStatement = null;
         applicationEvent.entities.forEach(entity => {
             if (whereStatement == null) {
-                return whereStatement = `WHERE n.nodeHashId = "${entity.id}"`;
+                return whereStatement = `n.nodeHashId = "${entity.id}"`;
             }
-
             return whereStatement += ` OR n.nodeHashId = "${entity.id}"`;
         });
 
         if (!whereStatement) {
             return;                
         }
-
-        const cypherQuery = `MATCH (n) ${whereStatement} AND EXISTS(n.aframeProperty) RETURN n`;
+        const cypherQuery = `MATCH (n) WHERE ${whereStatement} AND EXISTS(n.aframeProperty) RETURN n`;
 
         updateLoadSpinner(loaderController.toLoad); // firstly add one, because of the getNeo4jData
         let response = await getNeo4jData(cypherQuery);
