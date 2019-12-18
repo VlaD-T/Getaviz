@@ -4,6 +4,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.getaviz.generator.SettingsConfiguration;
 import org.getaviz.generator.SettingsConfiguration.Metaphor;
+import org.getaviz.generator.abap.city.ACityCreator;
+import org.getaviz.generator.abap.city.ACityElement;
+import org.getaviz.generator.abap.city.ACityRepository;
 import org.getaviz.generator.abap.city.m2m.ACity2ACity;
 import org.getaviz.generator.abap.city.s2m.SAP2ACity;
 import org.getaviz.generator.city.s2m.JQA2City;
@@ -16,6 +19,8 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.neo4j.driver.v1.Record;
 import org.neo4j.driver.v1.StatementResult;
+
+import java.util.List;
 
 public class ACityTest {
 	
@@ -30,8 +35,12 @@ public class ACityTest {
 		mockup.loadProperties("CityBankTest.properties");
 		connector = mockup.getConnector();
 		
-		new SAP2ACity();
-		new ACity2ACity();
+		//new SAP2ACity();
+		//new ACity2ACity();
+
+
+
+
 	}
 	
 	@AfterAll
@@ -41,12 +50,22 @@ public class ACityTest {
 
 	@Test
 	void numberOfVisualizedPackages() {
+
+		ACityCreator aCityCreator = new ACityCreator(config);
+
+		ACityRepository aCityRepository = aCityCreator.createACityRepository();
+
+		List<ACityElement> packageDistricts = aCityRepository.getElementsByType(ACityElement.ACityType.District);
+		assertEquals(2, packageDistricts.size());
+
+		/*
 		Record result = connector
 				.executeRead("MATCH (district:District)-[:VISUALIZES]->(:Package) RETURN count(district) AS result")
 				.single();
 		int numberOfVisualizedPackages = result.get("result").asInt();
 		System.out.println("Pakete:" + result);
 		assertEquals(2, numberOfVisualizedPackages);
+		*/
 	}
 	
 //	Probe Report

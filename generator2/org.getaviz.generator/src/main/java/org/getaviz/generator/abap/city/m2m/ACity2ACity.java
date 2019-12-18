@@ -2,27 +2,14 @@ package org.getaviz.generator.abap.city.m2m;
 
 //import org.getaviz.generator.ColorGradient;
 import org.getaviz.generator.SettingsConfiguration;
-import org.getaviz.generator.database.Labels;
-import org.getaviz.generator.SettingsConfiguration.BuildingType;
-import org.getaviz.generator.city.CityUtils;
-import org.getaviz.generator.city.m2m.BrickLayout;
-import org.getaviz.generator.city.m2m.CityLayout;
-import org.getaviz.generator.city.m2m.RGBColor;
-import org.getaviz.generator.SettingsConfiguration.ClassElementsModes;
-import org.getaviz.generator.SettingsConfiguration.Original.BuildingMetric;
-import org.getaviz.generator.SettingsConfiguration.OutputFormat;
 import java.util.HashMap;
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.ArrayList;
-import org.getaviz.generator.SettingsConfiguration.Panels.SeparatorModes;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.getaviz.generator.database.DatabaseConnector;
-import org.neo4j.driver.v1.Record;
 import org.neo4j.driver.v1.StatementResult;
 import org.neo4j.driver.v1.types.Node;
-import org.neo4j.driver.v1.types.Path;
 
 public class ACity2ACity {
 	private SettingsConfiguration config = SettingsConfiguration.getInstance();
@@ -192,7 +179,7 @@ public class ACity2ACity {
 		HashMap<String, String> buildingPartProperties = nodeProperties.get(buildingPart.id());
 		
 		String height = buildingPartProperties.get("height");
-		String color = buildingPartProperties.get("color");
+		String color = buildingPartProperties.get("");
 		
 		connector.executeWrite(
 		        String.format("MATCH (n) WHERE ID(n) = %d SET n.height = \'%s\',n.color = \'%s\'", buildingPart.id(),
