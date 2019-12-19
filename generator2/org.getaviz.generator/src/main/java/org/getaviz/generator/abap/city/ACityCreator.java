@@ -15,44 +15,88 @@ public class ACityCreator {
     private SettingsConfiguration config;
     private DatabaseConnector connector = DatabaseConnector.getInstance();
 
+    private ACityRepository repository;
 
     public ACityCreator(SettingsConfiguration config) {
         this.config = config;
+
+        repository = new ACityRepository();
     }
+
+
 
     public ACityRepository createACityRepository(){
 
-        ACityRepository repository = new ACityRepository();
-
-        //Node modelNode = createModelNode();
-
-
+        //Packages
         List<Node> sourcePackages = loadSourcePackages();
         List<ACityElement> packageDistricts = createPackageDistrictsElements(sourcePackages);
         repository.addElements(packageDistricts);
 
 
-        /*
-        List<Node> sourceTypes = loadSourceTypes(packageDistricts);
+        for( ACityElement packageDistrict : packageDistricts ) {
 
-        List<ACityElement> Buildings = createPackageDistrictsElements(sourcePackages);
-        repository.addElements(packageDistricts);
-         */
+            createTypesForDistrict(packageDistrict, "Class");
+            createTypesForDistrict(packageDistrict, "Report");
+            createTypesForDistrict(packageDistrict, "FunctionGroup");
+            createTypesForDistrict(packageDistrict, "Table");
 
+        }
 
         return repository;
     }
+
+    private void createTypesForDistrict(ACityElement packageDistrict, String sourceTypeLabel) {
+
+        List<Node> sourceTypes = loadSourceTypes(packageDistrict, sourceTypeLabel);
+
+        if( sourceTypes.size() != 0){
+            ACityElement sourceTypeDistrict = new ACityElement(ACityElement.ACityType.District);
+            sourceTypeDistrict.setParentElement(packageDistrict);
+            repository.addElement(sourceTypeDistrict);
+
+            List<ACityElement> typeBuildings = createTypeBuildingElements(sourceTypeDistrict, sourceTypes);
+            repository.addElements(typeBuildings);
+
+
+        }
+
+    }
+
+
+    private List<ACityElement> createTypeBuildingElements(ACityElement classDistrict, List<Node> sourceTypes) {
+        List<ACityElement> buildings = new ArrayList<>();
+
+        for( Node sourceType: sourceTypes ) {
+            ACityElement building = new ACityElement(ACityElement.ACityType.Building);
+
+            building.setSourceNodeID(sourceType.id());
+            building.setParentElement(classDistrict);
+
+            buildings.add(building);
+        }
+
+        return buildings;
+    }
+
 
     private List<ACityElement> createPackageDistrictsElements(List<Node> sourcePackages) {
         List<ACityElement> packageDistricts = new ArrayList<>();
 
         for( Node sourcePackage: sourcePackages ) {
-            ACityElement packageDistrict = new ACityElement((sourcePackage), ACityElement.ACityType.District);
+            ACityElement packageDistrict = new ACityElement(ACityElement.ACityType.District);
+
+            packageDistrict.setSourceNodeID(sourcePackage.id());
+
             packageDistricts.add(packageDistrict);
         }
 
         return packageDistricts;
     }
+
+
+
+
+
 
 
 
@@ -71,20 +115,16 @@ public class ACityCreator {
         return sourcePackages;
     }
 
-    private List<Node> loadSourceTypes(List<ACityElement> packageDistricts ){
+    private List<Node> loadSourceTypes(ACityElement packageDistrict, String sourceTypeLabel){
         List<Node> sourceTypes = new ArrayList<>();
 
-        for( ACityElement packageDistrict : packageDistricts ) {
-
-            connector.executeRead(
-                    " MATCH (n)-[:CONTAINS]->(t:Type) WHERE ID(n) = " + packageDistrict.getId() +
-                            " RETURN t"
-            ).forEachRemaining((result) -> {
-                Node sourceType = result.get("n").asNode();
-                sourceTypes.add(sourceType);
-            });
-
-        }
+        connector.executeRead(
+                " MATCH (n)-[:CONTAINS]->(t:" + sourceTypeLabel +") WHERE ID(n) = " + packageDistrict.getSourceNodeID() +
+                        " RETURN t"
+        ).forEachRemaining((result) -> {
+            Node sourceType = result.get("t").asNode();
+            sourceTypes.add(sourceType);
+        });
 
         return sourceTypes;
     }

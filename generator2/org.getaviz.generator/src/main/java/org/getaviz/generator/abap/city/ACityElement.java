@@ -7,8 +7,8 @@ import org.neo4j.driver.v1.types.Node;
 public class ACityElement {
 
     private String hash;
+    private Long sourceNodeID;
 
-    private Node sourceNode;
 
     private List<ACityElement> subElements;
     private ACityElement parentElement;
@@ -25,12 +25,18 @@ public class ACityElement {
     private float yPosition;
     private float zPosition;
 
-    public ACityElement(Node sourceNode, ACityType type) {
-        this.sourceNode = sourceNode;
+    public ACityElement(ACityType type) {
         this.type = type;
 
-
         subElements = new ArrayList<ACityElement>();
+    }
+
+    public Long getSourceNodeID() {
+        return sourceNodeID;
+    }
+
+    public void setSourceNodeID(Long sourceNodeID) {
+        this.sourceNodeID = sourceNodeID;
     }
 
     public enum ACityType {
@@ -112,9 +118,7 @@ public class ACityElement {
         this.subElements.add(subElement);
     }
 
-    public Long getId() {
-        return sourceNode.id();
-    }
+
 
 
 

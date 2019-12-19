@@ -7,6 +7,7 @@ import org.getaviz.generator.SettingsConfiguration.Metaphor;
 import org.getaviz.generator.abap.city.ACityCreator;
 import org.getaviz.generator.abap.city.ACityElement;
 import org.getaviz.generator.abap.city.ACityRepository;
+import org.getaviz.generator.abap.city.NodeRepository;
 import org.getaviz.generator.abap.city.m2m.ACity2ACity;
 import org.getaviz.generator.abap.city.s2m.SAP2ACity;
 import org.getaviz.generator.city.s2m.JQA2City;
@@ -19,8 +20,11 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.neo4j.driver.v1.Record;
 import org.neo4j.driver.v1.StatementResult;
+import org.neo4j.driver.v1.types.Node;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 public class ACityTest {
 	
@@ -49,7 +53,31 @@ public class ACityTest {
 	}
 
 	@Test
+	void nodeRepository(){
+		NodeRepository nodeRepository = new NodeRepository();
+		nodeRepository.loadNodesWithRelation("CONTAINS");
+
+		Collection<Node> packageNodes = nodeRepository.getNodesByLabel("Package");
+		assertEquals(2, packageNodes.size());
+
+		Collection<Node> typeNodes = nodeRepository.getNodesByLabel("Type");
+		assertEquals(4, typeNodes.size());
+
+		Node firstPackage = packageNodes.iterator().next();
+		Collection<Node> subNodes = nodeRepository.getRelatedNodes(firstPackage, "CONTAINS", true);
+		assertEquals(3, subNodes.size());
+
+		Node subNode = subNodes.iterator().next();
+		Collection<Node> parentNodes = nodeRepository.getRelatedNodes(subNode, "CONTAINS", false);
+		assertEquals(1, parentNodes.size());
+
+	}
+
+	@Test
 	void numberOfVisualizedPackages() {
+
+
+
 
 		ACityCreator aCityCreator = new ACityCreator(config);
 

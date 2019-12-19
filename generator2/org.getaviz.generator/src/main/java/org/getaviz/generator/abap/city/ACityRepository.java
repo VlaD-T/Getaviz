@@ -30,7 +30,7 @@ public class ACityRepository {
 
 
     public void addElement(ACityElement element) {
-        elementsByID.put(element.getId(), element);
+        elementsByID.put(element.getSourceNodeID(), element);
     }
 
     public void addElements(List<ACityElement> elements) {
