@@ -32,6 +32,7 @@ public class ACityTest {
 
 	static DatabaseConnector connector;
 	static ABAPmock mockup = new ABAPmock();
+	static NodeRepository nodeRepository;
 
 	@BeforeAll
 	static void setup() {
@@ -42,6 +43,9 @@ public class ACityTest {
 		//new SAP2ACity();
 		//new ACity2ACity();
 
+		nodeRepository = new NodeRepository();
+		nodeRepository.loadNodesWithRelation("CONTAINS");
+		nodeRepository.loadNodesWithRelation( "DECLARES");
 
 
 
@@ -54,9 +58,6 @@ public class ACityTest {
 
 	@Test
 	void nodeRepository(){
-		NodeRepository nodeRepository = new NodeRepository();
-		nodeRepository.loadNodesWithRelation("CONTAINS");
-		nodeRepository.loadNodesWithRelation( "DECLARES");
 
 		Collection<Node> allNodes = nodeRepository.getNodes();
 		assertEquals(10, allNodes.size());
@@ -80,15 +81,14 @@ public class ACityTest {
 	@Test
 	void numberOfVisualizedPackages() {
 
-
-
-
 		ACityCreator aCityCreator = new ACityCreator(config);
 
-		ACityRepository aCityRepository = aCityCreator.createACityRepository();
+		ACityRepository aCityRepository = aCityCreator.createACityRepository(nodeRepository);
 
 		List<ACityElement> packageDistricts = aCityRepository.getElementsByType(ACityElement.ACityType.District);
 		assertEquals(2, packageDistricts.size());
+
+
 
 		/*
 		Record result = connector

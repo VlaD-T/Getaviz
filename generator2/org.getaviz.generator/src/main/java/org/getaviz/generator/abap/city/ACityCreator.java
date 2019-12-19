@@ -7,6 +7,7 @@ import org.getaviz.generator.database.DatabaseConnector;
 import org.neo4j.driver.v1.types.Node;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 public class ACityCreator {
@@ -25,14 +26,14 @@ public class ACityCreator {
 
 
 
-    public ACityRepository createACityRepository(){
+    public ACityRepository createACityRepository(NodeRepository nodeRepository){
 
         //Packages
-        List<Node> sourcePackages = loadSourcePackages();
+        Collection<Node> sourcePackages = nodeRepository.getNodesByLabel("Package");
         List<ACityElement> packageDistricts = createPackageDistrictsElements(sourcePackages);
         repository.addElements(packageDistricts);
 
-
+        /*
         for( ACityElement packageDistrict : packageDistricts ) {
 
             createTypesForDistrict(packageDistrict, "Class");
@@ -40,7 +41,7 @@ public class ACityCreator {
             createTypesForDistrict(packageDistrict, "FunctionGroup");
             createTypesForDistrict(packageDistrict, "Table");
 
-        }
+        }*/
 
         return repository;
     }
@@ -79,7 +80,7 @@ public class ACityCreator {
     }
 
 
-    private List<ACityElement> createPackageDistrictsElements(List<Node> sourcePackages) {
+    private List<ACityElement> createPackageDistrictsElements(Collection<Node> sourcePackages) {
         List<ACityElement> packageDistricts = new ArrayList<>();
 
         for( Node sourcePackage: sourcePackages ) {
