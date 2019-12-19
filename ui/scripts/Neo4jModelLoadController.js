@@ -143,6 +143,7 @@ let neo4jModelLoadController = (function () {
         
         // Find next nodes
         data.forEach(entry => {
+            model.getEntityById(entry.id).wasChecked = true;
             return loadNodesRecursively(entry);
         });
     }
