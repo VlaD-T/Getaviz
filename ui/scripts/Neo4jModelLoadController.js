@@ -22,8 +22,7 @@ let neo4jModelLoadController = (function () {
             controllerConfig = {...controllerConfig, ...setup.neo4jModelLoadConfig}
         }
         events.loaded.on.subscribe(loadElementsAndChangeState);
-        events.wasExpanded.on.subscribe(onNodeExpand);
-        events.wasChecked.on.subscribe(onNodeCheck);
+        // events.wasChecked.on.subscribe(onNodeCheck);
 
         if (controllerConfig.showLoadSpinner) {
             createLoadSpinner();
@@ -107,25 +106,22 @@ let neo4jModelLoadController = (function () {
     }
 
 
-    function onNodeCheck(applicationEvent) {
-        let entity = model.getEntityById(applicationEvent.entity.id)
+    function onNodeCheck(entity) {
         entity.wasChecked = true;
         let data = loadNodesRecursively(entity)
     }
 
     async function loadNodesRecursively(entity) {
-        let data = [];
         // Exclude already loaded nodes from query
-        let whereStatement = null;
-        entity.children.forEach(child => {
-            // If was already checked, we don't need these node anymore
-            if (child.wasChecked) {
-                if (!whereStatement) {
-                    return whereStatement = `child.hash = "${child.id}"`;
+        let whereStatement = `child.hash = ""`;
+        if (entity.children) {
+            entity.children.forEach(child => {
+                // If was already checked, we don't need these node anymore
+                if (child.wasChecked) {
+                    return whereStatement += `OR child.hash = "${child.id}"`;
                 }
-                return whereStatement += `OR child.hash = "${child.id}"`;
-            }
-        });
+            });
+        }
 
         // Kinderknoten ziehen (direkte Kinder)
         const cypherQuery = `MATCH (parent)-[:DECLARES|HAS|CONTAINS]->(child)
@@ -134,18 +130,28 @@ let neo4jModelLoadController = (function () {
                              AND NOT (${whereStatement})
                              RETURN child`;
         let response = await getNeo4jData(cypherQuery);
-        entity.children.forEach(child => {
-            loadNodesRecursively(child)
+        let data = await getMetadataFromResponse(response);         
+
+        // For optimization, bulk load of entities
+        let entitiesToLoad = [];
+        data.forEach(entry => {
+            if (!model.getEntityById(entry.id)) {
+                return entitiesToLoad.push(entry);
+            } 
         });
-        console.log(response);
+        model.createEntities(entitiesToLoad);
+        
+        // Find next nodes
+        data.forEach(entry => {
+            return loadNodesRecursively(entry);
+        });
     }
 
 
     // Get MetaData for Child node on node expand
-    async function onNodeExpand(applicationEvent) {
-        let entity = model.getEntityById(applicationEvent.entity.id)
+    async function onNodeExpand(entity) {
         entity.wasExpanded = true;
-        let parentNodes = await getNeo4jChildNodes(applicationEvent.entity.id, false); // parent nodes inside of the selected node
+        let parentNodes = await getNeo4jChildNodes(entity.id, false); // parent nodes inside of the selected node
         let childNodes = await getMetadataForChildNodes(parentNodes, true); // select single child to show the expand sign
         model.createEntities([...parentNodes, ...childNodes]);
     };
@@ -248,6 +254,8 @@ let neo4jModelLoadController = (function () {
         initialize: initialize,
         loadStartMetaData: loadStartMetaData,
         updateLoadSpinner: updateLoadSpinner,
-        loaderController: loaderController
+        loaderController: loaderController,
+        onNodeExpand: onNodeExpand,
+        onNodeCheck: onNodeCheck
     };
 })();

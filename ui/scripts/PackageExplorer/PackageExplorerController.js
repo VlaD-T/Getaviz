@@ -79,15 +79,10 @@ var packageExplorerController = (function () {
 	function zTreeOnCheck(event, treeId, treeNode) {
 		let entities = [];
 
-		// First of all get all the child nodes, if this is first check for this node
+		// Get all the child nodes, if this is the first check for this node
 		let wasChecked = model.getEntityById(treeNode.id).wasChecked;
 		if (!wasChecked) {
-			let applicationEvent = {
-				sender: packageExplorerController,
-				entity: treeNode
-			}
-
-			events.wasChecked.on.publish(applicationEvent);
+			neo4jModelLoadController.onNodeCheck(model.getEntityById(treeNode.id));
 		}
 
 		// Process with changing check state
@@ -121,16 +116,11 @@ var packageExplorerController = (function () {
 	// Before expand load all child nodes and remove dummyForExpand state (entity state)
 	function zTreeBeforeExpand(event, treeId, treeNode) {
 		let entity = model.getEntityById(treeId.id)
-		if (entity.wasExpanded) {
+		if (entity.wasExpanded || entity.wasChecked) {
 			return true; // true to expand the list
 		}
 
-		let applicationEvent = {
-			sender: packageExplorerController,
-			entity: entity
-		};
-
-		events.wasExpanded.on.publish(applicationEvent);
+		neo4jModelLoadController.onNodeExpand(entity);
 		tree.expandNode(treeId, true, false, true, false);
 		return false; // tree.expandNode already opens the list, so return false to leave it open
 	}
