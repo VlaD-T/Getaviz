@@ -56,6 +56,10 @@ public class ACityTest {
 	void nodeRepository(){
 		NodeRepository nodeRepository = new NodeRepository();
 		nodeRepository.loadNodesWithRelation("CONTAINS");
+		nodeRepository.loadNodesWithRelation( "DECLARES");
+
+		Collection<Node> allNodes = nodeRepository.getNodes();
+		assertEquals(10, allNodes.size());
 
 		Collection<Node> packageNodes = nodeRepository.getNodesByLabel("Package");
 		assertEquals(2, packageNodes.size());

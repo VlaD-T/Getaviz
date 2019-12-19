@@ -14,7 +14,7 @@ public class NodeRepository {
     private SettingsConfiguration config;
     private DatabaseConnector connector = DatabaseConnector.getInstance();
 
-    /* Node not implements comparable interface
+    /* Node not implements comparable interface to use Sets
     *   -> use Maps with ID to Nodes */
 
     private Map<Long, Node> nodeById;
@@ -53,19 +53,8 @@ public class NodeRepository {
 
     }
 
-    private void addNodeByLabel(Node node){
-        node.labels().forEach( (label)->{
-            if( !nodesByLabel.containsKey(label)){
-                Map<Long, Node> nodeIDMap = new HashMap<>();
-                nodesByLabel.put(label, nodeIDMap);
-            }
-
-            Map<Long, Node> nodeIDMap = nodesByLabel.get(label);
-            Long nodeID = node.id();
-            if( !nodeIDMap.containsValue(nodeID)){
-                nodeIDMap.put(nodeID, node);
-            }
-        });
+    public Collection<Node> getNodes(){
+        return nodeById.values();
     }
 
     public Collection<Node> getRelatedNodes(Node node, String relationName, Boolean direction){
@@ -90,6 +79,34 @@ public class NodeRepository {
         }
         return nodesByLabel.get(label).values();
     }
+
+
+
+
+    private void addNodeByID(Node node) {
+        Long nodeID = node.id();
+        if( !nodeById.containsKey(nodeID)){
+            nodeById.put(nodeID, node);
+        }
+    }
+
+
+
+    private void addNodeByLabel(Node node){
+        node.labels().forEach( (label)->{
+            if( !nodesByLabel.containsKey(label)){
+                Map<Long, Node> nodeIDMap = new HashMap<>();
+                nodesByLabel.put(label, nodeIDMap);
+            }
+
+            Map<Long, Node> nodeIDMap = nodesByLabel.get(label);
+            Long nodeID = node.id();
+            if( !nodeIDMap.containsValue(nodeID)){
+                nodeIDMap.put(nodeID, node);
+            }
+        });
+    }
+
 
     private void addNodesByRelation(Node mNode, Node nNode, String relationName) {
 
@@ -128,11 +145,5 @@ public class NodeRepository {
         }
     }
 
-    private void addNodeByID(Node node) {
-        Long nodeID = node.id();
-        if( !nodeById.containsKey(nodeID)){
-            nodeById.put(nodeID, node);
-        }
-    }
 
 }
