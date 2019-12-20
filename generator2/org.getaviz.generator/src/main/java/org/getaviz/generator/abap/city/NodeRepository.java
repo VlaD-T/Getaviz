@@ -80,8 +80,16 @@ public class NodeRepository {
         return nodesByLabel.get(label.name()).values();
     }
 
-
-
+    /*
+    public boolean nodeHasLabel(Node node, SAPNodeLabels label){
+        for (String labelName: node.labels() ) {
+            if( labelName == label.name()){
+                return true;
+            }
+        }
+        return false;
+    }
+    */
 
     private void addNodeByID(Node node) {
         Long nodeID = node.id();

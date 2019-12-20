@@ -1,25 +1,39 @@
 package org.getaviz.generator.abap.city;
 
+import org.apache.commons.codec.digest.DigestUtils;
+
 import java.util.*;
 
 public class ACityRepository {
 
-    private Map<Long, ACityElement> elementsByID;
+    private Map<Long, ACityElement> elementsBySourceID;
+
+    private Map<String, ACityElement> elementsByHash;
 
     public ACityRepository(){
-        elementsByID = new HashMap<Long, ACityElement>();
+        elementsBySourceID = new HashMap<>();
+        elementsByHash = new HashMap<>();
     }
 
 
     public Collection<ACityElement> getAllElements() {
         //TODO copy
-        return elementsByID.values();
+        return elementsBySourceID.values();
     }
 
-    public List<ACityElement> getElementsByType(ACityElement.ACityType type){
+    public ACityElement getElementBySourceID(Long sourceID){
+        return elementsBySourceID.get(sourceID);
+    }
+
+    public ACityElement getElementByHash(String hash){
+        return elementsByHash.get(hash);
+    }
+
+    public Collection<ACityElement> getElementsByType(ACityElement.ACityType type){
         List<ACityElement> elementsByType = new ArrayList<>();
 
-        elementsByID.forEach((id, element) -> {
+        //TODO create Maps
+        elementsByHash.forEach((id, element) -> {
             if(element.getType() == type) {
                 elementsByType.add(element);
             }
@@ -30,7 +44,8 @@ public class ACityRepository {
 
 
     public void addElement(ACityElement element) {
-        elementsByID.put(element.getSourceNodeID(), element);
+        elementsByHash.put(element.getHash(), element);
+        elementsBySourceID.put(element.getSourceNodeID(), element);
     }
 
     public void addElements(List<ACityElement> elements) {
@@ -38,6 +53,5 @@ public class ACityRepository {
             addElement(element);
         }
     }
-
 
 }

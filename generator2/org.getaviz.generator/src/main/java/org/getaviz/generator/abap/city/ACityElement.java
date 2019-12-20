@@ -2,13 +2,20 @@ package org.getaviz.generator.abap.city;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
+
 import org.neo4j.driver.v1.types.Node;
 
 public class ACityElement {
 
+    public enum ACityType {
+        City, District, Building, Floor, Chimney
+    }
+
     private String hash;
     private Long sourceNodeID;
 
+    private Node sourceNode;
 
     private List<ACityElement> subElements;
     private ACityElement parentElement;
@@ -27,21 +34,26 @@ public class ACityElement {
 
     public ACityElement(ACityType type) {
         this.type = type;
+        subElements = new ArrayList<>();
 
-        subElements = new ArrayList<ACityElement>();
+        UUID uuid = UUID.randomUUID();
+        hash = "ID_" + uuid.toString();
     }
 
     public Long getSourceNodeID() {
-        return sourceNodeID;
+        return sourceNode.id();
     }
 
-    public void setSourceNodeID(Long sourceNodeID) {
-        this.sourceNodeID = sourceNodeID;
+
+    public Node getSourceNode() {
+        return sourceNode;
     }
 
-    public enum ACityType {
-        City, District, Building, Floor, Chimney
+    public void setSourceNode(Node sourceNode) {
+        this.sourceNode = sourceNode;
     }
+
+
 
 
     public float getHeight() {
@@ -123,10 +135,6 @@ public class ACityElement {
 
     public String getHash() {
         return hash;
-    }
-
-    public void setHash(String hash) {
-        this.hash = hash;
     }
 
     public ACityType getType() {

@@ -7,7 +7,9 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -41,13 +43,13 @@ public class CreatorTest {
 
     @Test
     void districtElements() {
-        List<ACityElement> districts = aCityRepository.getElementsByType(ACityElement.ACityType.District);
+        Collection<ACityElement> districts = aCityRepository.getElementsByType(ACityElement.ACityType.District);
         assertEquals(2, districts.size());
     }
 
     @Test
     void buildingElements() {
-        List<ACityElement> buildings = aCityRepository.getElementsByType(ACityElement.ACityType.Building);
+        Collection<ACityElement> buildings = aCityRepository.getElementsByType(ACityElement.ACityType.Building);
         assertEquals(4, buildings.size());
     }
 }
