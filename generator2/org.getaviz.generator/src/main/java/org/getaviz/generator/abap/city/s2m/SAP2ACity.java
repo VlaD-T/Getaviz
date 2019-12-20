@@ -4,12 +4,13 @@ import org.getaviz.generator.SettingsConfiguration;
 import org.neo4j.driver.v1.StatementResult;
 
 import java.util.GregorianCalendar;
-import org.getaviz.generator.abap.city.Labels;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.getaviz.generator.database.DatabaseConnector;
 
 public class SAP2ACity {
+
+	/*
 	private SettingsConfiguration config = SettingsConfiguration.getInstance();
 	private Log log = LogFactory.getLog(this.getClass());
 	private DatabaseConnector connector = DatabaseConnector.getInstance();
@@ -35,6 +36,7 @@ public class SAP2ACity {
 	}
 
 	private Long sapPackageToDistrict(Long sapPackage, Long parent) {
+
 		long district = connector.addNode(cypherCreateNode(parent,sapPackage,Labels.District.name()),"n").id();
 		connector.addRelationship(sapPackage, district, "MAPPED");
 		
@@ -83,4 +85,7 @@ public class SAP2ACity {
 			"MATCH(parent),(s) WHERE ID(parent) = %d AND ID(s) = %d CREATE (parent)-[:CONTAINS]->(n:ACity:%s)-[:VISUALIZES]->(s)",
 			parent, visualizedNode, label);
 	}
+
+
+	 */
 }

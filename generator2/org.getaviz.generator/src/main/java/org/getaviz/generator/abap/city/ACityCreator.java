@@ -18,131 +18,46 @@ public class ACityCreator {
 
     private ACityRepository repository;
 
-    public ACityCreator(SettingsConfiguration config) {
+    public ACityCreator(ACityRepository aCityRepository,SettingsConfiguration config) {
         this.config = config;
 
-        repository = new ACityRepository();
+        repository = aCityRepository;
     }
 
 
 
-    public ACityRepository createACityRepository(NodeRepository nodeRepository){
+    public void createRepositoryFromNodeRepository(NodeRepository nodeRepository){
 
-        //Packages
-        Collection<Node> sourcePackages = nodeRepository.getNodesByLabel("Package");
-        List<ACityElement> packageDistricts = createPackageDistrictsElements(sourcePackages);
-        repository.addElements(packageDistricts);
+        createACityElementsFromSourceNodes(repository, nodeRepository, "Package", ACityElement.ACityType.District);
 
-        /*
-        for( ACityElement packageDistrict : packageDistricts ) {
+        createACityElementsFromSourceNodes(repository, nodeRepository, "Report", ACityElement.ACityType.Building);
 
-            createTypesForDistrict(packageDistrict, "Class");
-            createTypesForDistrict(packageDistrict, "Report");
-            createTypesForDistrict(packageDistrict, "FunctionGroup");
-            createTypesForDistrict(packageDistrict, "Table");
+        createACityElementsFromSourceNodes(repository, nodeRepository, "Class", ACityElement.ACityType.Building);
 
-        }*/
+        createACityElementsFromSourceNodes(repository, nodeRepository, "FunctionGroup", ACityElement.ACityType.Building);
 
-        return repository;
+        createACityElementsFromSourceNodes(repository, nodeRepository, "Table", ACityElement.ACityType.Building);
+
+
+
     }
 
-    private void createTypesForDistrict(ACityElement packageDistrict, String sourceTypeLabel) {
+    private void createACityElementsFromSourceNodes(ACityRepository repository, NodeRepository nodeRepository, String nodeLabel, ACityElement.ACityType aCityType) {
+        Collection<Node> sourceNodes = nodeRepository.getNodesByLabel(nodeLabel);
+        List<ACityElement> aCityElements = createACityElements(sourceNodes, aCityType);
+        repository.addElements(aCityElements);
+    }
 
-        List<Node> sourceTypes = loadSourceTypes(packageDistrict, sourceTypeLabel);
+    private List<ACityElement> createACityElements(Collection<Node> sourceNodes, ACityElement.ACityType aCityType) {
+        List<ACityElement> aCityElements = new ArrayList<>();
 
-        if( sourceTypes.size() != 0){
-            ACityElement sourceTypeDistrict = new ACityElement(ACityElement.ACityType.District);
-            sourceTypeDistrict.setParentElement(packageDistrict);
-            repository.addElement(sourceTypeDistrict);
-
-            List<ACityElement> typeBuildings = createTypeBuildingElements(sourceTypeDistrict, sourceTypes);
-            repository.addElements(typeBuildings);
-
-
+        for( Node sourceNode: sourceNodes ) {
+            ACityElement aCityElement = new ACityElement(aCityType);
+            aCityElement.setSourceNodeID(sourceNode.id());
+            aCityElements.add(aCityElement);
         }
 
+        return aCityElements;
     }
 
-
-    private List<ACityElement> createTypeBuildingElements(ACityElement classDistrict, List<Node> sourceTypes) {
-        List<ACityElement> buildings = new ArrayList<>();
-
-        for( Node sourceType: sourceTypes ) {
-            ACityElement building = new ACityElement(ACityElement.ACityType.Building);
-
-            building.setSourceNodeID(sourceType.id());
-            building.setParentElement(classDistrict);
-
-            buildings.add(building);
-        }
-
-        return buildings;
-    }
-
-
-    private List<ACityElement> createPackageDistrictsElements(Collection<Node> sourcePackages) {
-        List<ACityElement> packageDistricts = new ArrayList<>();
-
-        for( Node sourcePackage: sourcePackages ) {
-            ACityElement packageDistrict = new ACityElement(ACityElement.ACityType.District);
-
-            packageDistrict.setSourceNodeID(sourcePackage.id());
-
-            packageDistricts.add(packageDistrict);
-        }
-
-        return packageDistricts;
-    }
-
-
-
-
-
-
-
-
-
-    private List<Node> loadSourcePackages(){
-        List<Node> sourcePackages = new ArrayList<>();
-
-        connector.executeRead(
-                "MATCH (n:Package) " +
-                        "RETURN n"
-        ).forEachRemaining((result) -> {
-            Node sourcePackage = result.get("n").asNode();
-            sourcePackages.add(sourcePackage);
-        });
-
-        return sourcePackages;
-    }
-
-    private List<Node> loadSourceTypes(ACityElement packageDistrict, String sourceTypeLabel){
-        List<Node> sourceTypes = new ArrayList<>();
-
-        connector.executeRead(
-                " MATCH (n)-[:CONTAINS]->(t:" + sourceTypeLabel +") WHERE ID(n) = " + packageDistrict.getSourceNodeID() +
-                        " RETURN t"
-        ).forEachRemaining((result) -> {
-            Node sourceType = result.get("t").asNode();
-            sourceTypes.add(sourceType);
-        });
-
-        return sourceTypes;
-    }
-
-
-
-
-
-    /*
-    private Node createModelNode(){
-        connector.executeWrite("MATCH (n:City) DETACH DELETE n");
-
-        Node modelNode = connector.addNode(
-                String.format("CREATE (n:Model:ACity {date: \'%s\', building_type: \'%s\'})",
-                        new GregorianCalendar().getTime().toString(), config.getBuildingTypeAsString()),"n");
-
-        return modelNode;
-    }
-    */
 }

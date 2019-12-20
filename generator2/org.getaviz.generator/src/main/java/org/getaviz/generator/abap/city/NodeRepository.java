@@ -33,10 +33,10 @@ public class NodeRepository {
         nodesByRelation = new HashMap<>();
     }
 
-    public void loadNodesWithRelation(String relationName){
+    public void loadNodesWithRelation(SAPRelationLabels relationLabel){
 
         connector.executeRead(
-                " MATCH (m)-[:" + relationName + "]->(n) RETURN m, n"
+                " MATCH (m)-[:" + relationLabel.name() + "]->(n) RETURN m, n"
         ).forEachRemaining((result) -> {
             Node mNode = result.get("m").asNode();
             Node nNode = result.get("n").asNode();
@@ -47,7 +47,7 @@ public class NodeRepository {
             addNodeByLabel(mNode);
             addNodeByLabel(nNode);
 
-            addNodesByRelation(mNode, nNode, relationName);
+            addNodesByRelation(mNode, nNode, relationLabel.name());
 
         });
 
@@ -57,11 +57,11 @@ public class NodeRepository {
         return nodeById.values();
     }
 
-    public Collection<Node> getRelatedNodes(Node node, String relationName, Boolean direction){
-        if( !nodesByRelation.containsKey(relationName)){
+    public Collection<Node> getRelatedNodes(Node node, SAPRelationLabels relationLabel, Boolean direction){
+        if( !nodesByRelation.containsKey(relationLabel.name())){
             return new TreeSet<>();
         };
-        Map<Boolean, Map<Long, Map<Long, Node>>> relationMap = nodesByRelation.get(relationName);
+        Map<Boolean, Map<Long, Map<Long, Node>>> relationMap = nodesByRelation.get(relationLabel.name());
 
         Map<Long, Map<Long, Node>> directedRelationMap = relationMap.get(direction);
 
@@ -98,8 +98,8 @@ public class NodeRepository {
                 Map<Long, Node> nodeIDMap = new HashMap<>();
                 nodesByLabel.put(label, nodeIDMap);
             }
-
             Map<Long, Node> nodeIDMap = nodesByLabel.get(label);
+
             Long nodeID = node.id();
             if( !nodeIDMap.containsValue(nodeID)){
                 nodeIDMap.put(nodeID, node);
@@ -137,8 +137,8 @@ public class NodeRepository {
             Map<Long, Node> nodeIDMap = new HashMap<>();
             relationMap.put(mNodeID, nodeIDMap);
         }
-
         Map<Long, Node> nodeIDMap = relationMap.get(mNodeID);
+
         Long nNodeID = nNode.id();
         if( !nodeIDMap.containsKey(nNodeID)){
             nodeIDMap.put(nNodeID, nNode);

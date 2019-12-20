@@ -40,8 +40,7 @@ public class ACityElement {
     }
 
     public enum ACityType {
-        City, District, Building, BuildingPart,
-        Method, Field, FormRoutine, FunctionModule, AbapStructure, Domain, DataElement, TableType
+        City, District, Building, Floor, Chimney
     }
 
 
