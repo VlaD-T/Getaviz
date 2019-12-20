@@ -2,6 +2,7 @@ package org.getaviz.generator.tests.acity;
 
 import org.getaviz.generator.SettingsConfiguration;
 import org.getaviz.generator.abap.city.NodeRepository;
+import org.getaviz.generator.abap.city.SAPNodeLabels;
 import org.getaviz.generator.abap.city.SAPRelationLabels;
 import org.getaviz.generator.mockups.ABAPmock;
 import org.junit.jupiter.api.AfterAll;
@@ -45,19 +46,19 @@ public class NodeRepositoryTest {
 
     @Test
     void packageLabel(){
-        Collection<Node> packageNodes = nodeRepository.getNodesByLabel("Package");
+        Collection<Node> packageNodes = nodeRepository.getNodesByLabel(SAPNodeLabels.Package);
         assertEquals(2, packageNodes.size());
     }
 
     @Test
     void typeLabel(){
-        Collection<Node> typeNodes = nodeRepository.getNodesByLabel("Type");
+        Collection<Node> typeNodes = nodeRepository.getNodesByLabel(SAPNodeLabels.Type);
         assertEquals(4, typeNodes.size());
     }
 
     @Test
     void containsRelationTest(){
-        Collection<Node> packageNodes = nodeRepository.getNodesByLabel("Package");
+        Collection<Node> packageNodes = nodeRepository.getNodesByLabel(SAPNodeLabels.Package);
 
         Node firstPackage = packageNodes.iterator().next();
         Collection<Node> subNodes = nodeRepository.getRelatedNodes(firstPackage, SAPRelationLabels.CONTAINS, true);
@@ -70,7 +71,7 @@ public class NodeRepositoryTest {
 
     @Test
     void declaresRelationTest(){
-        Collection<Node> reportNodes = nodeRepository.getNodesByLabel("Report");
+        Collection<Node> reportNodes = nodeRepository.getNodesByLabel(SAPNodeLabels.Report);
 
         Node firstReport = reportNodes.iterator().next();
         Collection<Node> subNodes = nodeRepository.getRelatedNodes(firstReport, SAPRelationLabels.DECLARES, true);

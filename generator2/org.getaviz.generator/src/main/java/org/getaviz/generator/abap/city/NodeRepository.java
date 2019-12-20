@@ -73,11 +73,11 @@ public class NodeRepository {
         return directedRelationMap.get(nodeID).values();
     }
 
-    public Collection<Node> getNodesByLabel(String label){
-        if( !nodesByLabel.containsKey(label)){
+    public Collection<Node> getNodesByLabel(SAPNodeLabels label){
+        if( !nodesByLabel.containsKey(label.name())){
             return new TreeSet<>();
         }
-        return nodesByLabel.get(label).values();
+        return nodesByLabel.get(label.name()).values();
     }
 
 

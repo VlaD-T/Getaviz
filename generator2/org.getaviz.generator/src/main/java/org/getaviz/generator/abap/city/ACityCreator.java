@@ -28,21 +28,21 @@ public class ACityCreator {
 
     public void createRepositoryFromNodeRepository(NodeRepository nodeRepository){
 
-        createACityElementsFromSourceNodes(repository, nodeRepository, "Package", ACityElement.ACityType.District);
+        createACityElementsFromSourceNodes(repository, nodeRepository, SAPNodeLabels.Package, ACityElement.ACityType.District);
 
-        createACityElementsFromSourceNodes(repository, nodeRepository, "Report", ACityElement.ACityType.Building);
+        createACityElementsFromSourceNodes(repository, nodeRepository, SAPNodeLabels.Report, ACityElement.ACityType.Building);
 
-        createACityElementsFromSourceNodes(repository, nodeRepository, "Class", ACityElement.ACityType.Building);
+        createACityElementsFromSourceNodes(repository, nodeRepository, SAPNodeLabels.Class, ACityElement.ACityType.Building);
 
-        createACityElementsFromSourceNodes(repository, nodeRepository, "FunctionGroup", ACityElement.ACityType.Building);
+        createACityElementsFromSourceNodes(repository, nodeRepository, SAPNodeLabels.FunctionGroup, ACityElement.ACityType.Building);
 
-        createACityElementsFromSourceNodes(repository, nodeRepository, "Table", ACityElement.ACityType.Building);
+        createACityElementsFromSourceNodes(repository, nodeRepository, SAPNodeLabels.Table, ACityElement.ACityType.Building);
 
 
 
     }
 
-    private void createACityElementsFromSourceNodes(ACityRepository repository, NodeRepository nodeRepository, String nodeLabel, ACityElement.ACityType aCityType) {
+    private void createACityElementsFromSourceNodes(ACityRepository repository, NodeRepository nodeRepository, SAPNodeLabels nodeLabel, ACityElement.ACityType aCityType) {
         Collection<Node> sourceNodes = nodeRepository.getNodesByLabel(nodeLabel);
         List<ACityElement> aCityElements = createACityElements(sourceNodes, aCityType);
         repository.addElements(aCityElements);
