@@ -36,14 +36,15 @@ var canvasManipulator = (function () {
             },
     
             init: function () {
-                // This will be called after the entity has properly attached and loaded.
+                // This will be called after the entity has been properly attached and loaded.
                 this.attrValue = ''; // imported payload is in this.data, so we don't need this one
                 Object.keys(this.schema).forEach(key => {
                     this.el.setAttribute(`${key}`, this.data[key]);                
                 })
 
-                // Per default set new element to be invisible. This parameter will be changed via other controllers, like packageExplorer.
-                this.el.setAttribute('visible', false);
+                // Adjust visibility
+                let visible = this.data['checked'] ? true : false; // set to visible, because parent node was checked
+                this.el.setAttribute('visible', visible);
             }
         });
     }
@@ -261,12 +262,12 @@ var canvasManipulator = (function () {
         return elementIds;
     }
 
-    function appendAframeElementWithProperties(payload) {
-        let aframeProperty = payload.row[0].aframeProperty;
+    function appendAframeElementWithProperties(element, adjustments) {
+        let aframeProperty = element.row[0].aframeProperty;
         let aframeObject = JSON.parse(`${aframeProperty}`); // create an object
 
         let entityEl = document.createElement(`${aframeObject.tag}`);
-        entityEl.setAttribute('set-aframe-attributes', aframeObject); // this attributes will be set after element is created
+        entityEl.setAttribute('set-aframe-attributes', {...aframeObject, ...adjustments}); // this attributes will be set after element is created
         let sceneEl = document.querySelector('a-scene');
         sceneEl.appendChild(entityEl);
 

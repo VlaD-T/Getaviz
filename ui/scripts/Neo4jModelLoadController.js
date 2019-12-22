@@ -108,7 +108,7 @@ let neo4jModelLoadController = (function () {
 
     function onNodeCheck(entity) {
         entity.wasChecked = true;
-        let data = loadNodesRecursively(entity)
+        loadNodesRecursively(entity);
     }
 
     async function loadNodesRecursively(entity) {
@@ -123,7 +123,7 @@ let neo4jModelLoadController = (function () {
             });
         }
 
-        // Kinderknoten ziehen (direkte Kinder)
+        // Load direct child nodes
         const cypherQuery = `MATCH (parent)-[:DECLARES|HAS|CONTAINS]->(child)
                              WHERE parent.hash = "${entity.id}" 
                              AND EXISTS(child.hash) 
@@ -139,12 +139,12 @@ let neo4jModelLoadController = (function () {
                 return entitiesToLoad.push(entry);
             } 
         });
-        model.createEntities(entitiesToLoad);
+        model.createEntities(entitiesToLoad, {checked: true});
         
         // Find next nodes
         data.forEach(entry => {
             model.getEntityById(entry.id).wasChecked = true;
-            return loadNodesRecursively(entry);
+            loadNodesRecursively(entry);
         });
     }
 
@@ -216,7 +216,7 @@ let neo4jModelLoadController = (function () {
             updateLoadSpinner(loaderController.toLoad); // second add, because of the appendAframeElementWithProperties
             // There may be some empty entites, like buildingSegments. They don't have any data, so we can't create an element for them.
             if (element) {
-                canvasManipulator.appendAframeElementWithProperties(element); // Start drawing the element
+                canvasManipulator.appendAframeElementWithProperties(element, applicationEvent.adjustments); // Start drawing the element
             } else {
                 updateLoadSpinner(loaderController.loaded);
             }
