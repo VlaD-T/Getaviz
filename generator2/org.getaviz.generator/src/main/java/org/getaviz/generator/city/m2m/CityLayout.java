@@ -79,7 +79,7 @@ public class CityLayout {
 			}
 
 			// set fitNode as occupied
-			fitNode.setOccupied(true);
+			fitNode.setOccupied();
 
 			// give Entity it's Position
 			setNewPositionFromNode(el, fitNode);
@@ -154,7 +154,7 @@ public class CityLayout {
 			}
 
 			// set fitNode as occupied
-			fitNode.setOccupied(true);
+			fitNode.setOccupied();
 
 			// give Entity it's Position
 			setNewPositionFromNode(el, fitNode);
@@ -294,7 +294,7 @@ public class CityLayout {
 			node.setRightChild(new CityKDTreeNode(new Rectangle(nodeUpperLeftX, (nodeUpperLeftY + r.getLength()),
 					nodeBottomRightX, nodeBottomRightY)));
 			// set node as occupied (only leaves can contain elements)
-			node.setOccupied(true);
+			node.setOccupied();
 
 			if (DEBUG_Part2) {
 				System.out.println("\t\t\t" + info + "horizontal");
@@ -322,7 +322,7 @@ public class CityLayout {
 			node.setRightChild(new CityKDTreeNode(new Rectangle((nodeUpperLeftX + r.getWidth()), nodeUpperLeftY,
 					nodeBottomRightX, nodeBottomRightY)));
 			// set node as occupied (only leaves can contain elements)
-			node.setOccupied(true);
+			node.setOccupied();
 
 			if (DEBUG_Part2) {
 				System.out.println("\t\t\t" + info + "vertical");

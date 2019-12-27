@@ -70,7 +70,7 @@ public class CityKDTreeNode {
 	public boolean isOccupied() {
 		return occupied;
 	}
-	public void setOccupied(boolean occupied) {
-		this.occupied = occupied;
+	public void setOccupied() {
+		this.occupied = true;
 	}
 }

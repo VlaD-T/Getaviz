@@ -9,7 +9,10 @@ public class ACityMetaphor {
 
     private Log log = LogFactory.getLog(this.getClass());
     private SettingsConfiguration config;
-    private DatabaseConnector connector = DatabaseConnector.getInstance();
+
+
+    private NodeRepository nodeRepository;
+    private ACityRepository aCityRepository;
 
     public ACityMetaphor(SettingsConfiguration config) {
         this.config = config;
@@ -24,14 +27,13 @@ public class ACityMetaphor {
 
     public void generate() {
         try {
+            //NodeRepository
 
             //ACityCreator
 
-            //ACityDesigner
-
             //ACityLayouter
 
-
+            //ACityDesigner
 
         } catch (Exception e) {
             log.error(e);
