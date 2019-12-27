@@ -122,10 +122,15 @@ public class ACityCreator {
         createACityElementsFromSourceNodes(nodeRepository, SAPNodeLabels.Report, ACityElement.ACityType.Building);
 
         createACityElementsFromSourceNodes(nodeRepository, SAPNodeLabels.Class, ACityElement.ACityType.Building);
+        createACityElementsFromSourceNodes(nodeRepository, SAPNodeLabels.Method, ACityElement.ACityType.Floor);
+        createACityElementsFromSourceNodes(nodeRepository, SAPNodeLabels.Attribute, ACityElement.ACityType.Chimney);
 
         createACityElementsFromSourceNodes(nodeRepository, SAPNodeLabels.FunctionGroup, ACityElement.ACityType.Building);
 
         createACityElementsFromSourceNodes(nodeRepository, SAPNodeLabels.Table, ACityElement.ACityType.Building);
+
+        //TODO add DDIC
+
     }
 
     private void createACityElementsFromSourceNodes(NodeRepository nodeRepository, SAPNodeLabels nodeLabel, ACityElement.ACityType aCityType) {

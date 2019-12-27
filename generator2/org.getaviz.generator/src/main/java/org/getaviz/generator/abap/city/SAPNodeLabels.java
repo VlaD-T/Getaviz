@@ -6,7 +6,7 @@ public enum SAPNodeLabels {
     Type,
     Class, Report, FunctionGroup, Table,
 
-    Method, Field, FormRoutine, FunctionModule,
+    Method, Attribute, FormRoutine, FunctionModule,
 
     Structure, Domain, DataElement, TableType
 }

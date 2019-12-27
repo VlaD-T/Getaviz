@@ -1,6 +1,7 @@
 package org.getaviz.generator.abap.city;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
@@ -24,13 +25,13 @@ public class ACityElement {
 
     private String color;
 
-    private float height;
-    private float width;
-    private float length;
+    private double height;
+    private double width;
+    private double length;
 
-    private float xPosition;
-    private float yPosition;
-    private float zPosition;
+    private double xPosition;
+    private double yPosition;
+    private double zPosition;
 
     public ACityElement(ACityType type) {
         this.type = type;
@@ -56,51 +57,51 @@ public class ACityElement {
 
 
 
-    public float getHeight() {
+    public double getHeight() {
         return height;
     }
 
-    public void setHeight(float height) {
+    public void setHeight(double height) {
         this.height = height;
     }
 
-    public float getWidth() {
+    public double getWidth() {
         return width;
     }
 
-    public void setWidth(float width) {
+    public void setWidth(double width) {
         this.width = width;
     }
 
-    public float getLength() {
+    public double getLength() {
         return length;
     }
 
-    public void setLength(float length) {
+    public void setLength(double length) {
         this.length = length;
     }
 
-    public float getXPosition() {
+    public double getXPosition() {
         return xPosition;
     }
 
-    public void setXPosition(float xPosition) {
+    public void setXPosition(double xPosition) {
         this.xPosition = xPosition;
     }
 
-    public float getYPosition() {
+    public double getYPosition() {
         return yPosition;
     }
 
-    public void setYPosition(float yPosition) {
+    public void setYPosition(double yPosition) {
         this.yPosition = yPosition;
     }
 
-    public float getZPosition() {
+    public double getZPosition() {
         return zPosition;
     }
 
-    public void setZPosition(float zPosition) {
+    public void setZPosition(double zPosition) {
         this.zPosition = zPosition;
     }
 
@@ -120,9 +121,22 @@ public class ACityElement {
         this.parentElement = parentElement;
     }
 
-    public List<ACityElement> getSubElements() {
+    public Collection<ACityElement> getSubElements() {
         //TODO return copy
         return subElements;
+    }
+
+    public Collection<ACityElement> getSubElementsOfType(ACityType elementType) {
+        List<ACityElement> subElementsOfType = new ArrayList<>();
+
+        Collection<ACityElement> subElements = getSubElements();
+        for(ACityElement element : subElements){
+
+            if( element.getType() == elementType){
+                subElementsOfType.add(element);
+            }
+        }
+        return subElementsOfType;
     }
 
     public void addSubElement(ACityElement subElement) {
