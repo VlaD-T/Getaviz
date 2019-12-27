@@ -1,5 +1,5 @@
 CREATE (VISAP_T:Package { element_id : '1', object_name : '/GSA/VISAP_T', type : 'DEVC' })
-CREATE (VISAP_T_TEST:Package { element_id : '2', object_nmae : '/GSA/VISAP_T_TEST', type : 'DEVC'})
+CREATE (VISAP_T_TEST:Package { element_id : '2', object_name : '/GSA/VISAP_T_TEST', type : 'DEVC'})
 
 CREATE (VISAP_T_REPORT2:Report:Type { element_id: '3', object_name: '/GSA/VISAP_T_TEST_REPORT2', type : 'REPS' })
 CREATE (VISAP_T_CLASS:Class:Type {element_id: '4', object_name: '/GSA/VISAP_T_TEST_CLASS', type : 'CLASS' })

@@ -32,7 +32,6 @@ public class ACityCreator {
     private void createAllACityRelations(NodeRepository nodeRepository) {
 
         Collection<ACityElement> aCityElements = repository.getAllElements();
-        Collection<Node> allNodes = nodeRepository.getNodes();
 
         for (ACityElement element: aCityElements){
 
@@ -53,32 +52,34 @@ public class ACityCreator {
 
     }
 
-    private void createTypeDistricts(ACityElement element, Collection<ACityElement> childElements) {
-
-        Map<SAPNodeLabels, ACityElement> typeDistrictMap = new HashMap<>();
+    private void createTypeDistricts(ACityElement parentDistrict, Collection<ACityElement> childElements) {
+        Map<String, ACityElement> typeDistrictMap = new HashMap<>();
 
         for (ACityElement childElement: childElements) {
-            addChildToTypeDistrict(element, childElement, typeDistrictMap, SAPNodeLabels.Class);
-            addChildToTypeDistrict(element, childElement, typeDistrictMap, SAPNodeLabels.Report);
-            addChildToTypeDistrict(element, childElement, typeDistrictMap, SAPNodeLabels.FunctionGroup);
-            addChildToTypeDistrict(element, childElement, typeDistrictMap, SAPNodeLabels.Table);
+            addChildToTypeDistrict(parentDistrict, childElement, typeDistrictMap, "Class", SAPNodeLabels.Class);
+            addChildToTypeDistrict(parentDistrict, childElement, typeDistrictMap, "Report", SAPNodeLabels.Report);
+            addChildToTypeDistrict(parentDistrict, childElement, typeDistrictMap, "FunctionGroup",SAPNodeLabels.FunctionGroup);
+            addChildToTypeDistrict(parentDistrict, childElement, typeDistrictMap, "Table", SAPNodeLabels.Table);
+
+            //TODO DDIC TypeDistrict
         }
     }
 
-    private void addChildToTypeDistrict(ACityElement element, ACityElement childElement, Map<SAPNodeLabels, ACityElement> typeDistrictMap, SAPNodeLabels sapNodeLabel) {
+    private void addChildToTypeDistrict(ACityElement parentDistrict, ACityElement childElement, Map<String, ACityElement> typeDistrictMap, String districtType, SAPNodeLabels sapNodeLabel) {
 
         Node childSourceNode = childElement.getSourceNode();
 
         if( childSourceNode.hasLabel( sapNodeLabel.name()) ){
-            if( !typeDistrictMap.containsKey(sapNodeLabel)){
+            if( !typeDistrictMap.containsKey(districtType)){
                 ACityElement typeDistrict = new ACityElement(ACityElement.ACityType.District);
-                typeDistrictMap.put(sapNodeLabel, typeDistrict);
+                typeDistrictMap.put(districtType, typeDistrict);
 
-                element.addSubElement(typeDistrict);
-                typeDistrict.setParentElement(element);
+                repository.addElement(typeDistrict);
+                parentDistrict.addSubElement(typeDistrict);
+                typeDistrict.setParentElement(parentDistrict);
             }
 
-            ACityElement typeDistrict = typeDistrictMap.get(sapNodeLabel);
+            ACityElement typeDistrict = typeDistrictMap.get(districtType);
 
             typeDistrict.addSubElement(childElement);
             childElement.setParentElement(typeDistrict);
@@ -109,6 +110,7 @@ public class ACityCreator {
 
         Node parentNode = parentNodes.iterator().next();
         Long parentNodeId = parentNode.id();
+
         ACityElement parentElement = repository.getElementBySourceID(parentNodeId);
         return parentElement;
     }

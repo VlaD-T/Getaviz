@@ -8,10 +8,9 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import java.util.Collection;
-import java.util.List;
-import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 public class CreatorTest {
 
@@ -44,7 +43,7 @@ public class CreatorTest {
     @Test
     void districtElements() {
         Collection<ACityElement> districts = aCityRepository.getElementsByType(ACityElement.ACityType.District);
-        assertEquals(2, districts.size());
+        assertEquals(6, districts.size());
     }
 
     @Test
@@ -52,4 +51,41 @@ public class CreatorTest {
         Collection<ACityElement> buildings = aCityRepository.getElementsByType(ACityElement.ACityType.Building);
         assertEquals(4, buildings.size());
     }
+
+    @Test
+    void buildingParentElements() {
+        Collection<ACityElement> buildings = aCityRepository.getElementsByType(ACityElement.ACityType.Building);
+
+        for (ACityElement building : buildings) {
+            assertNotEquals(null, building.getParentElement());
+
+            ACityElement.ACityType parentType = building.getParentElement().getType();
+            assertEquals(ACityElement.ACityType.District, parentType);
+        }
+    }
+
+    @Test
+    void districtSubElements(){
+
+        //first district
+        Collection<ACityElement> districts = aCityRepository.getElementsByTypeAndSourceProperty(ACityElement.ACityType.District, "object_name", "/GSA/VISAP_T_TEST");
+        assertEquals(1, districts.size());
+
+        ACityElement firstDistrict = districts.iterator().next();
+
+        Collection<ACityElement> subDistricts = firstDistrict.getSubElements();
+        assertEquals(1, subDistricts.size());
+
+
+        //second district
+        districts = aCityRepository.getElementsByTypeAndSourceProperty(ACityElement.ACityType.District, "object_name", "/GSA/VISAP_T");
+        assertEquals(1, districts.size());
+
+        ACityElement secondDistrict = districts.iterator().next();
+
+        subDistricts = secondDistrict.getSubElements();
+        assertEquals(3, subDistricts.size());
+    }
+
+
 }

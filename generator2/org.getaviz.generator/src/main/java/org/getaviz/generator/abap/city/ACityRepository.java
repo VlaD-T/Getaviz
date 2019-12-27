@@ -1,6 +1,8 @@
 package org.getaviz.generator.abap.city;
 
 import org.apache.commons.codec.digest.DigestUtils;
+import org.neo4j.driver.v1.Value;
+import org.neo4j.driver.v1.types.Node;
 
 import java.util.*;
 
@@ -42,10 +44,40 @@ public class ACityRepository {
         return elementsByType;
     }
 
+    public Collection<ACityElement> getElementsByTypeAndSourceProperty(ACityElement.ACityType type, String sourceProperty, String sourcePropertyValue){
+        Collection<ACityElement> elementsByType = getElementsByType(type);
+        List<ACityElement> elementsByTypeAndSourceProperty = new ArrayList<>();
+
+        for (ACityElement element: elementsByType){
+
+            Node sourceNode = element.getSourceNode();
+            if(sourceNode == null){
+                continue;
+            }
+
+            Value propertyValue = sourceNode.get(sourceProperty);
+            if( propertyValue == null){
+                continue;
+            }
+
+            String propertyValueString = propertyValue.asString();
+            if(!propertyValueString.equals(sourcePropertyValue)){
+                continue;
+            }
+
+            elementsByTypeAndSourceProperty.add(element);
+        }
+
+        return elementsByTypeAndSourceProperty;
+    }
+
 
     public void addElement(ACityElement element) {
         elementsByHash.put(element.getHash(), element);
-        elementsBySourceID.put(element.getSourceNodeID(), element);
+
+        if (element.getSourceNode() != null){
+            elementsBySourceID.put(element.getSourceNodeID(), element);
+        }
     }
 
     public void addElements(List<ACityElement> elements) {

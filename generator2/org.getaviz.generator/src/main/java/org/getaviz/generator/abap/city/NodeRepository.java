@@ -2,6 +2,7 @@ package org.getaviz.generator.abap.city;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.neo4j.driver.v1.Value;
 import org.neo4j.driver.v1.types.Node;
 import org.getaviz.generator.SettingsConfiguration;
 import org.getaviz.generator.database.DatabaseConnector;
@@ -15,7 +16,7 @@ public class NodeRepository {
     private DatabaseConnector connector = DatabaseConnector.getInstance();
 
     /* Node not implements comparable interface to use Sets
-    *   -> use Maps with ID to Nodes */
+    *   -> use Maps with ID to Node */
 
     private Map<Long, Node> nodeById;
 
@@ -80,16 +81,26 @@ public class NodeRepository {
         return nodesByLabel.get(label.name()).values();
     }
 
-    /*
-    public boolean nodeHasLabel(Node node, SAPNodeLabels label){
-        for (String labelName: node.labels() ) {
-            if( labelName == label.name()){
-                return true;
+    public Collection<Node> getNodesByLabelAndProperty(SAPNodeLabels label, String property, String value){
+        Collection<Node> nodesByLabel = getNodesByLabel(label);
+        List<Node> nodesByLabelAndProperty = new ArrayList<>();
+
+        for (Node node: nodesByLabel){
+            Value propertyValue = node.get(property);
+            if( propertyValue == null){
+                nodesByLabel.remove(node);
             }
+
+            if(propertyValue.asString() != value){
+                nodesByLabel.remove(node);
+            }
+
+            nodesByLabelAndProperty.add(node);
         }
-        return false;
+
+        return nodesByLabelAndProperty;
     }
-    */
+
 
     private void addNodeByID(Node node) {
         Long nodeID = node.id();
