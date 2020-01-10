@@ -22,7 +22,6 @@ let neo4jModelLoadController = (function () {
             controllerConfig = {...controllerConfig, ...setup.neo4jModelLoadConfig}
         }
         events.loaded.on.subscribe(loadElementsAndChangeState);
-        // events.wasChecked.on.subscribe(onNodeCheck);
 
         if (controllerConfig.showLoadSpinner) {
             createLoadSpinner();
