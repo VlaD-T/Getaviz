@@ -43,8 +43,8 @@ var canvasManipulator = (function () {
                 })
 
                 // Adjust visibility
-                let visible = this.data['checked'] ? true : false; // set to visible, because parent node was checked
-                this.el.setAttribute('visible', visible);
+                // let visible = this.data['checked'] ? true : false; // set to visible, because parent node was checked
+                this.el.setAttribute('visible', false);
             }
         });
     }
@@ -262,12 +262,12 @@ var canvasManipulator = (function () {
         return elementIds;
     }
 
-    function appendAframeElementWithProperties(element, adjustments) {
+    function appendAframeElementWithProperties(element) {
         let aframeProperty = element.row[0].aframeProperty;
         let aframeObject = JSON.parse(`${aframeProperty}`); // create an object
 
         let entityEl = document.createElement(`${aframeObject.tag}`);
-        entityEl.setAttribute('set-aframe-attributes', {...aframeObject, ...adjustments}); // this attributes will be set after element is created
+        entityEl.setAttribute('set-aframe-attributes', {...aframeObject}); // this attributes will be set after element is created
         let sceneEl = document.querySelector('a-scene');
         sceneEl.appendChild(entityEl);
 

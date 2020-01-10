@@ -13,6 +13,7 @@ var model = (function() {
 		antipattern     : { name: "antipattern" },
 		versionSelected : { name: "versionSelected" },
 		loaded			: { name: "loaded" }, // Element is added to DOM
+		childsLoaded	: { name: "childsLoaded" } // Child elements are also loaded
     };
 
 	let entitiesById = new Map();
@@ -54,7 +55,7 @@ var model = (function() {
 	}
 
 	// Adjustments - for example to change state
-	function createEntities(elements = [], adjustments = null) {
+	function createEntities(elements = []) {
 		let newEntities = [];            
 		//create initial entites from famix elements 
 		elements.forEach(function(element) {
@@ -74,7 +75,6 @@ var model = (function() {
 
 		//set object references - if set wrong, package Explorer will show wrong structure
 		newEntities.forEach(function(entity) {
-
 			if(entity.belongsTo === undefined || entity.belongsTo === "root" ){
 				delete entity.belongsTo;
 			} else if (typeof (entity.belongsTo) === 'object') {
@@ -173,13 +173,14 @@ var model = (function() {
 
 		// Add Element to DOM and refresh controllers
 		// let elements = [newEntities]
-		let applicationEvent = {			
-			sender: 	 model,
-			entities:    newEntities,
-			adjustments: adjustments
-		};
+		// let applicationEvent = {			
+		// 	sender: 	 model,
+		// 	entities:    newEntities,
+		// 	adjustments: adjustments
+		// };
 		
-		events.loaded.on.publish(applicationEvent);
+		// events.loaded.on.publish(applicationEvent);
+		return newEntities;
     }	
 	
 	

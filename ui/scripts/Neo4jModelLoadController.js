@@ -21,7 +21,7 @@ let neo4jModelLoadController = (function () {
         if (setup.neo4jModelLoadConfig) {
             controllerConfig = {...controllerConfig, ...setup.neo4jModelLoadConfig}
         }
-        events.loaded.on.subscribe(loadElementsAndChangeState);
+        // events.loaded.on.subscribe(loadElementsAndChangeState);
 
         if (controllerConfig.showLoadSpinner) {
             createLoadSpinner();
@@ -69,7 +69,15 @@ let neo4jModelLoadController = (function () {
 
         let parentNodes = await getMetadataForParentNodes(cypherQuery);
         let childNodes = await getMetadataForChildNodes(parentNodes, loadOneChild);
-        model.createEntities([...parentNodes, ...childNodes]);
+        let entities = model.createEntities([...parentNodes, ...childNodes]);
+        await loadElementsAndChangeState(entities);
+
+        let applicationEvent = {			
+			sender: 	 neo4jModelLoadController,
+			entities:    entities,
+			callback:    'addTreeNode'
+		};		
+		events.loaded.on.publish(applicationEvent);
     }
 
 
@@ -105,6 +113,7 @@ let neo4jModelLoadController = (function () {
     }
 
 
+    // loadChildNodesRecursively
     function onNodeCheck(entity) {
         entity.wasChecked = true;
         loadNodesRecursively(entity);
@@ -149,6 +158,7 @@ let neo4jModelLoadController = (function () {
 
 
     // Get MetaData for Child node on node expand
+    // loadChildNodes
     async function onNodeExpand(entity) {
         entity.wasExpanded = true;
         let parentNodes = await getNeo4jChildNodes(entity.id, false); // parent nodes inside of the selected node
@@ -189,10 +199,11 @@ let neo4jModelLoadController = (function () {
 
 
     // For given Node in Model load it's A-Frame code and create the element in DOM
-    async function loadElementsAndChangeState(applicationEvent) {
+    // async function loadElementsAndChangeState(applicationEvent) {
+    async function loadElementsAndChangeState(entities) {
         // Prepare cypherQuery with all the nodes ids
         let whereStatement = null;
-        applicationEvent.entities.forEach(entity => {
+        entities.forEach(entity => {
             if (whereStatement == null) {
                 return whereStatement = `n.nodeHashId = "${entity.id}"`;
             }
@@ -215,7 +226,8 @@ let neo4jModelLoadController = (function () {
             updateLoadSpinner(loaderController.toLoad); // second add, because of the appendAframeElementWithProperties
             // There may be some empty entites, like buildingSegments. They don't have any data, so we can't create an element for them.
             if (element) {
-                canvasManipulator.appendAframeElementWithProperties(element, applicationEvent.adjustments); // Start drawing the element
+                canvasManipulator.appendAframeElementWithProperties(element);
+                // canvasManipulator.appendAframeElementWithProperties(element, applicationEvent.adjustments); // Start drawing the element
             } else {
                 updateLoadSpinner(loaderController.loaded);
             }
@@ -245,7 +257,7 @@ let neo4jModelLoadController = (function () {
             let data = await response.json();
             return data.results;
         } catch (error) {
-            console.error(error);
+            events.log.warning.publish({ text: error });
         }
     }
 

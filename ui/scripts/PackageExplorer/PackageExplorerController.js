@@ -16,7 +16,18 @@ var packageExplorerController = (function () {
 
 	function initialize(setupConfig) {
 		application.transferConfigParams(setupConfig, controllerConfig);
-		events.loaded.on.subscribe(addTreeNode);
+		// events.loaded.on.subscribe(addTreeNode);
+		events.loaded.on.subscribe(onLoaded);
+	}
+
+	function onLoaded(applicationEvent) {
+		if (!applicationEvent.callback) {
+			return;
+		}
+		packageExplorerController[applicationEvent.callback](applicationEvent);
+		// switch (applicationEvent.callback) {
+		// 	case 
+		// }
 	}
 
 	function activate(rootDiv) {
@@ -132,8 +143,7 @@ var packageExplorerController = (function () {
 	}
 
 	// Currently called from Model.js 
-	function addTreeNode(applicationEvent) {
-		
+	function addTreeNode(applicationEvent) {		
 		//build items for ztree
 		let items = new Map();
 		applicationEvent.entities.forEach(function (entity) {
@@ -201,7 +211,6 @@ var packageExplorerController = (function () {
 
 					default:
 						events.log.warning.publish({ text: "FamixElement not in tree: " + entity.type });
-
 						return;
 				}
 			}
