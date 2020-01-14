@@ -75,7 +75,7 @@ let neo4jModelLoadController = (function () {
         let applicationEvent = {			
 			sender: 	 neo4jModelLoadController,
 			entities:    entities,
-			callback:    'addTreeNode'
+			callback:    ['addTreeNode']
 		};		
 		events.loaded.on.publish(applicationEvent);
     }
@@ -113,57 +113,56 @@ let neo4jModelLoadController = (function () {
     }
 
 
-    // loadChildNodesRecursively
-    function onNodeCheck(entity) {
-        entity.wasChecked = true;
-        loadNodesRecursively(entity);
-    }
-
     async function loadNodesRecursively(entity) {
-        // Exclude already loaded nodes from query
-        let whereStatement = `child.hash = ""`;
-        if (entity.children) {
-            entity.children.forEach(child => {
-                // If was already checked, we don't need these node anymore
-                if (child.wasChecked) {
-                    return whereStatement += `OR child.hash = "${child.id}"`;
-                }
-            });
+        let data;
+
+        // case 1: was expanded (childs are loaded)
+        if (entity.childsLoaded) {
+            data = entity.children;
         }
 
-        // Load direct child nodes
-        const cypherQuery = `MATCH (parent)-[:DECLARES|HAS|CONTAINS]->(child)
-                             WHERE parent.hash = "${entity.id}" 
-                             AND EXISTS(child.hash) 
-                             AND NOT (${whereStatement})
-                             RETURN child`;
-        let response = await getNeo4jData(cypherQuery);
-        let data = await getMetadataFromResponse(response);         
+        // case 2: childs are not loaded
+        if (!entity.childsLoaded) {
+            // load everything for this node
+            const cypherQuery = `MATCH (parent)-[:DECLARES|HAS|CONTAINS]->(child)
+                                    WHERE parent.hash = "${entity.id}" 
+                                    AND EXISTS(child.hash) 
+                                    RETURN child`;
+            let response = await getNeo4jData(cypherQuery);
+            data = await getMetadataFromResponse(response); 
+            let entities = model.createEntities(data);
+            await loadElementsAndChangeState(entities);
 
-        // For optimization, bulk load of entities
-        let entitiesToLoad = [];
+            let applicationEvent = {			
+                sender: 	 neo4jModelLoadController,
+                entities:    entities,
+                callback:    ['addTreeNode', 'zTreeNodeCheck']
+            };		
+            events.loaded.on.publish(applicationEvent);
+        }
+
+        entity.childsLoaded = true;
         data.forEach(entry => {
-            if (!model.getEntityById(entry.id)) {
-                return entitiesToLoad.push(entry);
-            } 
-        });
-        model.createEntities(entitiesToLoad, {checked: true});
-        
-        // Find next nodes
-        data.forEach(entry => {
-            model.getEntityById(entry.id).wasChecked = true;
             loadNodesRecursively(entry);
-        });
+        }) 
     }
 
 
     // Get MetaData for Child node on node expand
-    // loadChildNodes
-    async function onNodeExpand(entity) {
-        entity.wasExpanded = true;
+    async function loadChildNodes(entity) {
         let parentNodes = await getNeo4jChildNodes(entity.id, false); // parent nodes inside of the selected node
         let childNodes = await getMetadataForChildNodes(parentNodes, true); // select single child to show the expand sign
-        model.createEntities([...parentNodes, ...childNodes]);
+        let entities = model.createEntities([...parentNodes, ...childNodes]);
+        await loadElementsAndChangeState(entities);
+        entity.childsLoaded = true;
+
+        let applicationEvent = {			
+			sender: 	 neo4jModelLoadController,
+			entities:    entities,
+			callback:    ['addTreeNode']
+        };
+        
+        events.loaded.on.publish(applicationEvent);
     };
 
 
@@ -199,7 +198,6 @@ let neo4jModelLoadController = (function () {
 
 
     // For given Node in Model load it's A-Frame code and create the element in DOM
-    // async function loadElementsAndChangeState(applicationEvent) {
     async function loadElementsAndChangeState(entities) {
         // Prepare cypherQuery with all the nodes ids
         let whereStatement = null;
@@ -227,7 +225,6 @@ let neo4jModelLoadController = (function () {
             // There may be some empty entites, like buildingSegments. They don't have any data, so we can't create an element for them.
             if (element) {
                 canvasManipulator.appendAframeElementWithProperties(element);
-                // canvasManipulator.appendAframeElementWithProperties(element, applicationEvent.adjustments); // Start drawing the element
             } else {
                 updateLoadSpinner(loaderController.loaded);
             }
@@ -267,7 +264,7 @@ let neo4jModelLoadController = (function () {
         loadStartMetaData: loadStartMetaData,
         updateLoadSpinner: updateLoadSpinner,
         loaderController: loaderController,
-        onNodeExpand: onNodeExpand,
-        onNodeCheck: onNodeCheck
+        loadChildNodes: loadChildNodes,
+        loadNodesRecursively: loadNodesRecursively
     };
 })();

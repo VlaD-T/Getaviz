@@ -4,6 +4,7 @@ var packageExplorerController = (function () {
 	let jQPackageExplorerTree = "#packageExplorerTree";
 
 	let tree;
+	let activeTreeId;
 
 	let controllerConfig = {
 		projectIcon: "scripts/PackageExplorer/images/project.png",
@@ -24,10 +25,10 @@ var packageExplorerController = (function () {
 		if (!applicationEvent.callback) {
 			return;
 		}
-		packageExplorerController[applicationEvent.callback](applicationEvent);
-		// switch (applicationEvent.callback) {
-		// 	case 
-		// }
+		// used callbacks: "addTreeNode", "zTreeNodeCheck"
+		applicationEvent.callback.forEach(callback => {
+			packageExplorerController[callback](applicationEvent);
+		})
 	}
 
 	function activate(rootDiv) {
@@ -87,16 +88,24 @@ var packageExplorerController = (function () {
 		tree = $.fn.zTree.init($(jQPackageExplorerTree), settings, items);
 	}
 
-	// Load all child nodes (recursively)
 	function zTreeBeforeCheck(event, treeNode) {
+		// Load elements only on check (we don't need to proove check removal)
 		if (treeNode.checked) {
 			return true;
 		}
 
-		let wasChecked = model.getEntityById(treeNode.id).wasChecked;
-		if (!wasChecked) {
-			neo4jModelLoadController.onNodeCheck(model.getEntityById(treeNode.id));
+		neo4jModelLoadController.loadNodesRecursively(model.getEntityById(treeNode.id));
+	}
+
+	function zTreeNodeCheck(applicationEvent) {
+		if (!applicationEvent.entities) {
+			return;
 		}
+
+		applicationEvent.entities.forEach(entity => {
+			let node = tree.getNodeByTId(entity.id);
+			tree.checkNode(node, true, false, true);
+		});
 	}
 
 	function zTreeOnCheck(event, treeId, treeNode) {
@@ -130,16 +139,15 @@ var packageExplorerController = (function () {
 		events.selected.on.publish(applicationEvent);
 	}
 
-	// Before expand load all child nodes and remove dummyForExpand state (entity state)
+	// Before expand load all child nodes
 	function zTreeBeforeExpand(event, treeId, treeNode) {
 		let entity = model.getEntityById(treeId.id)
-		if (entity.wasExpanded || entity.wasChecked) {
+		if (entity.childsLoaded) {
 			return true; // true to expand the list
 		}
 
-		neo4jModelLoadController.onNodeExpand(entity);
-		tree.expandNode(treeId, true, false, true, false);
-		return false; // tree.expandNode already opens the list, so return false to leave it open
+		activeTreeId = treeId;
+		neo4jModelLoadController.loadChildNodes(entity);		
 	}
 
 	// Currently called from Model.js 
@@ -408,6 +416,7 @@ var packageExplorerController = (function () {
 		initialize: initialize,
 		activate: activate,
 		reset: reset,
-		addTreeNode: addTreeNode
+		addTreeNode: addTreeNode,
+		zTreeNodeCheck: zTreeNodeCheck
 	};
 })();
