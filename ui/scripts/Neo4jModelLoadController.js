@@ -183,7 +183,7 @@ let neo4jModelLoadController = (function () {
     // Return metadata object from response
     async function getMetadataFromResponse(response) {
         let data = [];
-        if (!response[0].data.length) {
+        if (!response[0].data) {
             return data;
         }
 

@@ -103,7 +103,7 @@ var packageExplorerController = (function () {
 		}
 
 		applicationEvent.entities.forEach(entity => {
-			let node = tree.getNodeByTId(entity.id);
+			let node = tree.getNodeByParam("id", entity.id, null);
 			tree.checkNode(node, true, false, true);
 		});
 	}
