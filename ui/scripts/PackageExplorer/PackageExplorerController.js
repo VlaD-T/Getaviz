@@ -17,7 +17,6 @@ var packageExplorerController = (function () {
 
 	function initialize(setupConfig) {
 		application.transferConfigParams(setupConfig, controllerConfig);
-		// events.loaded.on.subscribe(addTreeNode);
 		events.loaded.on.subscribe(onLoaded);
 	}
 
@@ -98,10 +97,6 @@ var packageExplorerController = (function () {
 	}
 
 	function zTreeNodeCheck(applicationEvent) {
-		if (!applicationEvent.entities) {
-			return;
-		}
-
 		applicationEvent.entities.forEach(entity => {
 			let node = tree.getNodeByParam("id", entity.id, null);
 			tree.checkNode(node, true, false, true);

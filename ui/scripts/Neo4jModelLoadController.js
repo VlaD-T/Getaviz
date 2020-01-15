@@ -40,12 +40,14 @@ let neo4jModelLoadController = (function () {
         document.body.appendChild(loader);
     }
 
-    function updateLoadSpinner(payload) { // payload = toLoad || loaded;
+    function updateLoadSpinner(payload, count = 1) { // payload = toLoad || loaded;
         if (!controllerConfig.showLoadSpinner) {
             return;
         }
         let loader = document.getElementById('loaderController');
-        payload === loaderController.toLoad ? loaderController.dataToLoad ++ : loaderController.dataToLoad --
+        payload === loaderController.toLoad 
+            ? loaderController.dataToLoad += count 
+            : loaderController.dataToLoad -= count
         if (loaderController.dataToLoad !== 0) { // show loader
             loader.classList.remove('hidden');
             let loaderData = document.getElementById('loaderController-data');
@@ -114,36 +116,51 @@ let neo4jModelLoadController = (function () {
 
 
     async function loadNodesRecursively(entity) {
-        let data;
+        let children = [];
 
         // case 1: was expanded (childs are loaded)
         if (entity.childsLoaded) {
-            data = entity.children;
+            children = entity.children;
         }
 
         // case 2: childs are not loaded
         if (!entity.childsLoaded) {
             // load everything for this node
-            const cypherQuery = `MATCH (parent)-[:DECLARES|HAS|CONTAINS]->(child)
-                                    WHERE parent.hash = "${entity.id}" 
-                                    AND EXISTS(child.hash) 
-                                    RETURN child`;
+            const cypherQuery = `MATCH (n {hash: "${entity.id}"})-[:DECLARES|HAS|CONTAINS *1..]->(child)
+                                    WHERE EXISTS (child.hash)
+                                    RETURN child`
             let response = await getNeo4jData(cypherQuery);
-            data = await getMetadataFromResponse(response); 
+            let data = await getMetadataFromResponse(response); 
             let entities = model.createEntities(data);
-            await loadElementsAndChangeState(entities);
-
+            let loaded = await loadElementsAndChangeState(entities);
+            
+            // Update childsLoaded state for new entities
             let applicationEvent = {			
                 sender: 	 neo4jModelLoadController,
-                entities:    entities,
-                callback:    ['addTreeNode', 'zTreeNodeCheck']
+                entities:    entities
             };		
-            events.loaded.on.publish(applicationEvent);
+            events.childsLoaded.on.publish(applicationEvent);
+
+            // This nodes are not new, so they aren't in entities
+            entity.children.forEach(child => {
+                child.childsLoaded = true;
+            })
+            
+            if (loaded) { // true if ok. False if something went wrong
+                applicationEvent = {			
+                    sender: 	 neo4jModelLoadController,
+                    entities:    entities,
+                    callback:    ['addTreeNode', 'zTreeNodeCheck']
+                };
+                events.loaded.on.publish(applicationEvent);
+            } else {
+                // error
+            }
         }
 
-        entity.childsLoaded = true;
-        data.forEach(entry => {
-            loadNodesRecursively(entry);
+        entity.childsLoaded = true;        
+        children.forEach(child => {
+            loadNodesRecursively(child);
         }) 
     }
 
@@ -201,6 +218,7 @@ let neo4jModelLoadController = (function () {
     async function loadElementsAndChangeState(entities) {
         // Prepare cypherQuery with all the nodes ids
         let whereStatement = null;
+        // let finished = false;
         entities.forEach(entity => {
             if (whereStatement == null) {
                 return whereStatement = `n.nodeHashId = "${entity.id}"`;
@@ -209,27 +227,29 @@ let neo4jModelLoadController = (function () {
         });
 
         if (!whereStatement) {
-            return;                
+            return false;         
         }
         const cypherQuery = `MATCH (n) WHERE ${whereStatement} AND EXISTS(n.aframeProperty) RETURN n`;
 
         updateLoadSpinner(loaderController.toLoad); // firstly add one, because of the getNeo4jData
         let response = await getNeo4jData(cypherQuery);
         if (!response) {
-            return;
+            return false;
         }
 
         let elements = response[0].data;
+        updateLoadSpinner(loaderController.toLoad, elements.length); // loader -> toLoad
         for (element of elements) {
-            updateLoadSpinner(loaderController.toLoad); // second add, because of the appendAframeElementWithProperties
+            // updateLoadSpinner(loaderController.toLoad); // second add, because of the appendAframeElementWithProperties
             // There may be some empty entites, like buildingSegments. They don't have any data, so we can't create an element for them.
             if (element) {
-                canvasManipulator.appendAframeElementWithProperties(element);
+                canvasManipulator.appendAframeElementWithProperties(element); // loader - loaded
             } else {
                 updateLoadSpinner(loaderController.loaded);
             }
         }
         updateLoadSpinner(loaderController.loaded);
+        return true; // finished
     }
 
 
