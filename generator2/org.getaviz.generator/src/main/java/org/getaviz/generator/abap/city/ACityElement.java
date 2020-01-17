@@ -9,8 +9,20 @@ import org.neo4j.driver.v1.types.Node;
 
 public class ACityElement {
 
+    public ACityShape getShape() {
+        return shape;
+    }
+
+    public void setShape(ACityShape shape) {
+        this.shape = shape;
+    }
+
     public enum ACityType {
         City, District, Building, Floor, Chimney
+    }
+
+    public enum ACityShape {
+        box, cylinder, cone
     }
 
     private String hash;
@@ -24,6 +36,7 @@ public class ACityElement {
     private ACityType type;
 
     private String color;
+    private ACityShape shape;
 
     private double height;
     private double width;

@@ -67,6 +67,8 @@ public class ACityBuildingLayout {
     }
 
     private void setPositionOfChimneys() {
+        //TODO outsource as a new Layout
+
         Double floorHeightSum = calculateFloorHeightSum();
         Double groundAreaLength = calculateGroundAreaByChimneyAmount();
 
