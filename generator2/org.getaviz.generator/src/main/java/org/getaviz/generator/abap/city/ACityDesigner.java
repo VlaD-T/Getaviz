@@ -52,6 +52,8 @@ public class ACityDesigner {
     private void designBuildings(ACityElement building) {
         building.setColor("#2ECCFA"); //TODO Config
         building.setShape(ACityElement.ACityShape.box); //TODO Config
+        building.setWidth(building.getWidth() - 0.1); //TODO Config
+        building.setLength(building.getLength() - 0.1); //TODO Config
     }
 
     private void designChimney(ACityElement chimney) {

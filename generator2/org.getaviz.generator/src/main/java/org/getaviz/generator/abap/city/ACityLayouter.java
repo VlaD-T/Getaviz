@@ -4,10 +4,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.getaviz.generator.SettingsConfiguration;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class ACityLayouter {
 
@@ -54,7 +51,7 @@ public class ACityLayouter {
 
             ACityElement parentElement = element.getParentElement();
             if(parentElement == null){
-                //TODO Exception
+                continue;
             }
 
             String hash = parentElement.getHash();

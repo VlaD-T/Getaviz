@@ -133,6 +133,11 @@ public class ACityCreator {
 
         //TODO add DDIC
 
+        createACityElementsFromSourceNodes(nodeRepository, SAPNodeLabels.DataElement, ACityElement.ACityType.Building);
+        createACityElementsFromSourceNodes(nodeRepository, SAPNodeLabels.Domain, ACityElement.ACityType.Building);
+        createACityElementsFromSourceNodes(nodeRepository, SAPNodeLabels.Structure, ACityElement.ACityType.Building);
+        createACityElementsFromSourceNodes(nodeRepository, SAPNodeLabels.TableType, ACityElement.ACityType.Building);
+
     }
 
     private void createACityElementsFromSourceNodes(NodeRepository nodeRepository, SAPNodeLabels nodeLabel, ACityElement.ACityType aCityType) {

@@ -67,18 +67,33 @@ public class ACityAFrameExporter {
         builder.append("\n");
         builder.append("\t position=\"" + element.getXPosition() + " " + element.getYPosition() + " " + element.getZPosition() + "\"");
         builder.append("\n");
-        builder.append("\t width=\"" + element.getWidth() + "\"");
-        builder.append("\n");
         builder.append("\t height=\"" + element.getHeight() + "\"");
         builder.append("\n");
-        builder.append("\t depth=\"" + element.getLength() + "\"");
-        builder.append("\n");
+
+        if(element.getShape() == ACityElement.ACityShape.box){
+            builder.append("\t width=\"" + element.getWidth() + "\"");
+            builder.append("\n");
+            builder.append("\t depth=\"" + element.getLength() + "\"");
+            builder.append("\n");
+        } else {
+            builder.append("\t radius=\"" + (element.getWidth() / 2) + "\"");
+            builder.append("\n");
+        }
+
+
+
+        //builder.append("\t shader=\"flat\"");
+        //builder.append("\n");
+        //builder.append("\t flat-shading=\"true\"");
+        //builder.append("\n");
+
         builder.append("\t color=\"" + element.getColor() + "\"");
         builder.append("\n");
-        builder.append("\t shader=\"flat\"");
+        builder.append("\t shadow");
+        builder.append(">");
+
         builder.append("\n");
-        builder.append("\t flat-shading=\"true\">");
-        builder.append("\n");
+
         builder.append("</" + getShapeExport(element.getShape()) + ">");
         builder.append("\n");
         return builder.toString();

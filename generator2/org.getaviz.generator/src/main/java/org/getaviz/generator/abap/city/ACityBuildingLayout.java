@@ -40,7 +40,7 @@ public class ACityBuildingLayout {
 
     private void setPositionOfBuilding() {
         building.setXPosition(0.0);
-        building.setYPosition(0.0);
+        building.setYPosition(building.getHeight() / 2);
         building.setZPosition(0.0);
     }
 
@@ -52,7 +52,7 @@ public class ACityBuildingLayout {
         building.setWidth(groundAreaLength);
         building.setLength(groundAreaLength);
 
-        building.setHeight(floorHeightSum + biggestChimneyHeight);
+        building.setHeight(floorHeightSum);
     }
 
     private Double getBiggestChimneyHeight() {
@@ -104,7 +104,7 @@ public class ACityBuildingLayout {
     private Double calculateFloorHeightSum() {
         double floorHeightSum = 1.0; //TODO config
         for(ACityElement floor : floors){
-            double floorTopEdge = floor.getYPosition() + floor.getHeight();
+            double floorTopEdge = floor.getYPosition() + ( floor.getHeight() / 2);
             if(floorTopEdge > floorHeightSum){
                 floorHeightSum = floorTopEdge;
             }
@@ -123,7 +123,7 @@ public class ACityBuildingLayout {
 
             if(cornerCounter == 0){
                 chimneyXPosition = (groundAreaLength / 2 - chimney.getWidth() / 2) * cornerX ;
-                chimneyYPosition = floorHeightSum;
+                chimneyYPosition = floorHeightSum + chimney.getHeight() / 2;
                 chimneyZPosition = (groundAreaLength / 2 - chimney.getLength() / 2) * cornerZ;
             }
 
@@ -159,7 +159,7 @@ public class ACityBuildingLayout {
 
             Double floorSizeSum = (floorCounter - 1) * floor.getHeight();
             Double floorGapSum = floorCounter * 0.5; //TODO Config
-            floor.setYPosition(floorSizeSum + floorGapSum);
+            floor.setYPosition((floor.getHeight() / 2) + floorSizeSum + floorGapSum);
 
             floor.setXPosition(0.0);
             floor.setZPosition(0.0);
