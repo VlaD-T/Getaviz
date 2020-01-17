@@ -67,6 +67,10 @@ public class ACityBuildingLayout {
     }
 
     private void setPositionOfChimneys() {
+        if(chimneys.size() == 0){
+            return;
+        }
+
         //TODO outsource as a new Layout
 
         Double floorHeightSum = calculateFloorHeightSum();

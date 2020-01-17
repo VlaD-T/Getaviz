@@ -29,7 +29,6 @@ public class DesignTest{
 
         nodeRepository = new NodeRepository();
         nodeRepository.loadNodesWithRelation(SAPRelationLabels.CONTAINS);
-        nodeRepository.loadNodesWithRelation( SAPRelationLabels.DECLARES);
 
         aCityRepository = new ACityRepository();
 

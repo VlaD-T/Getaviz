@@ -36,6 +36,14 @@ public class ACityLayouter {
         }
 
 
+        //TODO recursiv
+
+        Collection<ACityElement> districts = getParentDistricts(buildingDistricts);
+        for(ACityElement district : districts){
+            layoutDistrict(district);
+        }
+
+
 
     }
 
@@ -43,9 +51,15 @@ public class ACityLayouter {
     private Collection<ACityElement> getParentDistricts(Collection<ACityElement> elements) {
         Map<String, ACityElement> parentDistricts = new HashMap<>();
         for(ACityElement element : elements){
-            String hash = element.getHash();
+
+            ACityElement parentElement = element.getParentElement();
+            if(parentElement == null){
+                //TODO Exception
+            }
+
+            String hash = parentElement.getHash();
             if(!parentDistricts.containsKey(hash)){
-                parentDistricts.put(hash, element);
+                parentDistricts.put(hash, parentElement);
             }
         }
         return parentDistricts.values();

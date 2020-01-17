@@ -35,14 +35,14 @@ public class ACityDistrictLayout {
         adjustPositionsOfSubElements(subElements, 0 ,0 ,0);
 
         setSizeOfDistrict(coveringRectangle);
-        setPositionOfDistrict();
+        setPositionOfDistrict(coveringRectangle);
 
     }
 
-    private void setPositionOfDistrict() {
-        district.setXPosition(0.0);
-        district.setYPosition(0.0);
-        district.setZPosition(0.0);
+    private void setPositionOfDistrict(Rectangle coveringRectangle) {
+        district.setXPosition(coveringRectangle.getCenterX());
+        district.setYPosition(0.0); //TODO config
+        district.setZPosition(coveringRectangle.getCenterY());
     }
 
     private void setSizeOfDistrict(Rectangle coveringRectangle) {
@@ -266,9 +266,9 @@ public class ACityDistrictLayout {
             double centerY = element.getYPosition();
             double centerZ = element.getZPosition();
 
-            double newXPosition = centerX + parentX + config.getBuildingHorizontalMargin();
-            double newYPosition = centerY + parentY + config.getBuildingVerticalMargin();
-            double newZPosition = centerZ + parentZ + config.getBuildingHorizontalMargin();
+            double newXPosition = centerX + parentX; // TODO + config.getBuildingHorizontalMargin();
+            double newYPosition = centerY + parentY; // TODO + config.getBuildingVerticalMargin();
+            double newZPosition = centerZ + parentZ; // TODO + config.getBuildingHorizontalMargin();
 
             element.setXPosition(newXPosition);
             element.setYPosition(newYPosition);
@@ -276,7 +276,29 @@ public class ACityDistrictLayout {
 
             Collection<ACityElement> subElements = element.getSubElements();
             if(!subElements.isEmpty()){
-                adjustPositionsOfSubElements(subElements, newXPosition, newYPosition, newZPosition);
+                adjustPositionsOfSubSubElements(subElements, newXPosition, newYPosition, newZPosition);
+            }
+        }
+    }
+
+    private void adjustPositionsOfSubSubElements(Collection<ACityElement> elements, double parentX, double parentY, double parentZ) {
+        for (ACityElement element : elements) {
+
+            double centerX = element.getXPosition();
+            double centerY = element.getYPosition();
+            double centerZ = element.getZPosition();
+
+            double newXPosition = centerX + parentX; // TODO + config.getBuildingHorizontalMargin();
+            double newYPosition = centerY + parentY; // TODO + config.getBuildingVerticalMargin();
+            double newZPosition = centerZ + parentZ; // TODO + config.getBuildingHorizontalMargin();
+
+            element.setXPosition(newXPosition);
+            element.setYPosition(newYPosition);
+            element.setZPosition(newZPosition);
+
+            Collection<ACityElement> subElements = element.getSubElements();
+            if(!subElements.isEmpty()){
+                adjustPositionsOfSubElements(subElements, parentX, parentY, parentZ);
             }
         }
     }

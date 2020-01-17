@@ -120,12 +120,14 @@ public class ACityCreator {
         createACityElementsFromSourceNodes(nodeRepository, SAPNodeLabels.Package, ACityElement.ACityType.District);
 
         createACityElementsFromSourceNodes(nodeRepository, SAPNodeLabels.Report, ACityElement.ACityType.Building);
+        createACityElementsFromSourceNodes(nodeRepository, SAPNodeLabels.FormRoutine, ACityElement.ACityType.Floor);
 
         createACityElementsFromSourceNodes(nodeRepository, SAPNodeLabels.Class, ACityElement.ACityType.Building);
         createACityElementsFromSourceNodes(nodeRepository, SAPNodeLabels.Method, ACityElement.ACityType.Floor);
         createACityElementsFromSourceNodes(nodeRepository, SAPNodeLabels.Attribute, ACityElement.ACityType.Chimney);
 
         createACityElementsFromSourceNodes(nodeRepository, SAPNodeLabels.FunctionGroup, ACityElement.ACityType.Building);
+        createACityElementsFromSourceNodes(nodeRepository, SAPNodeLabels.FunctionModule, ACityElement.ACityType.Floor);
 
         createACityElementsFromSourceNodes(nodeRepository, SAPNodeLabels.Table, ACityElement.ACityType.Building);
 

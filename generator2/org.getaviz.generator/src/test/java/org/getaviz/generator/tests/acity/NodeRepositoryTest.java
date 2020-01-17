@@ -28,7 +28,6 @@ public class NodeRepositoryTest {
 
         nodeRepository = new NodeRepository();
         nodeRepository.loadNodesWithRelation(SAPRelationLabels.CONTAINS);
-        nodeRepository.loadNodesWithRelation( SAPRelationLabels.DECLARES);
     }
 
     @AfterAll
@@ -69,18 +68,6 @@ public class NodeRepositoryTest {
         assertEquals(1, parentNodes.size());
     }
 
-    @Test
-    void declaresRelationTest(){
-        Collection<Node> reportNodes = nodeRepository.getNodesByLabel(SAPNodeLabels.Report);
-
-        Node firstReport = reportNodes.iterator().next();
-        Collection<Node> subNodes = nodeRepository.getRelatedNodes(firstReport, SAPRelationLabels.DECLARES, true);
-        assertEquals(1, subNodes.size());
-
-        Node subNode = subNodes.iterator().next();
-        Collection<Node> parentNodes = nodeRepository.getRelatedNodes(subNode, SAPRelationLabels.DECLARES, false);
-        assertEquals(1, parentNodes.size());
-    }
 
 
 

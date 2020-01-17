@@ -27,7 +27,6 @@ public class CreatorTest {
 
         nodeRepository = new NodeRepository();
         nodeRepository.loadNodesWithRelation(SAPRelationLabels.CONTAINS);
-        nodeRepository.loadNodesWithRelation( SAPRelationLabels.DECLARES);
 
         aCityRepository = new ACityRepository();
 
@@ -50,6 +49,8 @@ public class CreatorTest {
     void buildingElements() {
         Collection<ACityElement> buildings = aCityRepository.getElementsByType(ACityElement.ACityType.Building);
         assertEquals(4, buildings.size());
+
+
     }
 
     @Test
@@ -63,6 +64,39 @@ public class CreatorTest {
             assertEquals(ACityElement.ACityType.District, parentType);
         }
     }
+
+    @Test
+    void buildingSubElements(){
+        Collection<ACityElement> buildings = aCityRepository.getElementsByTypeAndSourceProperty(ACityElement.ACityType.Building, "object_name", "/GSA/VISAP_T_TEST_CLASS");
+
+        ACityElement firstBuilding = buildings.iterator().next();
+        assertNotEquals(0, firstBuilding.getSubElements().size());
+    }
+
+    @Test
+    void floorParentElements(){
+        Collection<ACityElement> floors = aCityRepository.getElementsByType(ACityElement.ACityType.Floor);
+
+        for (ACityElement floor : floors) {
+            assertNotEquals(null, floor.getParentElement());
+
+            ACityElement.ACityType parentType = floor.getParentElement().getType();
+            assertEquals(ACityElement.ACityType.Building, parentType);
+        }
+    }
+
+    @Test
+    void chimneyParentElements(){
+        Collection<ACityElement> chimneys = aCityRepository.getElementsByType(ACityElement.ACityType.Chimney);
+
+        for (ACityElement chimney : chimneys) {
+            assertNotEquals(null, chimney.getParentElement());
+
+            ACityElement.ACityType parentType = chimney.getParentElement().getType();
+            assertEquals(ACityElement.ACityType.Building, parentType);
+        }
+    }
+
 
     @Test
     void districtSubElements(){
