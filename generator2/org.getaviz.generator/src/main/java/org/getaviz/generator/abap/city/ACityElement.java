@@ -17,10 +17,25 @@ public class ACityElement {
         this.shape = shape;
     }
 
-    public enum ACityType {
-        City, District, Building, Floor, Chimney
+    public ACitySubType getSubType() {
+        return subType;
     }
 
+    public void setSubType(ACitySubType subType) {
+        this.subType = subType;
+    }
+
+    public enum ACityType {
+        District, Building, Floor, Chimney,
+
+    }
+
+    public enum ACitySubType {
+        Class, Report, FunctionGroup, Table, DDIC
+    }
+
+
+    //Todo Großschreibung?
     public enum ACityShape {
         box, cylinder, cone
     }
@@ -34,6 +49,7 @@ public class ACityElement {
     private ACityElement parentElement;
 
     private ACityType type;
+    private ACitySubType subType;
 
     private String color;
     private ACityShape shape;

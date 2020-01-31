@@ -36,9 +36,7 @@ public class ACityDistrictLayout {
         setSizeOfDistrict(coveringRectangle);
         setPositionOfDistrict(coveringRectangle);
 
-        adjustPositionsOfSubElements(subElements);
     }
-
 
 
     private void setSizeOfDistrict(Rectangle coveringRectangle) {
@@ -58,42 +56,35 @@ public class ACityDistrictLayout {
         ACityElement element = rectangleElementsMap.get(rectangle);
 
         double xPosition = fitNode.getRectangle().getCenterX() - config.getBuildingHorizontalGap() / 2;
+        double xPositionDelta = xPosition - element.getXPosition();
         element.setXPosition(xPosition);
 
-        double yPosition = element.getYPosition();
+        double yPosition = element.getYPosition() + 0.2; //TODO config
+        double yPositionDelta = yPosition - element.getYPosition();
         element.setYPosition(yPosition);
 
         double zPosition = fitNode.getRectangle().getCenterY() - config.getBuildingHorizontalGap() / 2;
+        double zPositionDelta = zPosition - element.getZPosition();
         element.setZPosition(zPosition);
-    }
 
-    private void adjustPositionsOfSubElements(Collection<ACityElement> elements) {
-        for (ACityElement element : elements) {
-
-            double centerX = element.getXPosition();
-            double centerY = element.getYPosition();
-            double centerZ = element.getZPosition();
-
-            double newYPosition = centerY + district.getHeight(); // TODO + config.getBuildingVerticalMargin();
-            element.setYPosition(newYPosition);
-
-            Collection<ACityElement> subElements = element.getSubElements();
-            if(!subElements.isEmpty()){
-                adjustPositionsOfSubSubElements(subElements, centerX, centerZ);
-            }
+        Collection<ACityElement> subElements = element.getSubElements();
+        if(!subElements.isEmpty()){
+            adjustPositionsOfSubSubElements(subElements, xPositionDelta, yPositionDelta, zPositionDelta);
         }
     }
 
-    private void adjustPositionsOfSubSubElements(Collection<ACityElement> elements, double parentX, double parentZ) {
+
+
+    private void adjustPositionsOfSubSubElements(Collection<ACityElement> elements, double parentX, double parentY, double parentZ) {
         for (ACityElement element : elements) {
 
             double centerX = element.getXPosition();
             double centerY = element.getYPosition();
             double centerZ = element.getZPosition();
 
-            double newXPosition = centerX + parentX; // TODO + config.getBuildingHorizontalMargin();
-            double newYPosition = centerY + district.getHeight(); // TODO + config.getBuildingVerticalMargin();
-            double newZPosition = centerZ + parentZ; // TODO + config.getBuildingHorizontalMargin();
+            double newXPosition = centerX + parentX ; // TODO + config.getBuildingHorizontalMargin();
+            double newYPosition = centerY + parentY ; // TODO + config.getBuildingVerticalMargin();
+            double newZPosition = centerZ + parentZ ; // TODO + config.getBuildingHorizontalMargin();
 
             element.setXPosition(newXPosition);
             element.setYPosition(newYPosition);
@@ -101,13 +92,20 @@ public class ACityDistrictLayout {
 
             Collection<ACityElement> subElements = element.getSubElements();
             if(!subElements.isEmpty()){
-                adjustPositionsOfSubSubElements(subElements, parentX, parentZ);
+                adjustPositionsOfSubSubElements(subElements, parentX, parentY, parentZ);
             }
         }
     }
 
 
 
+
+
+
+
+    /*
+        Copied from CityLayout
+     */
 
 
     private Rectangle arrangeSubElements(Collection<ACityElement> subElements){
@@ -198,10 +196,6 @@ public class ACityDistrictLayout {
 
 
 
-    /*
-        Copied from CityLayout
-     */
-
     private void sortEmptyLeaf(CityKDTreeNode pnode, Rectangle el, Rectangle covrec,
                                       Map<CityKDTreeNode, Double> preservers, Map<CityKDTreeNode, Double> expanders) {
         // either element fits in current bounds (->preservers) or it doesn't
@@ -216,10 +210,8 @@ public class ACityDistrictLayout {
             double waste = pnode.getRectangle().getArea() - el.getArea();
             preservers.put(pnode, waste);
         } else {
-            double ratio = ((nodeNewBottomRightX > covrec.getBottomRightX() ? nodeNewBottomRightX
-                    : covrec.getBottomRightX())
-                    / (nodeNewBottomRightY > covrec.getBottomRightY() ? nodeNewBottomRightY
-                    : covrec.getBottomRightY()));
+            double ratio = ((Math.max(nodeNewBottomRightX, covrec.getBottomRightX()))
+                    / (Math.max(nodeNewBottomRightY, covrec.getBottomRightY())));
             expanders.put(pnode, ratio);
         }
     }
@@ -296,12 +288,8 @@ public class ACityDistrictLayout {
 
 
     private void updateCovrec(CityKDTreeNode fitNode, Rectangle covrec) {
-        double newX = (fitNode.getRectangle().getBottomRightX() > covrec.getBottomRightX()
-                ? fitNode.getRectangle().getBottomRightX()
-                : covrec.getBottomRightX());
-        double newY = (fitNode.getRectangle().getBottomRightY() > covrec.getBottomRightY()
-                ? fitNode.getRectangle().getBottomRightY()
-                : covrec.getBottomRightY());
+        double newX = (Math.max(fitNode.getRectangle().getBottomRightX(), covrec.getBottomRightX()));
+        double newY = (Math.max(fitNode.getRectangle().getBottomRightY(), covrec.getBottomRightY()));
         covrec.changeRectangle(0, 0, newX, newY);
     }
 

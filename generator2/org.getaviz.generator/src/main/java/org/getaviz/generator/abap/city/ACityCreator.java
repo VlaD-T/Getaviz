@@ -53,25 +53,30 @@ public class ACityCreator {
     }
 
     private void createTypeDistricts(ACityElement parentDistrict, Collection<ACityElement> childElements) {
-        Map<String, ACityElement> typeDistrictMap = new HashMap<>();
+        Map<ACityElement.ACitySubType, ACityElement> typeDistrictMap = new HashMap<>();
 
         for (ACityElement childElement: childElements) {
-            addChildToTypeDistrict(parentDistrict, childElement, typeDistrictMap, "Class", SAPNodeLabels.Class);
-            addChildToTypeDistrict(parentDistrict, childElement, typeDistrictMap, "Report", SAPNodeLabels.Report);
-            addChildToTypeDistrict(parentDistrict, childElement, typeDistrictMap, "FunctionGroup",SAPNodeLabels.FunctionGroup);
-            addChildToTypeDistrict(parentDistrict, childElement, typeDistrictMap, "Table", SAPNodeLabels.Table);
+            addChildToTypeDistrict(parentDistrict, childElement, typeDistrictMap, ACityElement.ACitySubType.Class, SAPNodeLabels.Class);
+            addChildToTypeDistrict(parentDistrict, childElement, typeDistrictMap, ACityElement.ACitySubType.Report, SAPNodeLabels.Report);
+            addChildToTypeDistrict(parentDistrict, childElement, typeDistrictMap, ACityElement.ACitySubType.FunctionGroup,SAPNodeLabels.FunctionGroup);
+            addChildToTypeDistrict(parentDistrict, childElement, typeDistrictMap, ACityElement.ACitySubType.Table, SAPNodeLabels.Table);
 
-            //TODO DDIC TypeDistrict
+            addChildToTypeDistrict(parentDistrict, childElement, typeDistrictMap, ACityElement.ACitySubType.DDIC, SAPNodeLabels.Structure);
+            addChildToTypeDistrict(parentDistrict, childElement, typeDistrictMap, ACityElement.ACitySubType.DDIC, SAPNodeLabels.Domain);
+            addChildToTypeDistrict(parentDistrict, childElement, typeDistrictMap, ACityElement.ACitySubType.DDIC, SAPNodeLabels.DataElement);
+            addChildToTypeDistrict(parentDistrict, childElement, typeDistrictMap, ACityElement.ACitySubType.DDIC, SAPNodeLabels.TableType);
+
         }
     }
 
-    private void addChildToTypeDistrict(ACityElement parentDistrict, ACityElement childElement, Map<String, ACityElement> typeDistrictMap, String districtType, SAPNodeLabels sapNodeLabel) {
+    private void addChildToTypeDistrict(ACityElement parentDistrict, ACityElement childElement, Map<ACityElement.ACitySubType, ACityElement> typeDistrictMap, ACityElement.ACitySubType districtType, SAPNodeLabels sapNodeLabel) {
 
         Node childSourceNode = childElement.getSourceNode();
 
         if( childSourceNode.hasLabel( sapNodeLabel.name()) ){
             if( !typeDistrictMap.containsKey(districtType)){
                 ACityElement typeDistrict = new ACityElement(ACityElement.ACityType.District);
+                typeDistrict.setSubType(districtType);
                 typeDistrictMap.put(districtType, typeDistrict);
 
                 repository.addElement(typeDistrict);
@@ -130,12 +135,14 @@ public class ACityCreator {
         createACityElementsFromSourceNodes(nodeRepository, SAPNodeLabels.FunctionModule, ACityElement.ACityType.Floor);
 
         createACityElementsFromSourceNodes(nodeRepository, SAPNodeLabels.Table, ACityElement.ACityType.Building);
+        //TODO Elements
 
-        //TODO add DDIC
+        createACityElementsFromSourceNodes(nodeRepository, SAPNodeLabels.Structure, ACityElement.ACityType.Building);
+        //TODO Elements
 
         createACityElementsFromSourceNodes(nodeRepository, SAPNodeLabels.DataElement, ACityElement.ACityType.Building);
         createACityElementsFromSourceNodes(nodeRepository, SAPNodeLabels.Domain, ACityElement.ACityType.Building);
-        createACityElementsFromSourceNodes(nodeRepository, SAPNodeLabels.Structure, ACityElement.ACityType.Building);
+
         createACityElementsFromSourceNodes(nodeRepository, SAPNodeLabels.TableType, ACityElement.ACityType.Building);
 
     }

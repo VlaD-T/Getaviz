@@ -42,15 +42,13 @@ public class CreatorTest {
     @Test
     void districtElements() {
         Collection<ACityElement> districts = aCityRepository.getElementsByType(ACityElement.ACityType.District);
-        assertEquals(6, districts.size());
+        assertEquals(7, districts.size());
     }
 
     @Test
     void buildingElements() {
         Collection<ACityElement> buildings = aCityRepository.getElementsByType(ACityElement.ACityType.Building);
-        assertEquals(4, buildings.size());
-
-
+        assertEquals(8, buildings.size());
     }
 
     @Test
@@ -118,7 +116,7 @@ public class CreatorTest {
         ACityElement secondDistrict = districts.iterator().next();
 
         subDistricts = secondDistrict.getSubElements();
-        assertEquals(3, subDistricts.size());
+        assertEquals(4, subDistricts.size());
     }
 
 

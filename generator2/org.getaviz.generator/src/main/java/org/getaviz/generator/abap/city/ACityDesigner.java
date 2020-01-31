@@ -45,8 +45,20 @@ public class ACityDesigner {
 
 
     private void designDistrict(ACityElement district) {
-        district.setColor("#FE2EF7"); //TODO Config
+
         district.setShape(ACityElement.ACityShape.box); //TODO Config
+
+        if (district.getSourceNode() == null){
+            switch (district.getSubType()){
+                case Class:         district.setColor("#F4D03F"); break; //TODO Config
+                case Report:        district.setColor("#85C1E9"); break; //TODO Config
+                case FunctionGroup: district.setColor("#7D3C98"); break; //TODO Config
+                case Table:         district.setColor("#1A5276"); break; //TODO Config
+                case DDIC:          district.setColor("#229954"); break; //TODO Config
+            }
+        } else {
+            district.setColor("#95A5A6"); //TODO Config
+        }
     }
 
     private void designBuildings(ACityElement building) {

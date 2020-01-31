@@ -39,7 +39,7 @@ public class NodeRepositoryTest {
     void allNodes(){
 
         Collection<Node> allNodes = nodeRepository.getNodes();
-        assertEquals(10, allNodes.size());
+        assertEquals(16, allNodes.size());
 
     }
 
@@ -61,7 +61,7 @@ public class NodeRepositoryTest {
 
         Node firstPackage = packageNodes.iterator().next();
         Collection<Node> subNodes = nodeRepository.getRelatedNodes(firstPackage, SAPRelationLabels.CONTAINS, true);
-        assertEquals(3, subNodes.size());
+        assertEquals(7, subNodes.size());
 
         Node subNode = subNodes.iterator().next();
         Collection<Node> parentNodes = nodeRepository.getRelatedNodes(subNode, SAPRelationLabels.CONTAINS, false);

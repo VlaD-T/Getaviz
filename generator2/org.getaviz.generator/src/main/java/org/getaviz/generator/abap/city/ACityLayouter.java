@@ -27,21 +27,23 @@ public class ACityLayouter {
             layoutBuilding(building);
         }
 
-        Collection<ACityElement> buildingDistricts = getParentDistricts(buildings);
-        for(ACityElement buildingDistrict : buildingDistricts){
-            layoutDistrict(buildingDistrict);
+        layoutParentDistricts(buildings);
+    }
+
+    private void layoutParentDistricts(Collection<ACityElement> districtElements) {
+
+        Collection<ACityElement> parentDistricts = getParentDistricts(districtElements);
+
+        if (parentDistricts.isEmpty()){
+            layoutVirtualRootDistrict(districtElements);
+            return;
         }
 
-
-        //TODO recursiv
-
-        Collection<ACityElement> districts = getParentDistricts(buildingDistricts);
-        for(ACityElement district : districts){
-            layoutDistrict(district);
+        for(ACityElement parentDistrict : parentDistricts){
+            layoutDistrict(parentDistrict);
         }
 
-
-
+        layoutParentDistricts(parentDistricts);
     }
 
 
@@ -70,10 +72,17 @@ public class ACityLayouter {
         buildingLayout.calculate();
     }
 
-    private void layoutDistrict(ACityElement buildingDistrict) {
-        Collection<ACityElement> buildings = buildingDistrict.getSubElements();
+    private void layoutDistrict(ACityElement district) {
+        Collection<ACityElement> subElements = district.getSubElements();
 
-        ACityDistrictLayout aCityDistrictLayout = new ACityDistrictLayout(buildingDistrict,  buildings, config);
+        ACityDistrictLayout aCityDistrictLayout = new ACityDistrictLayout(district,  subElements, config);
+        aCityDistrictLayout.calculate();
+    }
+
+    private void layoutVirtualRootDistrict(Collection<ACityElement> districts){
+        ACityElement virtualRootDistrict = new ACityElement(ACityElement.ACityType.District);
+
+        ACityDistrictLayout aCityDistrictLayout = new ACityDistrictLayout(virtualRootDistrict,  districts, config);
         aCityDistrictLayout.calculate();
     }
 
