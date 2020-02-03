@@ -28,6 +28,7 @@ public class AFrameExporterTest {
 
         nodeRepository = new NodeRepository();
         nodeRepository.loadNodesWithRelation(SAPRelationLabels.CONTAINS);
+        nodeRepository.loadNodesWithRelation(SAPRelationLabels.TYPEOF);
 
         aCityRepository = new ACityRepository();
 

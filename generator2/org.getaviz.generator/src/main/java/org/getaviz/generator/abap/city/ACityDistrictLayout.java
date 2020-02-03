@@ -55,7 +55,7 @@ public class ACityDistrictLayout {
     private void setNewPositionFromNode(Rectangle rectangle, CityKDTreeNode fitNode) {
         ACityElement element = rectangleElementsMap.get(rectangle);
 
-        double xPosition = fitNode.getRectangle().getCenterX() - config.getBuildingHorizontalGap() / 2;
+        double xPosition = fitNode.getRectangle().getCenterX();// - config.getBuildingHorizontalGap() / 2;
         double xPositionDelta = xPosition - element.getXPosition();
         element.setXPosition(xPosition);
 
@@ -63,7 +63,7 @@ public class ACityDistrictLayout {
         double yPositionDelta = yPosition - element.getYPosition();
         element.setYPosition(yPosition);
 
-        double zPosition = fitNode.getRectangle().getCenterY() - config.getBuildingHorizontalGap() / 2;
+        double zPosition = fitNode.getRectangle().getCenterY();//- config.getBuildingHorizontalGap() / 2;
         double zPositionDelta = zPosition - element.getZPosition();
         element.setZPosition(zPosition);
 
