@@ -24,7 +24,7 @@ public class DesignTest{
     @BeforeAll
     static void setup() {
 
-        mockUp.setupDatabase("./test/databases/CityBankTest.db");
+        mockUp.setupDatabase("./test/databases/CityBankTest.db", "SAP.cypher");
         mockUp.loadProperties("CityBankTest.properties");
 
         nodeRepository = new NodeRepository();

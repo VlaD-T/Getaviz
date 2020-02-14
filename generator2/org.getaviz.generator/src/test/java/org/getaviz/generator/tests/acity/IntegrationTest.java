@@ -6,11 +6,14 @@ import org.getaviz.generator.mockups.ABAPmock;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.neo4j.driver.v1.types.Node;
 
+import java.util.Collection;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
-public class AFrameExporterTest {
-
+public class IntegrationTest {
 
     private static SettingsConfiguration config = SettingsConfiguration.getInstance();
 
@@ -23,7 +26,8 @@ public class AFrameExporterTest {
     @BeforeAll
     static void setup() {
 
-        mockUp.setupDatabase("./test/databases/CityBankTest.db", "SAP.cypher");
+        mockUp.setupDatabase("./test/databases/CityBankTest.db", "SAPExportCreateNodes.cypher");
+        mockUp.runCypherScript("SAPExportCreateContainsRelation.cypher");
         mockUp.loadProperties("CityBankTest.properties");
 
         nodeRepository = new NodeRepository();
@@ -49,6 +53,13 @@ public class AFrameExporterTest {
     static void close() {
         mockUp.close();
     }
+
+    @Test
+    public void nodesLoaded(){
+        Collection<Node> allNodes = nodeRepository.getNodes();
+        assertEquals(340, allNodes.size());
+    }
+
 
     @Test
     public void export(){

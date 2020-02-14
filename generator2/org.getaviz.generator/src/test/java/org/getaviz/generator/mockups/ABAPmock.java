@@ -6,13 +6,13 @@ import org.neo4j.graphdb.factory.GraphDatabaseFactory;
 
 public class ABAPmock extends Mockup {
 
-	public void setupDatabase(String directory) {
+	public void setupDatabase(String directory, String cypherScript) {
 		graphDb = new GraphDatabaseFactory().newEmbeddedDatabaseBuilder(new File(directory))
 				.setConfig(bolt.type, "BOLT").setConfig(bolt.enabled, "true")
 				.setConfig(bolt.listen_address, "localhost:11003").newGraphDatabase();
 		registerShutdownHook(graphDb);
 		connector = DatabaseConnector.getInstance("bolt://localhost:11003");
 		resetDatabase();
-		runCypherScript("SAP.cypher");
+		runCypherScript(cypherScript);
 	}
 }
