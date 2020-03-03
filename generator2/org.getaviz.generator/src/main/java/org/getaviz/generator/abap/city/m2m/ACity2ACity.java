@@ -11,7 +11,7 @@ import org.getaviz.generator.database.DatabaseConnector;
 import org.neo4j.driver.v1.StatementResult;
 import org.neo4j.driver.v1.types.Node;
 
-public class ACity2ACity {
+/*public class ACity2ACity {
 	private SettingsConfiguration config = SettingsConfiguration.getInstance();
 	private Log log = LogFactory.getLog(this.getClass());
 	private HashMap<Long, HashMap<String, String>> nodeProperties = new HashMap<Long, HashMap<String, String>>(); //TODO kill member attribute
@@ -213,4 +213,4 @@ public class ACity2ACity {
 	
     
     
-}
+}*/

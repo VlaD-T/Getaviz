@@ -6,6 +6,9 @@ import org.getaviz.generator.SettingsConfiguration;
 
 import java.util.Collection;
 
+import org.getaviz.generator.abap.city.SAPNodeTypes;
+import org.neo4j.driver.v1.types.Node;
+
 public class ACityDesigner {
 
     private Log log = LogFactory.getLog(this.getClass());
@@ -13,7 +16,7 @@ public class ACityDesigner {
 
     private ACityRepository repository;
 
-    public ACityDesigner(ACityRepository aCityRepository,SettingsConfiguration config) {
+    public ACityDesigner(ACityRepository aCityRepository, SettingsConfiguration config) {
         this.config = config;
 
         repository = aCityRepository;
@@ -46,15 +49,15 @@ public class ACityDesigner {
 
     private void designDistrict(ACityElement district) {
 
-        district.setShape(ACityElement.ACityShape.box); //TODO Config
+        district.setShape(config.getACityDistrictShape());
 
         if (district.getSourceNode() == null){
             switch (district.getSubType()){
-                case Class:         district.setColor("#F4D03F"); break; //TODO Config
-                case Report:        district.setColor("#85C1E9"); break; //TODO Config
-                case FunctionGroup: district.setColor("#7D3C98"); break; //TODO Config
-                case Table:         district.setColor("#1A5276"); break; //TODO Config
-                case DDIC:          district.setColor("#229954"); break; //TODO Config
+                case Class:         district.setColor(config.getACityDistrictColorHex("classDistrict")); break;
+                case Report:        district.setColor(config.getACityDistrictColorHex("reportDistrict")); break;
+                case FunctionGroup: district.setColor(config.getACityDistrictColorHex("functionGroupDistrict")); break;
+                case Table:         district.setColor(config.getACityDistrictColorHex("tableDistrict")); break;
+                case DDIC:          district.setColor(config.getACityDistrictColorHex("dataDictionaryDistrict")); break;
             }
         } else {
             district.setColor("#95A5A6"); //TODO Config
@@ -63,121 +66,132 @@ public class ACityDesigner {
 
     private void designBuildings(ACityElement building) {
 
-        if (building.getSourceNode().hasLabel(SAPNodeLabels.Class.name())){
-            building.setColor("#ff00ff"); //TODO Config
-            building.setShape(ACityElement.ACityShape.box); //TODO Config
-            building.setWidth(building.getWidth() - 0.1); //TODO Config
-            building.setLength(building.getLength() - 0.1); //TODO Config
-        }
+        Node sourceNode = building.getSourceNode();
 
-        if (building.getSourceNode().hasLabel(SAPNodeLabels.Interface.name())){
-            building.setColor("#ff0000"); //TODO Config
-            building.setShape(ACityElement.ACityShape.box); //TODO Config
-            building.setWidth(building.getWidth() - 0.1); //TODO Config
-            building.setLength(building.getLength() - 0.1); //TODO Config
-        }
+        if (sourceNode != null) {
 
-        if (building.getSourceNode().hasLabel(SAPNodeLabels.Report.name())){
-            building.setColor("#00007f"); //TODO Config
-            building.setShape(ACityElement.ACityShape.box); //TODO Config
-            building.setWidth(building.getWidth() - 0.1); //TODO Config
-            building.setLength(building.getLength() - 0.1); //TODO Config
-        }
+            String propertyTypeName = sourceNode.get("type_name").asString();
 
-        if (building.getSourceNode().hasLabel(SAPNodeLabels.FunctionGroup.name())){
-            building.setColor("#7f003f"); //TODO Config
-            building.setShape(ACityElement.ACityShape.box); //TODO Config
-            building.setWidth(building.getWidth() - 0.1); //TODO Config
-            building.setLength(building.getLength() - 0.1); //TODO Config
-        }
+            switch (SAPNodeTypes.valueOf(propertyTypeName)) {
 
-        if (building.getSourceNode().hasLabel(SAPNodeLabels.Table.name())){
-            building.setColor("#bf5f00"); //TODO Config
-            building.setShape(ACityElement.ACityShape.cylinder); //TODO Config
-            building.setWidth(building.getWidth() - 0.1); //TODO Config
-            building.setLength(building.getLength() - 0.1); //TODO Config
-        }
-
-
-        if (building.getSourceNode().hasLabel(SAPNodeLabels.DataElement.name())){
-            building.setColor("#00bf00"); //TODO Config
-            building.setShape(ACityElement.ACityShape.box); //TODO Config
-            building.setWidth(building.getWidth() - 0.1); //TODO Config
-            building.setLength(building.getLength() - 0.1); //TODO Config
-        }
-
-        if (building.getSourceNode().hasLabel(SAPNodeLabels.Domain.name())){
-            building.setColor("#176817"); //TODO Config
-            building.setShape(ACityElement.ACityShape.cone); //TODO Config
-            building.setWidth(building.getWidth() - 0.1); //TODO Config
-            building.setLength(building.getLength() - 0.1); //TODO Config
-        }
-
-        if (building.getSourceNode().hasLabel(SAPNodeLabels.Structure.name())){
-            building.setColor("#e0e08f"); //TODO Config
-            building.setShape(ACityElement.ACityShape.cylinder); //TODO Config
-            building.setWidth(0.1); //TODO Config
-            building.setLength(0.1); //TODO Config
-        }
-
-        if (building.getSourceNode().hasLabel(SAPNodeLabels.TableType.name())){
-            building.setColor("#ff7f00"); //TODO Config
-            building.setShape(ACityElement.ACityShape.cylinder); //TODO Config
-            building.setWidth(0.1); //TODO Config
-            building.setLength(0.1); //TODO Config
-        }
-
-
+                case Class:
+                     building.setColor(config.getACityBuildingColorHex("classBuilding"));
+                     building.setShape(config.getACityBuildingShape("classBuilding"));
+                     building.setWidth(building.getWidth() - 0.1); //TODO Config
+                     building.setLength(building.getLength() - 0.1); //TODO Config
+                     break;
+                case Interface:
+                     building.setColor(config.getACityBuildingColorHex("interfaceBuilding"));
+                     building.setShape(config.getACityBuildingShape("interfaceBuilding"));
+                     building.setWidth(building.getWidth() - 0.1); //TODO Config
+                     building.setLength(building.getLength() - 0.1); //TODO Config
+                     break;
+                case Report:
+                     building.setColor(config.getACityBuildingColorHex("reportBuilding"));
+                     building.setShape(config.getACityBuildingShape("reportBuilding"));
+                     building.setWidth(building.getWidth() - 0.1); //TODO Config
+                     building.setLength(building.getLength() - 0.1); //TODO Config
+                     break;
+                case FunctionGroup:
+                     building.setColor(config.getACityBuildingColorHex("functionGroupBuilding"));
+                     building.setShape(config.getACityBuildingShape("functionGroupBuilding"));
+                     building.setWidth(building.getWidth() - 0.1); //TODO Config
+                     building.setLength(building.getLength() - 0.1); //TODO Config
+                     break;
+                case Table:
+                     building.setColor(config.getACityBuildingColorHex("tableBuilding"));
+                     building.setShape(config.getACityBuildingShape("tableBuilding"));
+                     building.setWidth(building.getWidth() - 0.1); //TODO Config
+                     building.setLength(building.getLength() - 0.1); //TODO Config
+                     break;
+                case DataElement:
+                     building.setColor(config.getACityBuildingColorHex("dataElementBuilding"));
+                     building.setShape(config.getACityBuildingShape("dataElementBuilding"));
+                     building.setWidth(building.getWidth() - 0.1); //TODO Config
+                     building.setLength(building.getLength() - 0.1); //TODO Config
+                     break;
+                case Domain:
+                     building.setColor(config.getACityBuildingColorHex("domainBuilding"));
+                     building.setShape(config.getACityBuildingShape("domainBuilding"));
+                     building.setWidth(building.getWidth() - 0.1); //TODO Config
+                     building.setLength(building.getLength() - 0.1); //TODO Config
+                     break;
+                case Structure:
+                     building.setColor(config.getACityBuildingColorHex("structureBuilding"));
+                     building.setShape(config.getACityBuildingShape("structureBuilding"));
+                     building.setWidth(0.1); //TODO Config
+                     building.setLength(0.1); //TODO Config
+                     break;
+                case TableType:
+                     building.setColor(config.getACityBuildingColorHex("tableTypeBuilding"));
+                     building.setShape(config.getACityBuildingShape("tableTypeBuilding"));
+                     //building.setWidth(0.3); //TODO Config
+                     building.setWidth(config.getACityBuildingHWidth("tableTypeBuilding"));
+                     building.setLength(0.3); //TODO Config
+            }
+        } else
+            {
+                building.setColor("#ffb48f"); //TODO Config
+                building.setShape(ACityElement.ACityShape.cone);
+                building.setWidth(0.3); //TODO Config
+                building.setLength(0.3); //TODO Config
+            }
     }
 
 
     private void designChimney(ACityElement chimney) {
-        chimney.setColor("#FFFF00"); //TODO Config
-        chimney.setShape(ACityElement.ACityShape.cylinder); //TODO Config
+        chimney.setColor(config.getACityChimneyColorHex("attribute"));
+        chimney.setShape(config.getACityChimneyShape("attributeChimney"));
     }
 
 
     private void designFloor(ACityElement floor) {
 
-        if (floor.getSourceNode().hasLabel(SAPNodeLabels.Method.name())){
-            floor.setColor("#ffffff"); //TODO Config
-            floor.setShape(ACityElement.ACityShape.box); //TODO Config
-            floor.setYPosition(floor.getYPosition() - 0.1); //TODO Config
+        Node sourceNode = floor.getSourceNode();
+
+        if (sourceNode != null) {
+
+            String propertyTypeName = sourceNode.get("type_name").asString();
+
+            switch (SAPNodeTypes.valueOf(propertyTypeName)) {
+                case Method:
+                    floor.setColor(config.getACityFloorColorHex("methodFloor"));
+                    floor.setShape(config.getACityFloorShape("methodFloor"));
+                    floor.setYPosition(floor.getYPosition() - 0.1); //TODO Config
+                    break;
+                case FormRoutine:
+                    floor.setColor(config.getACityFloorColorHex("formroutineFloor"));
+                    floor.setShape(config.getACityFloorShape("formroutineFloor"));
+                    floor.setYPosition(floor.getYPosition() - 0.1); //TODO Config
+                    break;
+                case FunctionModule:
+                    floor.setColor(config.getACityFloorColorHex("functionModuleFloor"));
+                    floor.setShape(config.getACityFloorShape("functionModuleFloor"));
+                    floor.setYPosition(floor.getYPosition() - 0.1); //TODO Config
+                    break;
+                case TableElement:
+                    floor.setColor(config.getACityFloorColorHex("tableElementFloor"));
+                    floor.setShape(config.getACityFloorShape("tableElementFloor"));
+                    floor.setYPosition(floor.getYPosition() - 0.1); //TODO Config
+                    break;
+                case StructureElement:
+                    floor.setColor(config.getACityFloorColorHex("structureElementFloor"));
+                    floor.setShape(config.getACityFloorShape("structureElementFloor"));
+                    floor.setYPosition(floor.getYPosition() - 0.1); //TODO Config
+                    break;
+                case DataElement:
+                    floor.setColor(config.getACityFloorColorHex("dataElementFloor"));
+                    floor.setShape(config.getACityFloorShape("dataElementFloor"));
+                    floor.setYPosition(floor.getYPosition() - 0.1); //TODO Config
+                    floor.setWidth(floor.getWidth() - 0.1); //TODO Config
+                    floor.setLength(floor.getLength() - 0.1); //TODO Config
+                    break;
+            }
+        } else
+            {
+                floor.setColor("#ffffcc"); //TODO Config
+                floor.setShape(ACityElement.ACityShape.cone); //TODO Config
+                floor.setYPosition(floor.getYPosition() - 0.1); //TODO Config
+            }
         }
-
-        if (floor.getSourceNode().hasLabel(SAPNodeLabels.FormRoutine.name())){
-            floor.setColor("#ffffff"); //TODO Config
-            floor.setShape(ACityElement.ACityShape.box); //TODO Config
-            floor.setYPosition(floor.getYPosition() - 0.1); //TODO Config
-        }
-
-        if (floor.getSourceNode().hasLabel(SAPNodeLabels.FunctionModule.name())){
-            floor.setColor("#ffffff"); //TODO Config
-            floor.setShape(ACityElement.ACityShape.box); //TODO Config
-            floor.setYPosition(floor.getYPosition() - 0.1); //TODO Config
-        }
-
-        if (floor.getSourceNode().hasLabel(SAPNodeLabels.TableElement.name())){
-            floor.setColor("#ffffff"); //TODO Config
-            floor.setShape(ACityElement.ACityShape.cylinder); //TODO Config
-            floor.setYPosition(floor.getYPosition() - 0.1); //TODO Config
-        }
-
-        if (floor.getSourceNode().hasLabel(SAPNodeLabels.StructureElement.name())){
-            floor.setColor("#e0e08f"); //TODO Config
-            floor.setShape(ACityElement.ACityShape.cone); //TODO Config
-            floor.setYPosition(floor.getYPosition() - 0.1); //TODO Config
-        }
-
-        if (floor.getSourceNode().hasLabel(SAPNodeLabels.DataElement.name())){
-            floor.setColor("#00bf00"); //TODO Config
-            floor.setShape(ACityElement.ACityShape.box); //TODO Config
-            floor.setYPosition(floor.getYPosition() - 0.1); //TODO Config
-            floor.setWidth(floor.getWidth() - 0.1); //TODO Config
-            floor.setLength(floor.getLength() - 0.1); //TODO Config
-        }
-    }
-
-
-
 }

@@ -12,6 +12,7 @@ import java.util.Collection;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 public class DesignTest{
 
@@ -24,8 +25,10 @@ public class DesignTest{
     @BeforeAll
     static void setup() {
 
-        mockUp.setupDatabase("./test/databases/CityBankTest.db", "SAP.cypher");
-        mockUp.loadProperties("CityBankTest.properties");
+        mockUp.setupDatabase("./test/databases/CityBankTest.db", "SAPExportCreateNodes.cypher");
+        mockUp.runCypherScript("SAPExportCreateContainsRelation.cypher");
+        //mockUp.runCypherScript("SAPExportTypeOfRelation.cypher");
+        mockUp.loadProperties("ABAPCityTest.properties");
 
         nodeRepository = new NodeRepository();
         nodeRepository.loadNodesWithRelation(SAPRelationLabels.CONTAINS);
@@ -46,34 +49,46 @@ public class DesignTest{
 
     @Test
     public void districtDesign(){
-        Collection<ACityElement> districts = aCityRepository.getElementsByType(ACityElement.ACityType.District);
-        for( ACityElement district : districts){
-             assertEquals("#FE2EF7", district.getColor());
+        Collection<ACityElement> classDistricts = aCityRepository.getElementsByTypeAndSourceProperty(ACityElement.ACityType.District, "type_name", "Table");
+        assertNotEquals(0, classDistricts.size());
+
+        for( ACityElement district : classDistricts){
+             assertEquals("#1A5276", district.getColor());
              assertEquals(ACityElement.ACityShape.box, district.getShape());
         }
     }
 
     @Test
     public void buildingDesign(){
-        Collection<ACityElement> buildings = aCityRepository.getElementsByType(ACityElement.ACityType.Building);
-        for( ACityElement building : buildings){
-            assertEquals("#2ECCFA", building.getColor());
-            assertEquals(ACityElement.ACityShape.box, building.getShape());
+        Collection<ACityElement> classBuildings =
+                aCityRepository.getElementsByTypeAndSourceProperty(
+            ACityElement.ACityType.Building, "type_name", "TableType");
+
+        assertNotEquals(0, classBuildings.size());
+
+        for( ACityElement building : classBuildings) {
+                assertEquals("#ffb48f", building.getColor());
+                assertEquals(ACityElement.ACityShape.cylinder, building.getShape());
+                assertEquals(0.3, building.getWidth());
         }
     }
 
     @Test
     public void floorDesign(){
-        Collection<ACityElement> floors = aCityRepository.getElementsByType(ACityElement.ACityType.Floor);
+        Collection<ACityElement> floors = aCityRepository.getElementsByTypeAndSourceProperty(ACityElement.ACityType.Floor, "type_name", "TableElement");
+        assertNotEquals(0, floors.size());
+
         for( ACityElement floor : floors){
-            assertEquals("#013ADF", floor.getColor());
-            assertEquals(ACityElement.ACityShape.box, floor.getShape());
+            assertEquals("#ffffff", floor.getColor());
+            assertEquals(ACityElement.ACityShape.cylinder, floor.getShape());
         }
     }
 
     @Test
     public void chimneyDesign(){
-        Collection<ACityElement> chimneys = aCityRepository.getElementsByType(ACityElement.ACityType.Chimney);
+        Collection<ACityElement> chimneys = aCityRepository.getElementsByTypeAndSourceProperty(ACityElement.ACityType.Chimney, "type_name", "Attribute");
+        assertNotEquals(0, chimneys.size());
+
         for( ACityElement chimney : chimneys){
             assertEquals("#FFFF00", chimney.getColor());
             assertEquals(ACityElement.ACityShape.cylinder, chimney.getShape());

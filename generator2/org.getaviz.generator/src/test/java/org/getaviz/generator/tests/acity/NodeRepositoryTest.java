@@ -3,6 +3,7 @@ package org.getaviz.generator.tests.acity;
 import org.getaviz.generator.SettingsConfiguration;
 import org.getaviz.generator.abap.city.NodeRepository;
 import org.getaviz.generator.abap.city.SAPNodeLabels;
+import org.getaviz.generator.abap.city.SAPNodeTypes;
 import org.getaviz.generator.abap.city.SAPRelationLabels;
 import org.getaviz.generator.mockups.ABAPmock;
 import org.junit.jupiter.api.AfterAll;
@@ -23,11 +24,14 @@ public class NodeRepositoryTest {
 
     @BeforeAll
     static void setup() {
-        mockUp.setupDatabase("./test/databases/CityBankTest.db", "SAP.cypher");
+        mockUp.setupDatabase("./test/databases/CityBankTest.db", "SAPExportCreateNodes.cypher");
+        mockUp.runCypherScript("SAPExportCreateContainsRelation.cypher");
+        mockUp.runCypherScript("SAPExportCreateTypeOfRelation.cypher");
         mockUp.loadProperties("CityBankTest.properties");
 
         nodeRepository = new NodeRepository();
         nodeRepository.loadNodesWithRelation(SAPRelationLabels.CONTAINS);
+        nodeRepository.loadNodesWithRelation(SAPRelationLabels.TYPEOF);
     }
 
     @AfterAll
@@ -39,35 +43,47 @@ public class NodeRepositoryTest {
     void allNodes(){
 
         Collection<Node> allNodes = nodeRepository.getNodes();
-        assertEquals(16, allNodes.size());
+        assertEquals(340, allNodes.size());
 
     }
 
     @Test
-    void packageLabel(){
-        Collection<Node> packageNodes = nodeRepository.getNodesByLabel(SAPNodeLabels.Package);
-        assertEquals(2, packageNodes.size());
+    void packageNodes(){
+        Collection<Node> packageNodes = nodeRepository.getNodesByProperty("type_name", SAPNodeTypes.Namespace.name());
+        assertEquals(17, packageNodes.size());
     }
 
     @Test
-    void typeLabel(){
-        Collection<Node> typeNodes = nodeRepository.getNodesByLabel(SAPNodeLabels.Type);
-        assertEquals(4, typeNodes.size());
+    void domainNodes(){
+        Collection<Node> domainNodes = nodeRepository.getNodesByProperty("type_name", SAPNodeTypes.Domain.name());
+        assertEquals(27, domainNodes.size());
     }
 
     @Test
     void containsRelationTest(){
-        Collection<Node> packageNodes = nodeRepository.getNodesByLabel(SAPNodeLabels.Package);
+        Collection<Node> packageNodes = nodeRepository.getNodesByProperty("type_name", SAPNodeTypes.Namespace.name());
 
         Node firstPackage = packageNodes.iterator().next();
         Collection<Node> subNodes = nodeRepository.getRelatedNodes(firstPackage, SAPRelationLabels.CONTAINS, true);
-        assertEquals(7, subNodes.size());
+        assertEquals(84, subNodes.size());
 
         Node subNode = subNodes.iterator().next();
         Collection<Node> parentNodes = nodeRepository.getRelatedNodes(subNode, SAPRelationLabels.CONTAINS, false);
         assertEquals(1, parentNodes.size());
     }
 
+    @Test
+    void typeOfRelationTest(){
+        Collection<Node> tableTypeNodes = nodeRepository.getNodesByProperty("type_name", SAPNodeTypes.TableType.name());
+
+        Node firstTableType = tableTypeNodes.iterator().next();
+        Collection<Node> subNodes = nodeRepository.getRelatedNodes(firstTableType, SAPRelationLabels.TYPEOF,true);
+        assertEquals(0, subNodes.size());
+
+        /*Node subNode = subNodes.iterator().next();
+        Collection<Node> parentNodes = nodeRepository.getRelatedNodes(subNode, SAPRelationLabels.TYPEOF,false);
+        assertEquals(1, parentNodes.size());*/
+    }
 
 
 

@@ -23,8 +23,10 @@ public class AFrameExporterTest {
     @BeforeAll
     static void setup() {
 
-        mockUp.setupDatabase("./test/databases/CityBankTest.db", "SAP.cypher");
-        mockUp.loadProperties("CityBankTest.properties");
+        mockUp.setupDatabase("./test/databases/CityBankTest.db", "SAPExportCreateNodes.cypher");
+        mockUp.runCypherScript("SAPExportCreateContainsRelation.cypher");
+        //mockUp.runCypherScript("SAPExportTypeOfRelation.cypher");
+        mockUp.loadProperties("ABAPCityTest.properties");
 
         nodeRepository = new NodeRepository();
         nodeRepository.loadNodesWithRelation(SAPRelationLabels.CONTAINS);

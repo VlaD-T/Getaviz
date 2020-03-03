@@ -5,6 +5,7 @@ import org.apache.commons.logging.LogFactory;
 import org.getaviz.generator.OutputFormatHelper;
 import org.getaviz.generator.SettingsConfiguration;
 
+import java.awt.*;
 import java.util.Collection;
 
 public class ACityAFrameExporter {

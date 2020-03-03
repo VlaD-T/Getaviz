@@ -22,7 +22,8 @@ public class CreatorTest {
 
     @BeforeAll
     static void setup() {
-        mockUp.setupDatabase("./test/databases/CityBankTest.db", "SAP.cypher");
+        mockUp.setupDatabase("./test/databases/CityBankTest.db", "SAPExportCreateNodes.cypher");
+        mockUp.runCypherScript("SAPExportCreateContainsRelation.cypher");
         mockUp.loadProperties("CityBankTest.properties");
 
         nodeRepository = new NodeRepository();
@@ -40,15 +41,15 @@ public class CreatorTest {
     }
 
     @Test
-    void districtElements() {
+    void numberOfDistricts() {
         Collection<ACityElement> districts = aCityRepository.getElementsByType(ACityElement.ACityType.District);
-        assertEquals(7, districts.size());
+        assertEquals(42, districts.size());
     }
 
     @Test
-    void buildingElements() {
+    void numberOfBuildings() {
         Collection<ACityElement> buildings = aCityRepository.getElementsByType(ACityElement.ACityType.Building);
-        assertEquals(8, buildings.size());
+        assertEquals(118, buildings.size());
     }
 
     @Test
@@ -65,10 +66,10 @@ public class CreatorTest {
 
     @Test
     void buildingSubElements(){
-        Collection<ACityElement> buildings = aCityRepository.getElementsByTypeAndSourceProperty(ACityElement.ACityType.Building, "object_name", "/GSA/VISAP_T_TEST_CLASS");
+        Collection<ACityElement> buildings = aCityRepository.getElementsByTypeAndSourceProperty(ACityElement.ACityType.Building, "object_name", "/GSA/CL_VISAP_T_TEST_CLASS");
 
         ACityElement firstBuilding = buildings.iterator().next();
-        assertNotEquals(0, firstBuilding.getSubElements().size());
+        assertEquals(9, firstBuilding.getSubElements().size());
     }
 
     @Test
@@ -106,7 +107,7 @@ public class CreatorTest {
         ACityElement firstDistrict = districts.iterator().next();
 
         Collection<ACityElement> subDistricts = firstDistrict.getSubElements();
-        assertEquals(1, subDistricts.size());
+        assertEquals(5, subDistricts.size());
 
 
         //second district
@@ -116,6 +117,15 @@ public class CreatorTest {
         ACityElement secondDistrict = districts.iterator().next();
 
         subDistricts = secondDistrict.getSubElements();
+        assertEquals(1, subDistricts.size());
+
+        //third district
+        districts = aCityRepository.getElementsByTypeAndSourceProperty(ACityElement.ACityType.District, "object_name", "/GISA/BWBCI");
+        assertEquals(1, districts.size());
+
+        ACityElement thirdDistrict = districts.iterator().next();
+
+        subDistricts = thirdDistrict.getSubElements();
         assertEquals(4, subDistricts.size());
     }
 

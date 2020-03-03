@@ -158,7 +158,7 @@ public class ACityBuildingLayout {
             floorCounter++;
 
             Double floorSizeSum = (floorCounter - 1) * floor.getHeight();
-            Double floorGapSum = floorCounter * 0.5; //TODO Config
+            Double floorGapSum = floorCounter * 0.2; //TODO Config default * 0.5
             floor.setYPosition((floor.getHeight() / 2) + floorSizeSum + floorGapSum);
 
             floor.setXPosition(0.0);
@@ -170,7 +170,7 @@ public class ACityBuildingLayout {
         Double groundAreaLength = calculateGroundAreaByChimneyAmount();
 
         for(ACityElement floor : floors){
-            floor.setHeight(1); //TODO Config
+            floor.setHeight(0.5); //TODO Config default: 1
             floor.setWidth(groundAreaLength);
             floor.setLength(groundAreaLength);
         }
@@ -190,9 +190,9 @@ public class ACityBuildingLayout {
 
     private void setSizeOfChimneys() {
         for(ACityElement chimney : chimneys){
-            chimney.setHeight(1); //TODO Config
-            chimney.setWidth(1); //TODO Config
-            chimney.setLength(1); //TODO Config
+            chimney.setHeight(0.5); //TODO Config
+            chimney.setWidth(0.5); //TODO Config
+            chimney.setLength(0.5); //TODO Config
         }
     }
 

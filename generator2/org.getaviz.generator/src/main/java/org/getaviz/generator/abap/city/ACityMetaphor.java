@@ -2,10 +2,11 @@ package org.getaviz.generator.abap.city;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.getaviz.generator.Metaphor;
 import org.getaviz.generator.SettingsConfiguration;
 import org.getaviz.generator.database.DatabaseConnector;
 
-public class ACityMetaphor {
+public class ACityMetaphor implements Metaphor {
 
     private Log log = LogFactory.getLog(this.getClass());
     private SettingsConfiguration config;
@@ -28,6 +29,8 @@ public class ACityMetaphor {
     public void generate() {
         try {
             //NodeRepository
+
+            //ACityRepository
 
             //ACityCreator
 

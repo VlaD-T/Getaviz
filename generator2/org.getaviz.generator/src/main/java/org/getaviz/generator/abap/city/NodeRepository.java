@@ -45,8 +45,12 @@ public class NodeRepository {
             addNodeByID(mNode);
             addNodeByID(nNode);
 
-            addNodeByLabel(mNode);
-            addNodeByLabel(nNode);
+            /*addNodeByLabel(mNode);
+            addNodeByLabel(nNode);*/
+
+            addNodesByProperty(mNode);
+            addNodesByProperty(nNode);
+
 
             addNodesByRelation(mNode, nNode, relationLabel.name());
 
@@ -54,9 +58,11 @@ public class NodeRepository {
 
     }
 
+
     public Collection<Node> getNodes(){
         return nodeById.values();
-    }
+}
+
 
     public Collection<Node> getRelatedNodes(Node node, SAPRelationLabels relationLabel, Boolean direction){
         if( !nodesByRelation.containsKey(relationLabel.name())){
@@ -79,6 +85,27 @@ public class NodeRepository {
             return new TreeSet<>();
         }
         return nodesByLabel.get(label.name()).values();
+    }
+
+    //TODO String property durch Enum mit Properties ersetzen
+    public Collection<Node> getNodesByProperty(String property, String value){
+        Collection<Node> nodesByID = getNodes();
+        List<Node> nodesByProperty = new ArrayList<>();
+
+        for (Node node: nodesByID) {
+            Value propertyValue = node.get(property);
+             if( propertyValue == null){
+                 continue;
+            }
+            String propertyValueString = propertyValue.asString();
+            if(!propertyValueString.equals(value)){
+                continue;
+            }
+
+            nodesByProperty.add(node);
+        }
+
+        return nodesByProperty;
     }
 
     public Collection<Node> getNodesByLabelAndProperty(SAPNodeLabels label, String property, String value){
@@ -109,7 +136,20 @@ public class NodeRepository {
         }
     }
 
+    private void addNodesByProperty(Node node) {
+        node.labels().forEach( (label)->{
+            if( !nodesByLabel.containsKey(label)){
+                Map<Long, Node> nodeIDMap = new HashMap<>();
+                nodesByLabel.put(label, nodeIDMap);
+            }
+            Map<Long, Node> nodeIDMap = nodesByLabel.get(label);
 
+            Long nodeID = node.id();
+            if( !nodeIDMap.containsValue(nodeID)){
+                nodeIDMap.put(nodeID, node);
+            }
+        });
+    }
 
     private void addNodeByLabel(Node node){
         node.labels().forEach( (label)->{
@@ -126,6 +166,20 @@ public class NodeRepository {
         });
     }
 
+   /* private void addNodeByProperty(Node node){
+        node.values().forEach( (nodeType)->{
+            if( !nodeById.containsKey(nodeType)){
+                Map<Long, Node> nodeIDMap = new HashMap<>();
+                nodeById.put(nodeType, nodeIDMap);
+            }
+            Map<Long, Node> nodeIDMap = nodeById.get(nodeType);
+
+            Long nodeID = node.id();
+            if( !nodeIDMap.containsValue(nodeID)){
+                nodeIDMap.put(nodeID, node);
+            }
+        });
+    }*/
 
     private void addNodesByRelation(Node mNode, Node nNode, String relationName) {
 

@@ -6,6 +6,10 @@ import org.neo4j.driver.v1.types.Node;
 
 import java.util.*;
 
+import static org.getaviz.generator.abap.city.ACityElement.ACitySubType.*;
+import static org.getaviz.generator.abap.city.ACityElement.ACityType.Building;
+import static org.getaviz.generator.abap.city.ACityElement.ACityType.District;
+
 public class ACityRepository {
 
     private Map<Long, ACityElement> elementsBySourceID;
@@ -51,8 +55,16 @@ public class ACityRepository {
         for (ACityElement element: elementsByType){
 
             Node sourceNode = element.getSourceNode();
-            if(sourceNode == null){
-                continue;
+
+            if(sourceNode == null ){
+                ACityElement.ACitySubType subType = element.getSubType();
+                String subTypeString = subType.toString();
+                    if(!subTypeString.equals(sourcePropertyValue)){
+                        continue;
+                    }
+                    elementsByTypeAndSourceProperty.add(element);
+
+              continue;
             }
 
             Value propertyValue = sourceNode.get(sourceProperty);
@@ -70,6 +82,9 @@ public class ACityRepository {
 
         return elementsByTypeAndSourceProperty;
     }
+
+    //Test
+    //Test Ende
 
 
     public void addElement(ACityElement element) {

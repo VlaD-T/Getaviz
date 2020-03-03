@@ -14,14 +14,17 @@ public class GeneratorServlet extends HttpServlet {
 
 	public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		log.info("GET request generator");
-		Generator.run();
+		SettingsConfiguration config = SettingsConfiguration.getInstance("/opt/config/settings.properties");
+		Generator_DB generator = new Generator_DB(config);
+		generator.run();
 		writeGetResponse(response);
 	}
 
 	public void doPost(HttpServletRequest request, HttpServletResponse response) {
 		log.info("POST request generator");
 		SettingsConfiguration config = SettingsConfiguration.getInstance(request);
-		Generator.run();
+		Generator_DB generator = new Generator_DB(config);
+		generator.run();
 		writePostResponse(response);
 	}
 	

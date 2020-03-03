@@ -197,7 +197,7 @@ public class ACityDistrictLayout {
 
 
     private void sortEmptyLeaf(CityKDTreeNode pnode, Rectangle el, Rectangle covrec,
-                                      Map<CityKDTreeNode, Double> preservers, Map<CityKDTreeNode, Double> expanders) {
+                               Map<CityKDTreeNode, Double> preservers, Map<CityKDTreeNode, Double> expanders) {
         // either element fits in current bounds (->preservers) or it doesn't
         // (->expanders)
         double nodeUpperLeftX = pnode.getRectangle().getUpperLeftX();

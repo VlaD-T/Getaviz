@@ -1,5 +1,6 @@
 package org.getaviz.generator.abap.city;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -8,6 +9,8 @@ import java.util.UUID;
 import org.neo4j.driver.v1.types.Node;
 
 public class ACityElement {
+
+
 
     public ACityShape getShape() {
         return shape;

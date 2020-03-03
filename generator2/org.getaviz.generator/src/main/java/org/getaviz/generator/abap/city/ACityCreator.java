@@ -37,28 +37,32 @@ public class ACityCreator {
     }
 
     private void createAllACityElements(NodeRepository nodeRepository) {
-        createACityElementsFromSourceNodes(nodeRepository, SAPNodeLabels.Package, ACityElement.ACityType.District);
+        createACityElementsFromSourceNodes(nodeRepository, ACityElement.ACityType.District,"type_name", SAPNodeTypes.Namespace);
 
-        createACityElementsFromSourceNodes(nodeRepository, SAPNodeLabels.Report, ACityElement.ACityType.Building);
-        createACityElementsFromSourceNodes(nodeRepository, SAPNodeLabels.FormRoutine, ACityElement.ACityType.Floor);
+        createACityElementsFromSourceNodes(nodeRepository, ACityElement.ACityType.Building,"type_name", SAPNodeTypes.Report);
+        createACityElementsFromSourceNodes(nodeRepository, ACityElement.ACityType.Floor,"type_name", SAPNodeTypes.FormRoutine);
 
-        createACityElementsFromSourceNodes(nodeRepository, SAPNodeLabels.Class, ACityElement.ACityType.Building);
-        createACityElementsFromSourceNodes(nodeRepository, SAPNodeLabels.Interface, ACityElement.ACityType.Building);
-        createACityElementsFromSourceNodes(nodeRepository, SAPNodeLabels.Method, ACityElement.ACityType.Floor);
-        createACityElementsFromSourceNodes(nodeRepository, SAPNodeLabels.Attribute, ACityElement.ACityType.Chimney);
+        createACityElementsFromSourceNodes(nodeRepository, ACityElement.ACityType.Building,"type_name", SAPNodeTypes.Class);
+        createACityElementsFromSourceNodes(nodeRepository, ACityElement.ACityType.Building,"type_name", SAPNodeTypes.Interface);
+        createACityElementsFromSourceNodes(nodeRepository, ACityElement.ACityType.Floor,"type_name", SAPNodeTypes.Method);
+        createACityElementsFromSourceNodes(nodeRepository, ACityElement.ACityType.Chimney,"type_name", SAPNodeTypes.Attribute);
 
-        createACityElementsFromSourceNodes(nodeRepository, SAPNodeLabels.FunctionGroup, ACityElement.ACityType.Building);
-        createACityElementsFromSourceNodes(nodeRepository, SAPNodeLabels.FunctionModule, ACityElement.ACityType.Floor);
+        createACityElementsFromSourceNodes(nodeRepository, ACityElement.ACityType.Building,"type_name", SAPNodeTypes.FunctionGroup);
+        createACityElementsFromSourceNodes(nodeRepository, ACityElement.ACityType.Floor,"type_name", SAPNodeTypes.FunctionModule);
 
-        createACityElementsFromSourceNodes(nodeRepository, SAPNodeLabels.Table, ACityElement.ACityType.Building);
-        createACityElementsFromSourceNodes(nodeRepository, SAPNodeLabels.TableElement, ACityElement.ACityType.Floor);
+        createACityElementsFromSourceNodes(nodeRepository, ACityElement.ACityType.Building,"type_name", SAPNodeTypes.Table);
+        createACityElementsFromSourceNodes(nodeRepository, ACityElement.ACityType.Floor,"type_name", SAPNodeTypes.TableElement);
 
-        createACityElementsFromSourceNodes(nodeRepository, SAPNodeLabels.Structure, ACityElement.ACityType.Building);
-        createACityElementsFromSourceNodes(nodeRepository, SAPNodeLabels.StructureElement, ACityElement.ACityType.Floor);
+        createACityElementsFromSourceNodes(nodeRepository, ACityElement.ACityType.Building,"type_name", SAPNodeTypes.Structure);
+        createACityElementsFromSourceNodes(nodeRepository, ACityElement.ACityType.Floor,"type_name", SAPNodeTypes.StructureElement);
 
-        createACityElementsFromSourceNodes(nodeRepository, SAPNodeLabels.DataElement, ACityElement.ACityType.Building);
-        createACityElementsFromSourceNodes(nodeRepository, SAPNodeLabels.Domain, ACityElement.ACityType.Building);
+        createACityElementsFromSourceNodes(nodeRepository, ACityElement.ACityType.Building,"type_name", SAPNodeTypes.DataElement);
+        createACityElementsFromSourceNodes(nodeRepository, ACityElement.ACityType.Building,"type_name", SAPNodeTypes.Domain);
     }
+
+
+
+
 
 
 
@@ -67,22 +71,22 @@ public class ACityCreator {
         Map<ACityElement.ACitySubType, ACityElement> typeDistrictMap = new HashMap<>();
 
         for (ACityElement childElement: childElements) {
-            addChildToTypeDistrict(parentDistrict, childElement, typeDistrictMap, ACityElement.ACitySubType.Class, SAPNodeLabels.Class);
-            addChildToTypeDistrict(parentDistrict, childElement, typeDistrictMap, ACityElement.ACitySubType.Class, SAPNodeLabels.Interface);
-            addChildToTypeDistrict(parentDistrict, childElement, typeDistrictMap, ACityElement.ACitySubType.Report, SAPNodeLabels.Report);
-            addChildToTypeDistrict(parentDistrict, childElement, typeDistrictMap, ACityElement.ACitySubType.FunctionGroup,SAPNodeLabels.FunctionGroup);
-            addChildToTypeDistrict(parentDistrict, childElement, typeDistrictMap, ACityElement.ACitySubType.Table, SAPNodeLabels.Table);
+            addChildToTypeDistrict(parentDistrict, childElement, typeDistrictMap, ACityElement.ACitySubType.Class, SAPNodeTypes.Class);
+            addChildToTypeDistrict(parentDistrict, childElement, typeDistrictMap, ACityElement.ACitySubType.Class, SAPNodeTypes.Interface);
+            addChildToTypeDistrict(parentDistrict, childElement, typeDistrictMap, ACityElement.ACitySubType.Report, SAPNodeTypes.Report);
+            addChildToTypeDistrict(parentDistrict, childElement, typeDistrictMap, ACityElement.ACitySubType.FunctionGroup, SAPNodeTypes.FunctionGroup);
+            addChildToTypeDistrict(parentDistrict, childElement, typeDistrictMap, ACityElement.ACitySubType.Table, SAPNodeTypes.Table);
 
-            addChildToTypeDistrict(parentDistrict, childElement, typeDistrictMap, ACityElement.ACitySubType.DDIC, SAPNodeLabels.Structure);
-            addChildToTypeDistrict(parentDistrict, childElement, typeDistrictMap, ACityElement.ACitySubType.DDIC, SAPNodeLabels.Domain);
-            addChildToTypeDistrict(parentDistrict, childElement, typeDistrictMap, ACityElement.ACitySubType.DDIC, SAPNodeLabels.DataElement);
-            addChildToTypeDistrict(parentDistrict, childElement, typeDistrictMap, ACityElement.ACitySubType.DDIC, SAPNodeLabels.TableType);
+            addChildToTypeDistrict(parentDistrict, childElement, typeDistrictMap, ACityElement.ACitySubType.DDIC, SAPNodeTypes.Structure);
+            addChildToTypeDistrict(parentDistrict, childElement, typeDistrictMap, ACityElement.ACitySubType.DDIC, SAPNodeTypes.Domain);
+            addChildToTypeDistrict(parentDistrict, childElement, typeDistrictMap, ACityElement.ACitySubType.DDIC, SAPNodeTypes.DataElement);
+            addChildToTypeDistrict(parentDistrict, childElement, typeDistrictMap, ACityElement.ACitySubType.DDIC, SAPNodeTypes.TableType);
         }
     }
 
 
     private void createACityElementsFromTableTypeTypeOfRelation(NodeRepository nodeRepository) {
-        Collection<Node> tableTypeSourceNodes = nodeRepository.getNodesByLabel(SAPNodeLabels.TableType);
+       Collection<Node> tableTypeSourceNodes = nodeRepository.getNodesByProperty("type_name", SAPNodeTypes.TableType.name() );
 
         List<ACityElement> tableTypeElements = createACityElements(tableTypeSourceNodes, ACityElement.ACityType.Building);
         repository.addElements(tableTypeElements);
@@ -91,7 +95,7 @@ public class ACityCreator {
 
             Node tableTypeSourceNode = tableTypeElement.getSourceNode();
 
-            Collection<Node> typeOfNodes = nodeRepository.getRelatedNodes(tableTypeSourceNode,SAPRelationLabels.TYPEOF, true);
+            Collection<Node> typeOfNodes = nodeRepository.getRelatedNodes(tableTypeSourceNode, SAPRelationLabels.TYPEOF, true);
             if(typeOfNodes.size() != 1){
                 //TODO Exception
                 continue;
@@ -145,11 +149,10 @@ public class ACityCreator {
 
 
 
-    private void addChildToTypeDistrict(ACityElement parentDistrict, ACityElement childElement, Map<ACityElement.ACitySubType, ACityElement> typeDistrictMap, ACityElement.ACitySubType districtType, SAPNodeLabels sapNodeLabel) {
+    private void addChildToTypeDistrict(ACityElement parentDistrict, ACityElement childElement, Map<ACityElement.ACitySubType, ACityElement> typeDistrictMap, ACityElement.ACitySubType districtType, SAPNodeTypes sapNodeTypes) {
 
         Node childSourceNode = childElement.getSourceNode();
-
-        if( childSourceNode.hasLabel( sapNodeLabel.name()) ){
+        if( childSourceNode.get("type_name").asString().equals(sapNodeTypes.name())){
             if( !typeDistrictMap.containsKey(districtType)){
                 ACityElement typeDistrict = new ACityElement(ACityElement.ACityType.District);
                 typeDistrict.setSubType(districtType);
@@ -199,8 +202,8 @@ public class ACityCreator {
 
 
 
-    private void createACityElementsFromSourceNodes(NodeRepository nodeRepository, SAPNodeLabels nodeLabel, ACityElement.ACityType aCityType) {
-        Collection<Node> sourceNodes = nodeRepository.getNodesByLabel(nodeLabel);
+    private void createACityElementsFromSourceNodes(NodeRepository nodeRepository, ACityElement.ACityType aCityType, String property, SAPNodeTypes nodeType) {
+        Collection<Node> sourceNodes = nodeRepository.getNodesByProperty(property, nodeType.name());
         List<ACityElement> aCityElements = createACityElements(sourceNodes, aCityType);
         repository.addElements(aCityElements);
     }
