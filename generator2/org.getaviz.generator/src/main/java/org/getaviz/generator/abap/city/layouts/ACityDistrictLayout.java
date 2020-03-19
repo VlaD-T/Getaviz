@@ -1,8 +1,9 @@
-package org.getaviz.generator.abap.city;
+package org.getaviz.generator.abap.city.layouts;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.getaviz.generator.SettingsConfiguration;
+import org.getaviz.generator.abap.city.ACityElement;
 import org.getaviz.generator.city.m2m.CityKDTree;
 import org.getaviz.generator.city.m2m.CityKDTreeNode;
 import org.getaviz.generator.city.m2m.Rectangle;

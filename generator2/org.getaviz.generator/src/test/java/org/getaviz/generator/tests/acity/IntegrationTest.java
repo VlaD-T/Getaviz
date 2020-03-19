@@ -1,7 +1,13 @@
 package org.getaviz.generator.tests.acity;
 
 import org.getaviz.generator.SettingsConfiguration;
-import org.getaviz.generator.abap.city.*;
+import org.getaviz.generator.abap.city.repository.ACityRepository;
+import org.getaviz.generator.abap.city.repository.SAPRelationLabels;
+import org.getaviz.generator.abap.city.repository.SourceNodeRepository;
+import org.getaviz.generator.abap.city.steps.ACityAFrameExporter;
+import org.getaviz.generator.abap.city.steps.ACityCreator;
+import org.getaviz.generator.abap.city.steps.ACityDesigner;
+import org.getaviz.generator.abap.city.steps.ACityLayouter;
 import org.getaviz.generator.mockups.ABAPmock;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -18,7 +24,7 @@ public class IntegrationTest {
     private static SettingsConfiguration config = SettingsConfiguration.getInstance();
 
     private static ABAPmock mockUp = new ABAPmock();
-    private static NodeRepository nodeRepository;
+    private static SourceNodeRepository nodeRepository;
     private static ACityRepository aCityRepository;
 
     private static String exportString;
@@ -28,11 +34,13 @@ public class IntegrationTest {
 
         mockUp.setupDatabase("./test/databases/CityBankTest.db", "SAPExportCreateNodes.cypher");
         mockUp.runCypherScript("SAPExportCreateContainsRelation.cypher");
+        mockUp.runCypherScript("SAPExportCreateUsesRelation.cypher");
         mockUp.loadProperties("CityBankTest.properties");
 
-        nodeRepository = new NodeRepository();
+        nodeRepository = new SourceNodeRepository();
         nodeRepository.loadNodesWithRelation(SAPRelationLabels.CONTAINS);
         nodeRepository.loadNodesWithRelation(SAPRelationLabels.TYPEOF);
+        nodeRepository.loadNodesWithRelation(SAPRelationLabels.USES);
 
         aCityRepository = new ACityRepository();
 

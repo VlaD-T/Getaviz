@@ -2,6 +2,8 @@ package org.getaviz.generator.tests.acity;
 
 import org.getaviz.generator.SettingsConfiguration;
 import org.getaviz.generator.abap.city.*;
+import org.getaviz.generator.abap.city.layouts.ACityBuildingLayout;
+import org.getaviz.generator.abap.city.layouts.ACityDistrictLayout;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -95,9 +97,9 @@ public class DistrictLayoutTest {
 
     @Test
     void districtPosition(){
-        assertEquals(0.0, district.getXPosition());
-        assertEquals(0.0, district.getYPosition());
-        assertEquals(0.0, district.getZPosition());
+        assertNotEquals(0.0, district.getXPosition());
+        assertNotEquals(0.0, district.getYPosition());
+        assertNotEquals(0.0, district.getZPosition());
     }
 
 

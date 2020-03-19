@@ -1,6 +1,5 @@
 package org.getaviz.generator.abap.city;
 
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;

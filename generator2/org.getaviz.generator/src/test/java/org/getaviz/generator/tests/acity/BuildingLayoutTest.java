@@ -1,7 +1,7 @@
 package org.getaviz.generator.tests.acity;
 
 import org.getaviz.generator.SettingsConfiguration;
-import org.getaviz.generator.abap.city.ACityBuildingLayout;
+import org.getaviz.generator.abap.city.layouts.ACityBuildingLayout;
 import org.getaviz.generator.abap.city.ACityElement;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -60,16 +60,16 @@ public class BuildingLayoutTest {
         for(ACityElement floor :  floors){
             assertEquals(4, floor.getWidth());
             assertEquals(4, floor.getLength());
-            assertEquals(1, floor.getHeight());
+            assertEquals(0.5, floor.getHeight());
         }
     }
 
     @Test
     void chimneySize(){
         for(ACityElement chimney : chimneys){
-            assertEquals(1, chimney.getWidth());
-            assertEquals(1, chimney.getLength());
-            assertEquals(1, chimney.getHeight());
+            assertEquals(0.5, chimney.getWidth());
+            assertEquals(0.5, chimney.getLength());
+            assertEquals(0.5, chimney.getHeight());
         }
     }
 
@@ -80,19 +80,20 @@ public class BuildingLayoutTest {
             floorCounter++;
 
             if(floorCounter == 1){
-                //0 x floor.height  + 1 x floor.gap
-                //0 x 1             + 1 x 0.5
-                assertEquals(0.5, floor.getYPosition());
+                // floor.setYPosition = ((floor.getHeight() / 2) + floorSizeSum + floorGapSum);
+                // --> floor.getHeight = 0.5
+                // --> floorSizeSum = (floorCounter - 1) x floor.height
+                // --> floorGapSum = floorCounter x 0.2
+                // 1 x 0.25 + 0 x 0.5 + 1 x 0.2 = 0.45
+                assertEquals(0.45, floor.getYPosition());
             }
             if(floorCounter == 5){
-                //4 x floor.height  + 5 x floor.gap
-                //4 x 1             + 5 x 0.5
-                assertEquals(6.5, floor.getYPosition());
+                //1 x 0.25 + 4 x 0.5 + 5 x 0.2 = 0.25 + 2 + 1 = 3.25
+                assertEquals(3.25, floor.getYPosition());
             }
             if(floorCounter == 8){
-                //7 x floor.height  + 8 x floor.gap
-                //7 x 1             + 8 x 0.5
-                assertEquals(11, floor.getYPosition());
+                // 1 x 0.25 + 7 x 0.5 + 8 x 0.2 = 2 + 3.5 + 1.6 = 7.1
+                assertEquals(5.35, floor.getYPosition());
             }
 
             assertEquals(0.0, floor.getXPosition());
@@ -115,32 +116,61 @@ public class BuildingLayoutTest {
                 ----
                 ---- */
             if(chimneyCounter == 1){
-                assertEquals(-1.5, chimney.getXPosition());
-                assertEquals(1.5, chimney.getZPosition());
+                // (groundAreaLength / 2 - chimney.getWidth() / 2) * cornerX
+                // chimney.width = 0.5
+                // cornerX = -1
+                // (2 - 0.25) x -1 = -1.75
+                assertEquals(-1.75, chimney.getXPosition());
+
+                // (groundAreaLength / 2 - chimney.getLength() / 2) * cornerZ
+                // chimney.length = 0,5
+                // cornerZ = 1
+                assertEquals(1.75, chimney.getZPosition());
             }
             /*  O--X
                 ----
                 ----
                 ---- */
-            if(chimneyCounter == 1.5){
-                assertEquals(1.5, chimney.getXPosition());
-                assertEquals(1.5, chimney.getZPosition());
+            if(chimneyCounter == 2){ //default 1.5
+                // (groundAreaLength / 2 - chimney.getWidth() / 2) * cornerX
+                // chimney.width = 0.5
+                // cornerX = 1 -> 0.5?
+                assertEquals(1.75, chimney.getXPosition());
+
+                // (groundAreaLength / 2 - chimney.getLength() / 2) * cornerZ
+                // chimney.length = 0,5
+                // cornerZ = 1
+                assertEquals(1.75, chimney.getZPosition());
             }
             /*  O--O
                 ----
                 ----
                 ---X */
             if(chimneyCounter == 3){
-                assertEquals(1.5, chimney.getXPosition());
-                assertEquals(-1.5, chimney.getZPosition());
+                // (groundAreaLength / 2 - chimney.getWidth() / 2) * cornerX
+                // chimney.width = 0.5
+                // cornerX = 1
+                assertEquals(1.75, chimney.getXPosition());
+
+                // (groundAreaLength / 2 - chimney.getLength() / 2) * cornerZ
+                // chimney.length = 0,5
+                // cornerZ = -1
+                assertEquals(-1.75, chimney.getZPosition());
             }
             /*  O--O
                 ----
                 ----
                 X--O */
             if(chimneyCounter == 4){
-                assertEquals(-1.5, chimney.getXPosition());
-                assertEquals(-1.5, chimney.getZPosition());
+                // (groundAreaLength / 2 - chimney.getWidth() / 2) * cornerX
+                // chimney.width = 0.5
+                // cornerX = -1
+                assertEquals(-1.75, chimney.getXPosition());
+
+                // (groundAreaLength / 2 - chimney.getLength() / 2) * cornerZ
+                // chimney.length = 0,5
+                // cornerZ = -1
+                assertEquals(-1.75, chimney.getZPosition());
             }
 
             /*  OX-O
@@ -148,37 +178,63 @@ public class BuildingLayoutTest {
                 ----
                 O--O */
             if(chimneyCounter == 5){
-                assertEquals(-0.5, chimney.getXPosition());
-                assertEquals(1.5, chimney.getZPosition());
+                // ((groundAreaLength / 2 - chimney.getWidth() / 2) * cornerX) - chimney.getWidth
+                // chimney.width = 0.5
+                // cornerX = -1
+                assertEquals(-1.25, chimney.getXPosition());
+
+                // (groundAreaLength / 2 - chimney.getLength() / 2) * cornerZ
+                // chimney.length = 0,5
+                // cornerZ = 1
+                assertEquals(1.75, chimney.getZPosition());
             }
             /*  OO-O
                 ---X
                 ----
                 O--O */
             if(chimneyCounter == 6){
-                assertEquals(1.5, chimney.getXPosition());
-                assertEquals(0.5, chimney.getZPosition());
+                // (groundAreaLength / 2 - chimney.getWidth() / 2) * cornerX
+                // chimney.width = 0.5
+                // cornerX = 1
+                assertEquals(1.75, chimney.getXPosition());
+
+                // ((groundAreaLength / 2 - chimney.getWidth() / 2) * cornerZ) - chimney.getLenght
+                // chimney.width = 0.5
+                // cornerZ = 1
+                assertEquals(1.25, chimney.getZPosition());
             }
             /*  OO-O
                 ---O
                 ----
                 O-XO */
             if(chimneyCounter == 7){
-                assertEquals(0.5, chimney.getXPosition());
-                assertEquals(-1.5, chimney.getZPosition());
+                // ((groundAreaLength / 2 - chimney.getWidth() / 2) * cornerX) - chimneygetWidth
+                // cornerX = 1
+                assertEquals(1.25, chimney.getXPosition());
+
+                //(groundAreaLength / 2 - chimney.getWidth() / 2) * cornerZ
+                //cornerZ = -1
+                assertEquals(-1.75, chimney.getZPosition());
             }
             /*  OO-O
                 ---O
                 X---
                 O-OO */
             if(chimneyCounter == 8){
-                assertEquals(-1.5, chimney.getXPosition());
-                assertEquals(-0.5, chimney.getZPosition());
+                assertEquals(-1.75, chimney.getXPosition());
+                assertEquals(-1.25, chimney.getZPosition());
             }
 
-            //8 x floor.height  + 8 x floor.gap
-            //8 x 1             + 8 x 0.5
-            assertEquals(12, chimney.getYPosition());
+            if(chimneyCounter == 9){
+                // ((groundAreaLength / 2 - chimney.getWidth() / 2) * cornerX) - 2 x chimneygetWidth
+                assertEquals(-0.75, chimney.getXPosition());
+                assertEquals(1.75, chimney.getZPosition());
+            }
+
+            // floorHeightSum + chimney.getHeight() / 2;
+            // floorHeightSum = floor.getYPosition() + ( floor.getHeight() / 2);
+            // 5.35 + 0.25 + 0.25 = 5.85
+            assertEquals(5.85, chimney.getYPosition());
         }
     }
 
@@ -193,13 +249,20 @@ public class BuildingLayoutTest {
 
         //8 x floor.height  + 8 x floor.gap + chimney.height
         //8 x 1             + 8 x 0.5       + 1
-        assertEquals(13.0, building.getHeight());
+        //8 x 0.5           + 8 x 0.2       + 0.5 --> ohne chimney height?????
+        assertEquals(5.6, building.getHeight());
     }
 
     @Test
     void buildingPosition(){
+
         assertEquals(0.0, building.getXPosition());
-        assertEquals(0.0, building.getYPosition());
+
+        // building.getYPosition = building.setYPosition(building.getHeight() / 2)
+        // --> building.getHeight = 8 x floor.height  + 8 x floor.gap + chimney.height
+        // 8 x 0.5           + 8 x 0.2       + 0.5 --> ohne chimney height????? ---> 5.6
+        // 5.6 / 2 = 2.8
+        assertEquals(2.8, building.getYPosition());
         assertEquals(0.0, building.getZPosition());
     }
 

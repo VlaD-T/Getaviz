@@ -2,9 +2,6 @@ package org.getaviz.generator;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-//import org.getaviz.generator.abap.city.m2m.ACity2ACity;
-import org.getaviz.generator.abap.city.m2t.ACity2AFrame;
-import org.getaviz.generator.abap.city.s2m.SAP2ACity;
 import org.getaviz.generator.city.m2m.City2City;
 import org.getaviz.generator.city.m2t.City2AFrame;
 import org.getaviz.generator.city.m2t.City2X3D;

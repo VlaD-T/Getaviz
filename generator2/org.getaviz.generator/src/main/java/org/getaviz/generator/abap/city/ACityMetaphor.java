@@ -4,7 +4,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.getaviz.generator.Metaphor;
 import org.getaviz.generator.SettingsConfiguration;
-import org.getaviz.generator.database.DatabaseConnector;
+import org.getaviz.generator.abap.city.repository.ACityRepository;
+import org.getaviz.generator.abap.city.repository.SourceNodeRepository;
 
 public class ACityMetaphor implements Metaphor {
 
@@ -12,7 +13,7 @@ public class ACityMetaphor implements Metaphor {
     private SettingsConfiguration config;
 
 
-    private NodeRepository nodeRepository;
+    private SourceNodeRepository nodeRepository;
     private ACityRepository aCityRepository;
 
     public ACityMetaphor(SettingsConfiguration config) {

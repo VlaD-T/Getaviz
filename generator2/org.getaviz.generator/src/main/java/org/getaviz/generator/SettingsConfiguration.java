@@ -364,6 +364,8 @@ public class SettingsConfiguration {
 	// Test Color Config ABAP-City
 	public String getACityDistrictColorHex(String type) {
 		switch (type) {
+			case "packageDistrict":
+				return config.getString("city.abap.color.packageDistrict", "#95A5A6");
 			case "classDistrict":
 				return config.getString("city.abap.color.classDistrict", "#C5CEA9");
 			case "reportDistrict":
@@ -425,7 +427,7 @@ public class SettingsConfiguration {
 
 	public String getACityChimneyColorHex(String type) {
 		switch (type) {
-			case "attribute":
+			case "attributeColor":
 				return config.getString("city.abap.color.attribute", "#C5CEA9");
 			default:
 				return config.getString("#FFFFFF");
@@ -659,7 +661,7 @@ public class SettingsConfiguration {
 				}
 	}
 
-	public double getACityBuildingHWidth(String type) {
+	public double getACityBuildingWidth(String type) {
 		switch (type) {
 			case "tableTypeBuilding":
 				return config.getDouble("city.abap.width.tableTypeBuilding", 0.1);
@@ -668,6 +670,24 @@ public class SettingsConfiguration {
 			default:
 				return config.getDouble(String.valueOf(0.1));
 		}
+	}
+
+	public double getACityChimneyWidth(){
+		return config.getDouble("city.abap.width.chimney", 0.3);
+	}
+	public double getACityChimneyHeight(){
+		return config.getDouble("city.abap.height.chimney", 0.3);
+	}
+	public double getACityChimneyLength(){
+		return config.getDouble("city.abap.length.chimney", 0.3);
+	}
+
+	public double getACityFloorHeight(){
+		return config.getDouble("city.abap.height.floor", 1);
+	}
+
+	public double getACityFloorGap(){
+		return config.getDouble("city.abap.gap.floor", 0.5);
 	}
 
 	//public double getACityFloorWidth(String type) {

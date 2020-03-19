@@ -1,16 +1,14 @@
-package org.getaviz.generator.abap.city;
+package org.getaviz.generator.abap.city.repository;
 
-import org.apache.commons.codec.digest.DigestUtils;
+import org.getaviz.generator.abap.city.ACityElement;
+import org.getaviz.generator.database.DatabaseConnector;
 import org.neo4j.driver.v1.Value;
 import org.neo4j.driver.v1.types.Node;
 
 import java.util.*;
 
-import static org.getaviz.generator.abap.city.ACityElement.ACitySubType.*;
-import static org.getaviz.generator.abap.city.ACityElement.ACityType.Building;
-import static org.getaviz.generator.abap.city.ACityElement.ACityType.District;
-
 public class ACityRepository {
+    private DatabaseConnector connector = DatabaseConnector.getInstance();
 
     private Map<Long, ACityElement> elementsBySourceID;
 
@@ -25,6 +23,11 @@ public class ACityRepository {
     public Collection<ACityElement> getAllElements() {
         //TODO copy
         return elementsBySourceID.values();
+    }
+
+    public Collection<ACityElement> getAllElementsByHash() {
+        //TODO copy
+        return elementsByHash.values();
     }
 
     public ACityElement getElementBySourceID(Long sourceID){
@@ -48,7 +51,7 @@ public class ACityRepository {
         return elementsByType;
     }
 
-    public Collection<ACityElement> getElementsByTypeAndSourceProperty(ACityElement.ACityType type, String sourceProperty, String sourcePropertyValue){
+    public Collection<ACityElement> getElementsByTypeAndSourceProperty(ACityElement.ACityType type, SAPNodeProperties sourceProperty, String sourcePropertyValue){
         Collection<ACityElement> elementsByType = getElementsByType(type);
         List<ACityElement> elementsByTypeAndSourceProperty = new ArrayList<>();
 
@@ -67,7 +70,7 @@ public class ACityRepository {
               continue;
             }
 
-            Value propertyValue = sourceNode.get(sourceProperty);
+            Value propertyValue = sourceNode.get(sourceProperty.toString());
             if( propertyValue == null){
                 continue;
             }
@@ -84,6 +87,41 @@ public class ACityRepository {
     }
 
     //Test
+    //Schreiben der ACityElemente in die Neo4j-Datenbank
+    public Collection<ACityElement> addACityElementsToNeo4j(ACityElement.ACityType aCityElement) {
+        List<ACityElement> newNeo4jElements = new ArrayList<>();
+
+        elementsByHash.forEach((id, element) -> {
+            if(element.getType() == aCityElement) {
+                connector.executeWrite("CREATE ( :Elements { cityType : '" + aCityElement.toString() + "'," + getACityProperties(element) + "})");
+                newNeo4jElements.add(element);
+                //addElementsNeo(newNeo4jElements);
+            }
+
+        });
+
+        return newNeo4jElements;
+    }
+
+    public String getACityProperties(ACityElement element) {
+        StringBuilder test = new StringBuilder();
+
+        test.append(" subType :  " + element.getSubType() + ",");
+        //test.append(" subElements :  " + element.getSubElements() + ",");
+        test.append(" sourceNode :  " + element.getSourceNode().get("id") + ",");
+        test.append(" color :  '" + element.getColor() + "',");
+        test.append(" shape :  '" + element.getShape() + "',");
+        test.append(" height :  " + element.getHeight() + ",");
+        test.append(" width :  " + element.getWidth() + ",");
+        test.append(" length :  " + element.getLength() + ",");
+        test.append(" height :  " + element.getHeight() + ",");
+        test.append(" xPosition :  " + element.getXPosition() + ",");
+        test.append(" yPosition :  " + element.getYPosition() + ",");
+        test.append(" zPosition :  " + element.getZPosition() + "");
+
+
+        return test.toString();
+    }
     //Test Ende
 
 

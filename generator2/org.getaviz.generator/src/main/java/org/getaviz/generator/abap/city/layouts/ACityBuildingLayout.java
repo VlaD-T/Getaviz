@@ -1,8 +1,9 @@
-package org.getaviz.generator.abap.city;
+package org.getaviz.generator.abap.city.layouts;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.getaviz.generator.SettingsConfiguration;
+import org.getaviz.generator.abap.city.ACityElement;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -158,7 +159,7 @@ public class ACityBuildingLayout {
             floorCounter++;
 
             Double floorSizeSum = (floorCounter - 1) * floor.getHeight();
-            Double floorGapSum = floorCounter * 0.2; //TODO Config default * 0.5
+            Double floorGapSum = floorCounter * config.getACityFloorGap(); // default * 0.5
             floor.setYPosition((floor.getHeight() / 2) + floorSizeSum + floorGapSum);
 
             floor.setXPosition(0.0);
@@ -170,7 +171,7 @@ public class ACityBuildingLayout {
         Double groundAreaLength = calculateGroundAreaByChimneyAmount();
 
         for(ACityElement floor : floors){
-            floor.setHeight(0.5); //TODO Config default: 1
+            floor.setHeight(config.getACityFloorHeight()); //default: 1
             floor.setWidth(groundAreaLength);
             floor.setLength(groundAreaLength);
         }
@@ -190,9 +191,9 @@ public class ACityBuildingLayout {
 
     private void setSizeOfChimneys() {
         for(ACityElement chimney : chimneys){
-            chimney.setHeight(0.5); //TODO Config
-            chimney.setWidth(0.5); //TODO Config
-            chimney.setLength(0.5); //TODO Config
+            chimney.setHeight(config.getACityChimneyHeight());
+            chimney.setWidth(config.getACityChimneyWidth());
+            chimney.setLength(config.getACityChimneyLength());
         }
     }
 

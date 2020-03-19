@@ -2,10 +2,17 @@ package org.getaviz.generator.tests.acity;
 
 import org.getaviz.generator.SettingsConfiguration;
 import org.getaviz.generator.abap.city.*;
+import org.getaviz.generator.abap.city.repository.*;
+import org.getaviz.generator.abap.city.steps.ACityCreator;
+import org.getaviz.generator.abap.city.steps.ACityDesigner;
+import org.getaviz.generator.database.DatabaseConnector;
 import org.getaviz.generator.mockups.ABAPmock;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.neo4j.driver.v1.Record;
+import org.neo4j.driver.v1.StatementResult;
+import org.neo4j.driver.v1.types.Node;
 
 import java.util.Collection;
 
@@ -17,28 +24,35 @@ public class CreatorTest {
     private static SettingsConfiguration config = SettingsConfiguration.getInstance();
 
     private static ABAPmock mockUp = new ABAPmock();
-    private static NodeRepository nodeRepository;
+    private static SourceNodeRepository nodeRepository;
     private static ACityRepository aCityRepository;
+    private static ACityElement aCityElementTest;
+    static DatabaseConnector connector;
 
     @BeforeAll
     static void setup() {
         mockUp.setupDatabase("./test/databases/CityBankTest.db", "SAPExportCreateNodes.cypher");
         mockUp.runCypherScript("SAPExportCreateContainsRelation.cypher");
-        mockUp.loadProperties("CityBankTest.properties");
+        mockUp.loadProperties("ABAPCityTest.properties");
+        connector = mockUp.getConnector();
 
-        nodeRepository = new NodeRepository();
+        nodeRepository = new SourceNodeRepository();
         nodeRepository.loadNodesWithRelation(SAPRelationLabels.CONTAINS);
-
         aCityRepository = new ACityRepository();
 
         ACityCreator aCityCreator = new ACityCreator(aCityRepository, config);
         aCityCreator.createRepositoryFromNodeRepository(nodeRepository);
+
+        ACityDesigner designer = new ACityDesigner(aCityRepository, config);
+        designer.designRepository();
     }
 
     @AfterAll
     static void close() {
         mockUp.close();
     }
+
+
 
     @Test
     void numberOfDistricts() {
@@ -66,7 +80,7 @@ public class CreatorTest {
 
     @Test
     void buildingSubElements(){
-        Collection<ACityElement> buildings = aCityRepository.getElementsByTypeAndSourceProperty(ACityElement.ACityType.Building, "object_name", "/GSA/CL_VISAP_T_TEST_CLASS");
+        Collection<ACityElement> buildings = aCityRepository.getElementsByTypeAndSourceProperty(ACityElement.ACityType.Building, SAPNodeProperties.object_name, "/GSA/CL_VISAP_T_TEST_CLASS");
 
         ACityElement firstBuilding = buildings.iterator().next();
         assertEquals(9, firstBuilding.getSubElements().size());
@@ -101,7 +115,7 @@ public class CreatorTest {
     void districtSubElements(){
 
         //first district
-        Collection<ACityElement> districts = aCityRepository.getElementsByTypeAndSourceProperty(ACityElement.ACityType.District, "object_name", "/GSA/VISAP_T_TEST");
+        Collection<ACityElement> districts = aCityRepository.getElementsByTypeAndSourceProperty(ACityElement.ACityType.District, SAPNodeProperties.object_name, "/GSA/VISAP_T_TEST");
         assertEquals(1, districts.size());
 
         ACityElement firstDistrict = districts.iterator().next();
@@ -111,7 +125,7 @@ public class CreatorTest {
 
 
         //second district
-        districts = aCityRepository.getElementsByTypeAndSourceProperty(ACityElement.ACityType.District, "object_name", "/GSA/VISAP_T");
+        districts = aCityRepository.getElementsByTypeAndSourceProperty(ACityElement.ACityType.District, SAPNodeProperties.object_name, "/GSA/VISAP_T");
         assertEquals(1, districts.size());
 
         ACityElement secondDistrict = districts.iterator().next();
@@ -120,7 +134,7 @@ public class CreatorTest {
         assertEquals(1, subDistricts.size());
 
         //third district
-        districts = aCityRepository.getElementsByTypeAndSourceProperty(ACityElement.ACityType.District, "object_name", "/GISA/BWBCI");
+        districts = aCityRepository.getElementsByTypeAndSourceProperty(ACityElement.ACityType.District, SAPNodeProperties.object_name, "/GISA/BWBCI");
         assertEquals(1, districts.size());
 
         ACityElement thirdDistrict = districts.iterator().next();

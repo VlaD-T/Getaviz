@@ -1,10 +1,10 @@
 package org.getaviz.generator.tests.acity;
 
 import org.getaviz.generator.SettingsConfiguration;
-import org.getaviz.generator.abap.city.NodeRepository;
-import org.getaviz.generator.abap.city.SAPNodeLabels;
-import org.getaviz.generator.abap.city.SAPNodeTypes;
-import org.getaviz.generator.abap.city.SAPRelationLabels;
+import org.getaviz.generator.abap.city.repository.SAPNodeProperties;
+import org.getaviz.generator.abap.city.repository.SourceNodeRepository;
+import org.getaviz.generator.abap.city.repository.SAPNodeTypes;
+import org.getaviz.generator.abap.city.repository.SAPRelationLabels;
 import org.getaviz.generator.mockups.ABAPmock;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Test;
 import org.neo4j.driver.v1.types.Node;
 
 import java.util.Collection;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -20,18 +21,20 @@ public class NodeRepositoryTest {
     private static SettingsConfiguration config = SettingsConfiguration.getInstance();
 
     private static ABAPmock mockUp = new ABAPmock();
-    private static NodeRepository nodeRepository;
+    private static SourceNodeRepository nodeRepository;
 
     @BeforeAll
     static void setup() {
         mockUp.setupDatabase("./test/databases/CityBankTest.db", "SAPExportCreateNodes.cypher");
         mockUp.runCypherScript("SAPExportCreateContainsRelation.cypher");
+        mockUp.runCypherScript("SAPExportCreateUsesRelation.cypher");
         mockUp.runCypherScript("SAPExportCreateTypeOfRelation.cypher");
         mockUp.loadProperties("CityBankTest.properties");
 
-        nodeRepository = new NodeRepository();
+        nodeRepository = new SourceNodeRepository();
         nodeRepository.loadNodesWithRelation(SAPRelationLabels.CONTAINS);
         nodeRepository.loadNodesWithRelation(SAPRelationLabels.TYPEOF);
+        nodeRepository.loadNodesWithRelation(SAPRelationLabels.USES);
     }
 
     @AfterAll
@@ -49,19 +52,37 @@ public class NodeRepositoryTest {
 
     @Test
     void packageNodes(){
-        Collection<Node> packageNodes = nodeRepository.getNodesByProperty("type_name", SAPNodeTypes.Namespace.name());
+        Collection<Node> packageNodes = nodeRepository.getNodesByProperty(SAPNodeProperties.type_name, SAPNodeTypes.Namespace.name());
         assertEquals(17, packageNodes.size());
     }
 
     @Test
+    void NodesByRelation(){
+        Collection<Node> nodesByRelationTest = nodeRepository.getNodesByRelation(SAPRelationLabels.USES);
+      //  assertEquals(17, nodesByRelationTest.size());
+    }
+
+    @Test
+    void NodesByIdenticalPropertyValue(){
+        int packageNodes = nodeRepository.getNodesByIdenticalPropertyValuesSize(SAPNodeProperties.type_name, SAPNodeTypes.Class.name());
+        assertEquals(21, packageNodes);
+    }
+
+    @Test
+    void NodesByIdenticalPropertyValueNode(){
+        Collection<Node> packageNodes = nodeRepository.getNodesByIdenticalPropertyValuesNodes(SAPNodeProperties.type_name, SAPNodeTypes.Class.name());
+        assertEquals(21, packageNodes.size());
+    }
+
+    @Test
     void domainNodes(){
-        Collection<Node> domainNodes = nodeRepository.getNodesByProperty("type_name", SAPNodeTypes.Domain.name());
+        Collection<Node> domainNodes = nodeRepository.getNodesByProperty(SAPNodeProperties.type_name, SAPNodeTypes.Domain.name());
         assertEquals(27, domainNodes.size());
     }
 
     @Test
     void containsRelationTest(){
-        Collection<Node> packageNodes = nodeRepository.getNodesByProperty("type_name", SAPNodeTypes.Namespace.name());
+        Collection<Node> packageNodes = nodeRepository.getNodesByProperty(SAPNodeProperties.type_name, SAPNodeTypes.Namespace.name());
 
         Node firstPackage = packageNodes.iterator().next();
         Collection<Node> subNodes = nodeRepository.getRelatedNodes(firstPackage, SAPRelationLabels.CONTAINS, true);
@@ -74,7 +95,7 @@ public class NodeRepositoryTest {
 
     @Test
     void typeOfRelationTest(){
-        Collection<Node> tableTypeNodes = nodeRepository.getNodesByProperty("type_name", SAPNodeTypes.TableType.name());
+        Collection<Node> tableTypeNodes = nodeRepository.getNodesByProperty(SAPNodeProperties.type_name, SAPNodeTypes.TableType.name());
 
         Node firstTableType = tableTypeNodes.iterator().next();
         Collection<Node> subNodes = nodeRepository.getRelatedNodes(firstTableType, SAPRelationLabels.TYPEOF,true);

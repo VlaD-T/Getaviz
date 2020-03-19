@@ -1,7 +1,9 @@
-package org.getaviz.generator.abap.city;
+package org.getaviz.generator.abap.city.repository;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.neo4j.driver.v1.Record;
+import org.neo4j.driver.v1.StatementResult;
 import org.neo4j.driver.v1.Value;
 import org.neo4j.driver.v1.types.Node;
 import org.getaviz.generator.SettingsConfiguration;
@@ -9,7 +11,7 @@ import org.getaviz.generator.database.DatabaseConnector;
 
 import java.util.*;
 
-public class NodeRepository {
+public class SourceNodeRepository {
 
     private Log log = LogFactory.getLog(this.getClass());
     private SettingsConfiguration config;
@@ -28,7 +30,7 @@ public class NodeRepository {
                                 Map<Long, Node>> > > nodesByRelation;
 
 
-    public NodeRepository(){
+    public SourceNodeRepository(){
         nodeById = new HashMap<>();
         nodesByLabel = new HashMap<>();
         nodesByRelation = new HashMap<>();
@@ -61,7 +63,7 @@ public class NodeRepository {
 
     public Collection<Node> getNodes(){
         return nodeById.values();
-}
+    }
 
 
     public Collection<Node> getRelatedNodes(Node node, SAPRelationLabels relationLabel, Boolean direction){
@@ -88,12 +90,12 @@ public class NodeRepository {
     }
 
     //TODO String property durch Enum mit Properties ersetzen
-    public Collection<Node> getNodesByProperty(String property, String value){
+    public Collection<Node> getNodesByProperty(SAPNodeProperties property, String value){
         Collection<Node> nodesByID = getNodes();
         List<Node> nodesByProperty = new ArrayList<>();
 
         for (Node node: nodesByID) {
-            Value propertyValue = node.get(property);
+            Value propertyValue = node.get(property.toString());
              if( propertyValue == null){
                  continue;
             }
@@ -107,6 +109,39 @@ public class NodeRepository {
 
         return nodesByProperty;
     }
+
+    // Test Laden Property
+    public Collection<Node> getNodesByIdenticalPropertyValuesNodes(SAPNodeProperties property, String value){
+
+        Collection<Node> nodesByLabelAndProperty = new ArrayList<>();
+
+            StatementResult test = connector.executeRead("MATCH (n:Elements {" + property + ": '" + value + "'}) RETURN n");
+                test.forEachRemaining((result) -> {
+                Node namespace = result.get("n").asNode();
+
+                    nodesByLabelAndProperty.add(namespace);
+
+                });
+
+        return nodesByLabelAndProperty;
+    }
+
+    public int getNodesByIdenticalPropertyValuesSize(SAPNodeProperties property, String value){
+
+        Record tests = connector.executeRead("MATCH (n:Elements {" + property + ": '" + value + "'}) RETURN count(n) AS result").next();
+        int numberOfVisualizedPackages = tests.get("result").asInt();
+
+        return numberOfVisualizedPackages;
+    }
+    // Testende Laden Property
+
+    //Test Laden Relationships
+
+    public Collection<Node> getNodesByRelation(SAPRelationLabels relationType){
+        return null;
+    }
+
+    //Testende Laden Relationships
 
     public Collection<Node> getNodesByLabelAndProperty(SAPNodeLabels label, String property, String value){
         Collection<Node> nodesByLabel = getNodesByLabel(label);
@@ -165,6 +200,7 @@ public class NodeRepository {
             }
         });
     }
+
 
    /* private void addNodeByProperty(Node node){
         node.values().forEach( (nodeType)->{

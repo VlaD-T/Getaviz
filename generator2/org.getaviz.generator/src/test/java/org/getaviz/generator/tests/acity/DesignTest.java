@@ -2,14 +2,17 @@ package org.getaviz.generator.tests.acity;
 
 import org.getaviz.generator.SettingsConfiguration;
 import org.getaviz.generator.abap.city.*;
+import org.getaviz.generator.abap.city.repository.*;
+import org.getaviz.generator.abap.city.steps.ACityCreator;
+import org.getaviz.generator.abap.city.steps.ACityDesigner;
+import org.getaviz.generator.database.DatabaseConnector;
 import org.getaviz.generator.mockups.ABAPmock;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.neo4j.driver.v1.Record;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
@@ -19,19 +22,21 @@ public class DesignTest{
     private static SettingsConfiguration config = SettingsConfiguration.getInstance();
 
     private static ABAPmock mockUp = new ABAPmock();
-    private static NodeRepository nodeRepository;
+    private static SourceNodeRepository nodeRepository;
     private static ACityRepository aCityRepository;
+    static DatabaseConnector connector;
 
     @BeforeAll
     static void setup() {
 
         mockUp.setupDatabase("./test/databases/CityBankTest.db", "SAPExportCreateNodes.cypher");
         mockUp.runCypherScript("SAPExportCreateContainsRelation.cypher");
-        //mockUp.runCypherScript("SAPExportTypeOfRelation.cypher");
+        mockUp.runCypherScript("SAPExportCreateUsesRelation.cypher");
         mockUp.loadProperties("ABAPCityTest.properties");
 
-        nodeRepository = new NodeRepository();
+        nodeRepository = new SourceNodeRepository();
         nodeRepository.loadNodesWithRelation(SAPRelationLabels.CONTAINS);
+        nodeRepository.loadNodesWithRelation(SAPRelationLabels.USES);
 
         aCityRepository = new ACityRepository();
 
@@ -49,7 +54,7 @@ public class DesignTest{
 
     @Test
     public void districtDesign(){
-        Collection<ACityElement> classDistricts = aCityRepository.getElementsByTypeAndSourceProperty(ACityElement.ACityType.District, "type_name", "Table");
+        Collection<ACityElement> classDistricts = aCityRepository.getElementsByTypeAndSourceProperty(ACityElement.ACityType.District, SAPNodeProperties.type_name, "Table");
         assertNotEquals(0, classDistricts.size());
 
         for( ACityElement district : classDistricts){
@@ -58,11 +63,12 @@ public class DesignTest{
         }
     }
 
+
     @Test
     public void buildingDesign(){
         Collection<ACityElement> classBuildings =
                 aCityRepository.getElementsByTypeAndSourceProperty(
-            ACityElement.ACityType.Building, "type_name", "TableType");
+            ACityElement.ACityType.Building, SAPNodeProperties.type_name, "TableType");
 
         assertNotEquals(0, classBuildings.size());
 
@@ -75,7 +81,7 @@ public class DesignTest{
 
     @Test
     public void floorDesign(){
-        Collection<ACityElement> floors = aCityRepository.getElementsByTypeAndSourceProperty(ACityElement.ACityType.Floor, "type_name", "TableElement");
+        Collection<ACityElement> floors = aCityRepository.getElementsByTypeAndSourceProperty(ACityElement.ACityType.Floor, SAPNodeProperties.type_name, "TableElement");
         assertNotEquals(0, floors.size());
 
         for( ACityElement floor : floors){
@@ -86,7 +92,7 @@ public class DesignTest{
 
     @Test
     public void chimneyDesign(){
-        Collection<ACityElement> chimneys = aCityRepository.getElementsByTypeAndSourceProperty(ACityElement.ACityType.Chimney, "type_name", "Attribute");
+        Collection<ACityElement> chimneys = aCityRepository.getElementsByTypeAndSourceProperty(ACityElement.ACityType.Chimney, SAPNodeProperties.type_name, "Attribute");
         assertNotEquals(0, chimneys.size());
 
         for( ACityElement chimney : chimneys){

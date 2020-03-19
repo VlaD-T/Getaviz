@@ -1,4 +1,4 @@
-package org.getaviz.generator.abap.city;
+package org.getaviz.generator.abap.city.steps;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -6,7 +6,10 @@ import org.getaviz.generator.SettingsConfiguration;
 
 import java.util.Collection;
 
-import org.getaviz.generator.abap.city.SAPNodeTypes;
+import org.getaviz.generator.abap.city.ACityElement;
+import org.getaviz.generator.abap.city.repository.ACityRepository;
+import org.getaviz.generator.abap.city.repository.SAPNodeProperties;
+import org.getaviz.generator.abap.city.repository.SAPNodeTypes;
 import org.neo4j.driver.v1.types.Node;
 
 public class ACityDesigner {
@@ -60,7 +63,7 @@ public class ACityDesigner {
                 case DDIC:          district.setColor(config.getACityDistrictColorHex("dataDictionaryDistrict")); break;
             }
         } else {
-            district.setColor("#95A5A6"); //TODO Config
+            district.setColor(config.getACityDistrictColorHex("packageDistrict"));
         }
     }
 
@@ -68,79 +71,76 @@ public class ACityDesigner {
 
         Node sourceNode = building.getSourceNode();
 
-        if (sourceNode != null) {
 
-            String propertyTypeName = sourceNode.get("type_name").asString();
+
+        if (sourceNode == null) {
+            log.error("SourceNode nicht vorhnaden");
+        } else {
+
+            String propertyTypeName = sourceNode.get(String.valueOf(SAPNodeProperties.type_name)).asString();
 
             switch (SAPNodeTypes.valueOf(propertyTypeName)) {
 
                 case Class:
-                     building.setColor(config.getACityBuildingColorHex("classBuilding"));
-                     building.setShape(config.getACityBuildingShape("classBuilding"));
-                     building.setWidth(building.getWidth() - 0.1); //TODO Config
-                     building.setLength(building.getLength() - 0.1); //TODO Config
-                     break;
+                    building.setColor(config.getACityBuildingColorHex("classBuilding"));
+                    building.setShape(config.getACityBuildingShape("classBuilding"));
+                    building.setWidth(building.getWidth() - 0.1); //TODO Config
+                    building.setLength(building.getLength() - 0.1); //TODO Config
+                    break;
                 case Interface:
-                     building.setColor(config.getACityBuildingColorHex("interfaceBuilding"));
-                     building.setShape(config.getACityBuildingShape("interfaceBuilding"));
-                     building.setWidth(building.getWidth() - 0.1); //TODO Config
-                     building.setLength(building.getLength() - 0.1); //TODO Config
-                     break;
+                    building.setColor(config.getACityBuildingColorHex("interfaceBuilding"));
+                    building.setShape(config.getACityBuildingShape("interfaceBuilding"));
+                    building.setWidth(building.getWidth() - 0.1); //TODO Config
+                    building.setLength(building.getLength() - 0.1); //TODO Config
+                    break;
                 case Report:
-                     building.setColor(config.getACityBuildingColorHex("reportBuilding"));
-                     building.setShape(config.getACityBuildingShape("reportBuilding"));
-                     building.setWidth(building.getWidth() - 0.1); //TODO Config
-                     building.setLength(building.getLength() - 0.1); //TODO Config
-                     break;
+                    building.setColor(config.getACityBuildingColorHex("reportBuilding"));
+                    building.setShape(config.getACityBuildingShape("reportBuilding"));
+                    building.setWidth(building.getWidth() - 0.1); //TODO Config
+                    building.setLength(building.getLength() - 0.1); //TODO Config
+                    break;
                 case FunctionGroup:
-                     building.setColor(config.getACityBuildingColorHex("functionGroupBuilding"));
-                     building.setShape(config.getACityBuildingShape("functionGroupBuilding"));
-                     building.setWidth(building.getWidth() - 0.1); //TODO Config
-                     building.setLength(building.getLength() - 0.1); //TODO Config
-                     break;
+                    building.setColor(config.getACityBuildingColorHex("functionGroupBuilding"));
+                    building.setShape(config.getACityBuildingShape("functionGroupBuilding"));
+                    building.setWidth(building.getWidth() - 0.1); //TODO Config
+                    building.setLength(building.getLength() - 0.1); //TODO Config
+                    break;
                 case Table:
-                     building.setColor(config.getACityBuildingColorHex("tableBuilding"));
-                     building.setShape(config.getACityBuildingShape("tableBuilding"));
-                     building.setWidth(building.getWidth() - 0.1); //TODO Config
-                     building.setLength(building.getLength() - 0.1); //TODO Config
-                     break;
+                    building.setColor(config.getACityBuildingColorHex("tableBuilding"));
+                    building.setShape(config.getACityBuildingShape("tableBuilding"));
+                    building.setWidth(building.getWidth() - 0.1); //TODO Config
+                    building.setLength(building.getLength() - 0.1); //TODO Config
+                    break;
                 case DataElement:
-                     building.setColor(config.getACityBuildingColorHex("dataElementBuilding"));
-                     building.setShape(config.getACityBuildingShape("dataElementBuilding"));
-                     building.setWidth(building.getWidth() - 0.1); //TODO Config
-                     building.setLength(building.getLength() - 0.1); //TODO Config
-                     break;
+                    building.setColor(config.getACityBuildingColorHex("dataElementBuilding"));
+                    building.setShape(config.getACityBuildingShape("dataElementBuilding"));
+                    building.setWidth(building.getWidth() - 0.1); //TODO Config
+                    building.setLength(building.getLength() - 0.1); //TODO Config
+                    break;
                 case Domain:
-                     building.setColor(config.getACityBuildingColorHex("domainBuilding"));
-                     building.setShape(config.getACityBuildingShape("domainBuilding"));
-                     building.setWidth(building.getWidth() - 0.1); //TODO Config
-                     building.setLength(building.getLength() - 0.1); //TODO Config
-                     break;
+                    building.setColor(config.getACityBuildingColorHex("domainBuilding"));
+                    building.setShape(config.getACityBuildingShape("domainBuilding"));
+                    building.setWidth(building.getWidth() - 0.1); //TODO Config
+                    building.setLength(building.getLength() - 0.1); //TODO Config
+                    break;
                 case Structure:
-                     building.setColor(config.getACityBuildingColorHex("structureBuilding"));
-                     building.setShape(config.getACityBuildingShape("structureBuilding"));
-                     building.setWidth(0.1); //TODO Config
-                     building.setLength(0.1); //TODO Config
-                     break;
+                    building.setColor(config.getACityBuildingColorHex("structureBuilding"));
+                    building.setShape(config.getACityBuildingShape("structureBuilding"));
+                    building.setWidth(0.1); //TODO Config
+                    building.setLength(0.1); //TODO Config
+                    break;
                 case TableType:
-                     building.setColor(config.getACityBuildingColorHex("tableTypeBuilding"));
-                     building.setShape(config.getACityBuildingShape("tableTypeBuilding"));
-                     //building.setWidth(0.3); //TODO Config
-                     building.setWidth(config.getACityBuildingHWidth("tableTypeBuilding"));
-                     building.setLength(0.3); //TODO Config
+                    building.setColor(config.getACityBuildingColorHex("tableTypeBuilding"));
+                    building.setShape(config.getACityBuildingShape("tableTypeBuilding"));
+                    building.setWidth(config.getACityBuildingWidth("tableTypeBuilding"));
+                    building.setLength(0.3); //TODO Config
             }
-        } else
-            {
-                building.setColor("#ffb48f"); //TODO Config
-                building.setShape(ACityElement.ACityShape.cone);
-                building.setWidth(0.3); //TODO Config
-                building.setLength(0.3); //TODO Config
-            }
+        }
     }
 
 
     private void designChimney(ACityElement chimney) {
-        chimney.setColor(config.getACityChimneyColorHex("attribute"));
+        chimney.setColor(config.getACityChimneyColorHex("attributeColor"));
         chimney.setShape(config.getACityChimneyShape("attributeChimney"));
     }
 
@@ -151,7 +151,7 @@ public class ACityDesigner {
 
         if (sourceNode != null) {
 
-            String propertyTypeName = sourceNode.get("type_name").asString();
+            String propertyTypeName = sourceNode.get(String.valueOf(SAPNodeProperties.type_name)).asString();
 
             switch (SAPNodeTypes.valueOf(propertyTypeName)) {
                 case Method:
