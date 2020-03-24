@@ -15,7 +15,7 @@ import java.util.Collection;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class SourceNodeRepositoryTest {
+public class NodeRepositoryRelationLoadTest {
 
     private static SettingsConfiguration config = SettingsConfiguration.getInstance();
 

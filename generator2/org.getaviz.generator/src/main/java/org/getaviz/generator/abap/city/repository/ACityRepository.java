@@ -2,7 +2,6 @@ package org.getaviz.generator.abap.city.repository;
 
 import org.getaviz.generator.abap.city.enums.SAPNodeProperties;
 import org.getaviz.generator.database.DatabaseConnector;
-import org.neo4j.driver.v1.StatementResult;
 import org.neo4j.driver.v1.Value;
 import org.neo4j.driver.v1.types.Node;
 
@@ -92,40 +91,44 @@ public class ACityRepository {
     public void writeRepositoryToNeo4j() {
 
         elementsByHash.forEach((id, element) -> {
-            //Prüfung auf bereits erstellte Nodes
+            //TODO Node mit Hash bereits in Neo4J vorhanden? -> Update der Properties
 
-            ACityElement.ACityType aCityElement = element.getType();
-            connector.executeWrite("CREATE ( :Elements { " + getACityProperties(element, aCityElement) + "})");
+            connector.executeWrite("CREATE ( :Elements { " + getACityProperties(element) + "})");
+
+            //TODO Erstelle Source Node Relation
+            // MATCH (a:Elements {element_id: element.element.getSourceNodeID()}), (b:Elements {hash: element.getHash()})
+            // CREATE (a)<-[r:SOURCE]-(b)
 
         });
     }
-    public void writeACityElementsToNeo4j(ACityElement.ACityType aCityElement){
+    public void writeACityElementsToNeo4j(ACityElement.ACityType aCityElementType){
 
         elementsByHash.forEach((id, element) -> {
-            if(element.getType() == aCityElement){
-                    connector.executeWrite("CREATE ( :Elements { " + getACityProperties(element, aCityElement) + "})");
+            if(element.getType() == aCityElementType){
+                    connector.executeWrite("CREATE ( :Elements { " + getACityProperties(element) + "})");
+
+                    //TODO Erstelle Source Node Relation
             }
         });
     }
 
-    private String getACityProperties(ACityElement element, ACityElement.ACityType aCityElement) {
-        StringBuilder test = new StringBuilder();
+    private String getACityProperties(ACityElement element) {
+        StringBuilder propertyBuilder = new StringBuilder();
 
-        test.append(" cityType : '" + aCityElement.toString() + "',");
-        test.append(" hash :  '"+ element.getHash() + "',");
-        test.append(" subType :  '" + element.getSubType() + "',");
-        test.append(" color :  '" + element.getColor() + "',");
-        test.append(" shape :  '" + element.getShape() + "',");
-        test.append(" height :  " + element.getHeight() + ",");
-        test.append(" width :  " + element.getWidth() + ",");
-        test.append(" length :  " + element.getLength() + ",");
-        test.append(" height :  " + element.getHeight() + ",");
-        test.append(" xPosition :  " + element.getXPosition() + ",");
-        test.append(" yPosition :  " + element.getYPosition() + ",");
-        test.append(" zPosition :  " + element.getZPosition() + "");
+        propertyBuilder.append(" cityType : '" + element.getType().toString() + "',");
+        propertyBuilder.append(" hash :  '"+ element.getHash() + "',");
+        propertyBuilder.append(" subType :  '" + element.getSubType() + "',");
+        propertyBuilder.append(" color :  '" + element.getColor() + "',");
+        propertyBuilder.append(" shape :  '" + element.getShape() + "',");
+        propertyBuilder.append(" height :  " + element.getHeight() + ",");
+        propertyBuilder.append(" width :  " + element.getWidth() + ",");
+        propertyBuilder.append(" length :  " + element.getLength() + ",");
+        propertyBuilder.append(" height :  " + element.getHeight() + ",");
+        propertyBuilder.append(" xPosition :  " + element.getXPosition() + ",");
+        propertyBuilder.append(" yPosition :  " + element.getYPosition() + ",");
+        propertyBuilder.append(" zPosition :  " + element.getZPosition() + "");
 
-
-        return test.toString();
+        return propertyBuilder.toString();
     }
     //Test Ende
 

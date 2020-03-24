@@ -128,24 +128,18 @@ public class SourceNodeRepository {
         return nodesByLabelAndProperty;
     }
 
-    public int getNodesByIdenticalPropertyValuesSize(SAPNodeProperties property, String value){
-
-        Record tests = connector.executeRead("MATCH (n:Elements {" + property + ": '" + value + "'}) RETURN count(n) AS result").next();
-        int numberOfVisualizedPackages = tests.get("result").asInt();
-
-        return numberOfVisualizedPackages;
-    }
 
     /// NEW
     public void loadNodesByPropertyValue(SAPNodeProperties property, String value){
 
         connector.executeRead("MATCH (n:Elements {" + property + ": '" + value + "'}) RETURN n")
         .forEachRemaining((result) -> {
-            Node propertyValue = result.get("n").asNode();
-            System.out.println(propertyValue.values());
+            Node sourceNode = result.get("n").asNode();
 
-            addNodeByID(propertyValue);
-            addNodesByProperty(propertyValue);
+            //System.out.println(propertyValue.values());
+
+            addNodeByID(sourceNode);
+            addNodesByProperty(sourceNode);
 
         });
     }

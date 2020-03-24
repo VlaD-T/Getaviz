@@ -2,5 +2,3 @@ LOAD CSV WITH HEADERS FROM "file:///C:/Users/GPRA443/IdeaProjects/Getaviz_vlad/g
 AS row FIELDTERMINATOR ';'
 CREATE (n:Elements)
 SET n = row
-
-

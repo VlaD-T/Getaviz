@@ -18,7 +18,7 @@ import java.util.Collection;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class NodeRepositoryTest {
+public class NodeRepositoryPropertyRelationLoadTest {
 
     private static SettingsConfiguration config = SettingsConfiguration.getInstance();
 
@@ -37,9 +37,8 @@ public class NodeRepositoryTest {
         connector = mockUp.getConnector();
 
         nodeRepository = new SourceNodeRepository();
-        nodeRepository.loadNodesWithRelation(SAPRelationLabels.CONTAINS);
-        nodeRepository.loadNodesWithRelation(SAPRelationLabels.TYPEOF);
-        nodeRepository.loadNodesWithRelation(SAPRelationLabels.USES);
+
+        nodeRepository.loadNodesByPropertyValue(SAPNodeProperties.type_name, SAPNodeTypes.DataElement.name());
     }
 
     @AfterAll
@@ -54,27 +53,13 @@ public class NodeRepositoryTest {
     }
 
     @Test
-    void NodesByRelatin(){
-         nodeRepository.loadNodesByPropertyValue(SAPNodeProperties.type_name, SAPNodeTypes.DataElement.name());
+    void NodesByProperty(){
+        int nodeAmount = nodeRepository.getNodes().size();
 
-         // Test if method works correctly
-        Record PropertyValueResults = connector
-                .executeRead("MATCH (n:Elements { " + SAPNodeProperties.type_name + " : '" + SAPNodeTypes.DataElement.name() + "' }) RETURN count(n) AS result")
-                .single();
-        int numberOfVisualized = PropertyValueResults.get("result").asInt();
-        assertEquals(18, numberOfVisualized);
+        assertEquals(19, nodeAmount);
     }
 
-    @Test
-    void NodesByIdenticalPropertyValue(){
-        int packageNodes = nodeRepository.getNodesByIdenticalPropertyValuesSize(SAPNodeProperties.type_name, SAPNodeTypes.Class.name());
-        assertEquals(21, packageNodes);
-    }
 
-    @Test
-    void NodesByIdenticalPropertyValueNode(){
-        Collection<Node> packageNodes = nodeRepository.getNodesByIdenticalPropertyValuesNodes(SAPNodeProperties.type_name, SAPNodeTypes.Class.name());
-        assertEquals(21, packageNodes.size());
-    }
+
 
 }
