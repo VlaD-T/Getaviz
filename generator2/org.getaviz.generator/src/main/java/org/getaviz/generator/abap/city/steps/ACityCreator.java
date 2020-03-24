@@ -38,7 +38,11 @@ public class ACityCreator {
 
         createAllACityRelations(nodeRepository);
 
+        createTypeDistrictRelations(nodeRepository);
+
     }
+
+
 
     private void createAllACityElements(SourceNodeRepository nodeRepository) {
         createACityElementsFromSourceNodes(nodeRepository, ACityElement.ACityType.District, SAPNodeProperties.type_name, SAPNodeTypes.Namespace);
@@ -65,6 +69,43 @@ public class ACityCreator {
     }
 
 
+    private void createAllACityRelations(SourceNodeRepository nodeRepository) {
+
+        Collection<ACityElement> aCityElements = repository.getAllElements();
+
+        for (ACityElement element: aCityElements){
+
+            Node sourceNode = element.getSourceNode();
+            Collection<ACityElement> childElements = getChildElementsBySourceNode(nodeRepository, sourceNode);
+
+            for (ACityElement childElement: childElements) {
+
+                //No nesting of packages/districts
+                if(childElement.getType() == ACityElement.ACityType.District){
+                    continue;
+                }
+
+                element.addSubElement(childElement);
+                childElement.setParentElement(element);
+            }
+        }
+
+    }
+
+    private void createTypeDistrictRelations(SourceNodeRepository nodeRepository) {
+
+        Collection<ACityElement> districts = repository.getElementsByType(ACityElement.ACityType.District);
+
+        for (ACityElement district: districts){
+            Collection<ACityElement> subElements =  district.getSubElements();
+
+            createTypeDistricts(district, subElements);
+
+            removeSubElementsFromDistrict(district, subElements);
+
+        }
+    }
+
     private void createTypeDistricts(ACityElement parentDistrict, Collection<ACityElement> childElements) {
         Map<ACityElement.ACitySubType, ACityElement> typeDistrictMap = new HashMap<>();
 
@@ -79,6 +120,45 @@ public class ACityCreator {
             addChildToTypeDistrict(parentDistrict, childElement, typeDistrictMap, ACityElement.ACitySubType.DDIC, SAPNodeTypes.Domain);
             addChildToTypeDistrict(parentDistrict, childElement, typeDistrictMap, ACityElement.ACitySubType.DDIC, SAPNodeTypes.DataElement);
             addChildToTypeDistrict(parentDistrict, childElement, typeDistrictMap, ACityElement.ACitySubType.DDIC, SAPNodeTypes.TableType);
+        }
+    }
+
+    private void addChildToTypeDistrict(ACityElement parentDistrict, ACityElement childElement, Map<ACityElement.ACitySubType, ACityElement> typeDistrictMap, ACityElement.ACitySubType districtType, SAPNodeTypes sapNodeTypes) {
+
+        Node childSourceNode = childElement.getSourceNode();
+        String typeNameProperty = childSourceNode.get(String.valueOf(SAPNodeProperties.type_name)).asString();
+
+        if( typeNameProperty.equals(sapNodeTypes.name())){
+
+            if( !typeDistrictMap.containsKey(districtType)){
+                createTypeDistrict(parentDistrict, typeDistrictMap, districtType);
+            }
+            ACityElement typeDistrict = typeDistrictMap.get(districtType);
+
+            typeDistrict.addSubElement(childElement);
+            childElement.setParentElement(typeDistrict);
+        }
+
+    }
+
+    private void createTypeDistrict(ACityElement parentDistrict, Map<ACityElement.ACitySubType, ACityElement> typeDistrictMap, ACityElement.ACitySubType districtType) {
+        ACityElement typeDistrict = new ACityElement(ACityElement.ACityType.District);
+        typeDistrict.setSubType(districtType);
+
+        typeDistrictMap.put(districtType, typeDistrict);
+        repository.addElement(typeDistrict);
+
+        parentDistrict.addSubElement(typeDistrict);
+        typeDistrict.setParentElement(parentDistrict);
+    }
+
+
+    private void removeSubElementsFromDistrict(ACityElement district, Collection<ACityElement> subElements) {
+        for (ACityElement subElement: subElements){
+            if(subElement.getType() == ACityElement.ACityType.District){
+                continue;
+            }
+            district.removeSubElement(subElement);
         }
     }
 
@@ -122,52 +202,8 @@ public class ACityCreator {
     }
 
 
-    private void createAllACityRelations(SourceNodeRepository nodeRepository) {
-
-        Collection<ACityElement> aCityElements = repository.getAllElements();
-
-        for (ACityElement element: aCityElements){
-
-            Node sourceNode = element.getSourceNode();
-            Collection<ACityElement> childElements = getChildElementsBySourceNode(nodeRepository, sourceNode);
-
-            if( element.getType() == ACityElement.ACityType.District){
-
-                createTypeDistricts(element, childElements);
-
-            } else {
-                for (ACityElement childElement: childElements) {
-                    element.addSubElement(childElement);
-                    childElement.setParentElement(element);
-                }
-            }
-        }
-
-    }
 
 
-
-    private void addChildToTypeDistrict(ACityElement parentDistrict, ACityElement childElement, Map<ACityElement.ACitySubType, ACityElement> typeDistrictMap, ACityElement.ACitySubType districtType, SAPNodeTypes sapNodeTypes) {
-
-        Node childSourceNode = childElement.getSourceNode();
-        if( childSourceNode.get(String.valueOf(SAPNodeProperties.type_name)).asString().equals(sapNodeTypes.name())){
-            if( !typeDistrictMap.containsKey(districtType)){
-                ACityElement typeDistrict = new ACityElement(ACityElement.ACityType.District);
-                typeDistrict.setSubType(districtType);
-                typeDistrictMap.put(districtType, typeDistrict);
-
-                repository.addElement(typeDistrict);
-                parentDistrict.addSubElement(typeDistrict);
-                typeDistrict.setParentElement(parentDistrict);
-            }
-
-            ACityElement typeDistrict = typeDistrictMap.get(districtType);
-
-            typeDistrict.addSubElement(childElement);
-            childElement.setParentElement(typeDistrict);
-        }
-
-    }
 
     private Collection<ACityElement> getChildElementsBySourceNode(SourceNodeRepository nodeRepository, Node node) {
         Collection<Node> childNodes = nodeRepository.getRelatedNodes(node, SAPRelationLabels.CONTAINS, true);

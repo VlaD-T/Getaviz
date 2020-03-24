@@ -1,9 +1,6 @@
 package org.getaviz.generator.abap.city.repository;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 import org.neo4j.driver.v1.types.Node;
 
@@ -153,8 +150,7 @@ public class ACityElement {
     }
 
     public Collection<ACityElement> getSubElements() {
-        //TODO return copy
-        return subElements;
+        return new ArrayList(subElements);
     }
 
     public Collection<ACityElement> getSubElementsOfType(ACityType elementType) {
@@ -172,6 +168,10 @@ public class ACityElement {
 
     public void addSubElement(ACityElement subElement) {
         this.subElements.add(subElement);
+    }
+
+    public void removeSubElement(ACityElement subElement) {
+        this.subElements.remove(subElement);
     }
 
 

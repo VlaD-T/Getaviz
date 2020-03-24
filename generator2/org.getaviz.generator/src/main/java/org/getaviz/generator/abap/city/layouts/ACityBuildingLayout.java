@@ -77,7 +77,7 @@ public class ACityBuildingLayout {
         Double floorHeightSum = calculateFloorHeightSum();
         Double groundAreaLength = calculateGroundAreaByChimneyAmount();
 
-        //TODO refactor names
+        //TODO refactor names upperLeft upperRight and so on
         List<ACityElement> corner1 = new ArrayList<>();
         List<ACityElement> corner2 = new ArrayList<>();
         List<ACityElement> corner3 = new ArrayList<>();
@@ -178,9 +178,8 @@ public class ACityBuildingLayout {
     }
 
     private double calculateGroundAreaByChimneyAmount() {
-        //TODO calculateByChimney width and length
         if (chimneys.size() < 2){
-            return 2.0;
+            return 2.0; //TODO config
         }
 
         int chimneyAmount = chimneys.size();

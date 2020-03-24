@@ -1,9 +1,11 @@
 package org.getaviz.generator.abap.city.enums;
 
+//Unused so far
 public enum SAPNodeLabels {
+
+    /*
     Package,
 
-    Type, //Todo entfernen
     Class, Interface, Report, FunctionGroup, Table,
 
     Method, Attribute, FormRoutine, FunctionModule,
@@ -13,4 +15,6 @@ public enum SAPNodeLabels {
     TableElement, StructureElement,
 
     Elements
+    */
+
 }

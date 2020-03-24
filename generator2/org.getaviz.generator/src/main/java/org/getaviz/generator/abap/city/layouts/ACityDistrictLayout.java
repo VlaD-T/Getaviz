@@ -11,7 +11,7 @@ import org.getaviz.generator.city.m2m.Rectangle;
 import java.util.*;
 
 public class ACityDistrictLayout {
-    //TODO Refactor, generalize and maybe reimplement
+    //Old coding -> Refactor, generalize and maybe reimplement
 
     private Log log = LogFactory.getLog(this.getClass());
     private SettingsConfiguration config;

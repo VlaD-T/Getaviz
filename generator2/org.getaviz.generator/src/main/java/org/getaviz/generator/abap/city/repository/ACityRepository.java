@@ -14,20 +14,21 @@ public class ACityRepository {
 
     private Map<String, ACityElement> elementsByHash;
 
+    private Map<ACityElement.ACityType, Map<String, ACityElement> > elementsByType;
+
     public ACityRepository(){
         elementsBySourceID = new HashMap<>();
         elementsByHash = new HashMap<>();
+        elementsByType = new HashMap<>();
     }
 
 
     public Collection<ACityElement> getAllElements() {
-        //TODO copy
-        return elementsBySourceID.values();
+        return new ArrayList(elementsBySourceID.values());
     }
 
     public Collection<ACityElement> getAllElementsByHash() {
-        //TODO copy
-        return elementsByHash.values();
+        return new ArrayList(elementsByHash.values());
     }
 
     public ACityElement getElementBySourceID(Long sourceID){
@@ -39,16 +40,8 @@ public class ACityRepository {
     }
 
     public Collection<ACityElement> getElementsByType(ACityElement.ACityType type){
-        List<ACityElement> elementsByType = new ArrayList<>();
-
-        //TODO create Maps
-        elementsByHash.forEach((id, element) -> {
-            if(element.getType() == type) {
-                elementsByType.add(element);
-            }
-        });
-
-        return elementsByType;
+        Map<String, ACityElement> elementsByTypeMap = elementsByType.get(type);
+        return new ArrayList(elementsByTypeMap.values());
     }
 
     public Collection<ACityElement> getElementsByTypeAndSourceProperty(ACityElement.ACityType type, SAPNodeProperties sourceProperty, String sourcePropertyValue){
@@ -136,6 +129,15 @@ public class ACityRepository {
     public void addElement(ACityElement element) {
         elementsByHash.put(element.getHash(), element);
 
+        //add to type map
+        ACityElement.ACityType elementType = element.getType();
+        if (!elementsByType.containsKey(elementType)){
+            elementsByType.put(elementType, new HashMap<>());
+        }
+        Map<String, ACityElement> elementsByTypeMap = elementsByType.get(elementType);
+        elementsByTypeMap.put(element.getHash(), element);
+
+        //add to source node id map
         if (element.getSourceNode() != null){
             elementsBySourceID.put(element.getSourceNodeID(), element);
         }
