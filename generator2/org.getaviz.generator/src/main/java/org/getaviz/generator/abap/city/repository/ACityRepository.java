@@ -1,7 +1,8 @@
 package org.getaviz.generator.abap.city.repository;
 
-import org.getaviz.generator.abap.city.ACityElement;
+import org.getaviz.generator.abap.city.enums.SAPNodeProperties;
 import org.getaviz.generator.database.DatabaseConnector;
+import org.neo4j.driver.v1.StatementResult;
 import org.neo4j.driver.v1.Value;
 import org.neo4j.driver.v1.types.Node;
 
@@ -88,27 +89,31 @@ public class ACityRepository {
 
     //Test
     //Schreiben der ACityElemente in die Neo4j-Datenbank
-    public Collection<ACityElement> addACityElementsToNeo4j(ACityElement.ACityType aCityElement) {
-        List<ACityElement> newNeo4jElements = new ArrayList<>();
+    public void writeRepositoryToNeo4j() {
 
         elementsByHash.forEach((id, element) -> {
-            if(element.getType() == aCityElement) {
-                connector.executeWrite("CREATE ( :Elements { cityType : '" + aCityElement.toString() + "'," + getACityProperties(element) + "})");
-                newNeo4jElements.add(element);
-                //addElementsNeo(newNeo4jElements);
-            }
+            //Prüfung auf bereits erstellte Nodes
+
+            ACityElement.ACityType aCityElement = element.getType();
+            connector.executeWrite("CREATE ( :Elements { " + getACityProperties(element, aCityElement) + "})");
 
         });
+    }
+    public void writeACityElementsToNeo4j(ACityElement.ACityType aCityElement){
 
-        return newNeo4jElements;
+        elementsByHash.forEach((id, element) -> {
+            if(element.getType() == aCityElement){
+                    connector.executeWrite("CREATE ( :Elements { " + getACityProperties(element, aCityElement) + "})");
+            }
+        });
     }
 
-    public String getACityProperties(ACityElement element) {
+    private String getACityProperties(ACityElement element, ACityElement.ACityType aCityElement) {
         StringBuilder test = new StringBuilder();
 
-        test.append(" subType :  " + element.getSubType() + ",");
-        //test.append(" subElements :  " + element.getSubElements() + ",");
-        test.append(" sourceNode :  " + element.getSourceNode().get("id") + ",");
+        test.append(" cityType : '" + aCityElement.toString() + "',");
+        test.append(" hash :  '"+ element.getHash() + "',");
+        test.append(" subType :  '" + element.getSubType() + "',");
         test.append(" color :  '" + element.getColor() + "',");
         test.append(" shape :  '" + element.getShape() + "',");
         test.append(" height :  " + element.getHeight() + ",");

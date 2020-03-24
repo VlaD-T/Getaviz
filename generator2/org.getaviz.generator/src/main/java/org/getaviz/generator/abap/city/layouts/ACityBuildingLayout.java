@@ -3,7 +3,7 @@ package org.getaviz.generator.abap.city.layouts;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.getaviz.generator.SettingsConfiguration;
-import org.getaviz.generator.abap.city.ACityElement;
+import org.getaviz.generator.abap.city.repository.ACityElement;
 
 import java.util.ArrayList;
 import java.util.Collection;

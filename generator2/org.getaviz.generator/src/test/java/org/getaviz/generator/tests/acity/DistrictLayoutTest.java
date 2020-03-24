@@ -1,9 +1,9 @@
 package org.getaviz.generator.tests.acity;
 
 import org.getaviz.generator.SettingsConfiguration;
-import org.getaviz.generator.abap.city.*;
 import org.getaviz.generator.abap.city.layouts.ACityBuildingLayout;
 import org.getaviz.generator.abap.city.layouts.ACityDistrictLayout;
+import org.getaviz.generator.abap.city.repository.ACityElement;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 

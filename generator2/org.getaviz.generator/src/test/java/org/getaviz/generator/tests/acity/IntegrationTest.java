@@ -2,7 +2,7 @@ package org.getaviz.generator.tests.acity;
 
 import org.getaviz.generator.SettingsConfiguration;
 import org.getaviz.generator.abap.city.repository.ACityRepository;
-import org.getaviz.generator.abap.city.repository.SAPRelationLabels;
+import org.getaviz.generator.abap.city.enums.SAPRelationLabels;
 import org.getaviz.generator.abap.city.repository.SourceNodeRepository;
 import org.getaviz.generator.abap.city.steps.ACityAFrameExporter;
 import org.getaviz.generator.abap.city.steps.ACityCreator;

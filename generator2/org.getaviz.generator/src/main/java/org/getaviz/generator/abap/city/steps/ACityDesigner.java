@@ -6,10 +6,10 @@ import org.getaviz.generator.SettingsConfiguration;
 
 import java.util.Collection;
 
-import org.getaviz.generator.abap.city.ACityElement;
+import org.getaviz.generator.abap.city.repository.ACityElement;
 import org.getaviz.generator.abap.city.repository.ACityRepository;
-import org.getaviz.generator.abap.city.repository.SAPNodeProperties;
-import org.getaviz.generator.abap.city.repository.SAPNodeTypes;
+import org.getaviz.generator.abap.city.enums.SAPNodeProperties;
+import org.getaviz.generator.abap.city.enums.SAPNodeTypes;
 import org.neo4j.driver.v1.types.Node;
 
 public class ACityDesigner {

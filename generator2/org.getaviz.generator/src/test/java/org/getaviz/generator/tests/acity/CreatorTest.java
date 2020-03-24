@@ -1,7 +1,8 @@
 package org.getaviz.generator.tests.acity;
 
 import org.getaviz.generator.SettingsConfiguration;
-import org.getaviz.generator.abap.city.*;
+import org.getaviz.generator.abap.city.enums.SAPNodeProperties;
+import org.getaviz.generator.abap.city.enums.SAPRelationLabels;
 import org.getaviz.generator.abap.city.repository.*;
 import org.getaviz.generator.abap.city.steps.ACityCreator;
 import org.getaviz.generator.abap.city.steps.ACityDesigner;
@@ -10,9 +11,6 @@ import org.getaviz.generator.mockups.ABAPmock;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.neo4j.driver.v1.Record;
-import org.neo4j.driver.v1.StatementResult;
-import org.neo4j.driver.v1.types.Node;
 
 import java.util.Collection;
 

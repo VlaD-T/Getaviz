@@ -3,7 +3,9 @@ package org.getaviz.generator.abap.city.steps;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.getaviz.generator.SettingsConfiguration;
-import org.getaviz.generator.abap.city.*;
+import org.getaviz.generator.abap.city.enums.SAPNodeProperties;
+import org.getaviz.generator.abap.city.enums.SAPNodeTypes;
+import org.getaviz.generator.abap.city.enums.SAPRelationLabels;
 import org.getaviz.generator.abap.city.repository.*;
 import org.neo4j.driver.v1.types.Node;
 
@@ -39,7 +41,7 @@ public class ACityCreator {
     }
 
     private void createAllACityElements(SourceNodeRepository nodeRepository) {
-        createACityElementsFromSourceNodes(nodeRepository, ACityElement.ACityType.District,SAPNodeProperties.type_name, SAPNodeTypes.Namespace);
+        createACityElementsFromSourceNodes(nodeRepository, ACityElement.ACityType.District, SAPNodeProperties.type_name, SAPNodeTypes.Namespace);
 
         createACityElementsFromSourceNodes(nodeRepository, ACityElement.ACityType.Building,SAPNodeProperties.type_name, SAPNodeTypes.Report);
         createACityElementsFromSourceNodes(nodeRepository, ACityElement.ACityType.Floor,SAPNodeProperties.type_name, SAPNodeTypes.FormRoutine);

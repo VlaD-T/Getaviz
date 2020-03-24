@@ -5,7 +5,7 @@ import org.apache.commons.logging.LogFactory;
 import org.getaviz.generator.SettingsConfiguration;
 import org.getaviz.generator.abap.city.layouts.ACityBuildingLayout;
 import org.getaviz.generator.abap.city.layouts.ACityDistrictLayout;
-import org.getaviz.generator.abap.city.ACityElement;
+import org.getaviz.generator.abap.city.repository.ACityElement;
 import org.getaviz.generator.abap.city.repository.ACityRepository;
 
 import java.util.*;

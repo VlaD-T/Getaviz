@@ -1,4 +1,4 @@
-package org.getaviz.generator.abap.city;
+package org.getaviz.generator.abap.city.repository;
 
 import java.util.ArrayList;
 import java.util.Collection;

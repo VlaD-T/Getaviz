@@ -16,7 +16,7 @@ import org.apache.commons.logging.LogFactory;
 import org.getaviz.generator.SettingsConfiguration.Bricks.Layout;
 import org.getaviz.generator.SettingsConfiguration.Original.BuildingMetric;
 import org.getaviz.generator.SettingsConfiguration.Panels.SeparatorModes;
-import org.getaviz.generator.abap.city.ACityElement;
+import org.getaviz.generator.abap.city.repository.ACityElement;
 
 public class SettingsConfiguration {
 	private static PropertiesConfiguration config;

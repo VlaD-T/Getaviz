@@ -1,11 +1,10 @@
 package org.getaviz.generator.tests.acity;
 
 import org.getaviz.generator.SettingsConfiguration;
-import org.getaviz.generator.abap.city.ACityElement;
-import org.getaviz.generator.abap.city.layouts.ACityBuildingLayout;
+import org.getaviz.generator.abap.city.repository.ACityElement;
 import org.getaviz.generator.abap.city.repository.ACityRepository;
-import org.getaviz.generator.abap.city.repository.SAPNodeLabels;
-import org.getaviz.generator.abap.city.repository.SAPRelationLabels;
+import org.getaviz.generator.abap.city.enums.SAPNodeLabels;
+import org.getaviz.generator.abap.city.enums.SAPRelationLabels;
 import org.getaviz.generator.abap.city.repository.SourceNodeRepository;
 import org.getaviz.generator.abap.city.steps.ACityCreator;
 import org.getaviz.generator.abap.city.steps.ACityDesigner;
@@ -18,9 +17,7 @@ import org.junit.jupiter.api.Test;
 import org.neo4j.driver.v1.Record;
 import org.neo4j.driver.v1.types.Node;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
@@ -54,18 +51,13 @@ public class WriteDataToNeo4jTest {
 
         ACityLayouter aCityLayouter = new ACityLayouter(aCityRepository, config);
         aCityLayouter.layoutRepository();
+
+        aCityRepository.writeRepositoryToNeo4j();
     }
 
     @AfterAll
     static void close() {
         mockUp.close();
-    }
-
-    @Test
-    void addElementsToNeo4j() {
-
-        Collection<ACityElement> chimneys = aCityRepository.addACityElementsToNeo4j(ACityElement.ACityType.Chimney);
-        assertEquals(66, chimneys.size());
     }
 
     @Test
@@ -76,11 +68,26 @@ public class WriteDataToNeo4jTest {
                 .single();
         int numberOfVisualizedPackages = result.get("result").asInt();
         assertEquals(66, numberOfVisualizedPackages);
+    }
 
+    @Test
+    void checkIfElementsAreAddedToNeo4jD() {
 
+        Record districtResult = connector
+                .executeRead("MATCH (n:Elements {cityType : '" + ACityElement.ACityType.District + "' }) RETURN count(n) AS result")
+                .single();
+        int numberOfVisualizedPackages = districtResult.get("result").asInt();
+        assertEquals(42, numberOfVisualizedPackages);
+    }
 
+    @Test
+    void checkIfElementsAreAddedToNeo4jF() {
 
-
+        Record floorResult = connector
+                .executeRead("MATCH (n:Elements {cityType : '" + ACityElement.ACityType.Floor + "' }) RETURN count(n) AS result")
+                .single();
+        int numberOfVisualizedPackages = floorResult.get("result").asInt();
+        assertEquals(100, numberOfVisualizedPackages);
     }
 
     @Test
@@ -99,14 +106,12 @@ public class WriteDataToNeo4jTest {
                 .executeRead("MATCH (n:Elements {cityType : '" + ACityElement.ACityType.Building + "' }) RETURN count(n) AS result")
                 .single();
         int numberOfVisualized = results.get("result").asInt();
-        assertEquals(0, numberOfVisualized);
+        assertEquals(118, numberOfVisualized);
 
     }
 
     @Test
     void checkBuildingLayout(){
-        Collection<ACityElement> chimneys = aCityRepository.addACityElementsToNeo4j(ACityElement.ACityType.Building);
-       // assertEquals(42, chimneys.size());
 
         Record heightResult = connector
                 .executeRead("MATCH (n:Elements {cityType : '" + ACityElement.ACityType.Chimney + "' }) RETURN n.height AS result").next();
@@ -119,10 +124,8 @@ public class WriteDataToNeo4jTest {
 
         Record allNodesNew = connector.executeRead("MATCH (n) RETURN count(n) AS result").single();
         int numberOfAllNodes = allNodesNew.get("result").asInt();
-        assertEquals(10, numberOfAllNodes);
+        assertEquals(666, numberOfAllNodes); //340 Elelemente vorher + 100Floors + 66 chimneys + 42 Distrikte + 118 Buildings =
 
-        Collection<Node> allNodes = nodeRepository.getNodesByLabel(SAPNodeLabels.Elements);
-        assertEquals(340, allNodes.size());
     }
 
 }

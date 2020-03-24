@@ -2,6 +2,9 @@ package org.getaviz.generator.abap.city.repository;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.getaviz.generator.abap.city.enums.SAPNodeLabels;
+import org.getaviz.generator.abap.city.enums.SAPNodeProperties;
+import org.getaviz.generator.abap.city.enums.SAPRelationLabels;
 import org.neo4j.driver.v1.Record;
 import org.neo4j.driver.v1.StatementResult;
 import org.neo4j.driver.v1.Value;
@@ -89,7 +92,6 @@ public class SourceNodeRepository {
         return nodesByLabel.get(label.name()).values();
     }
 
-    //TODO String property durch Enum mit Properties ersetzen
     public Collection<Node> getNodesByProperty(SAPNodeProperties property, String value){
         Collection<Node> nodesByID = getNodes();
         List<Node> nodesByProperty = new ArrayList<>();
@@ -115,11 +117,11 @@ public class SourceNodeRepository {
 
         Collection<Node> nodesByLabelAndProperty = new ArrayList<>();
 
-            StatementResult test = connector.executeRead("MATCH (n:Elements {" + property + ": '" + value + "'}) RETURN n");
-                test.forEachRemaining((result) -> {
-                Node namespace = result.get("n").asNode();
+            StatementResult results = connector.executeRead("MATCH (n:Elements {" + property + ": '" + value + "'}) RETURN n");
+                results.forEachRemaining((result) -> {
+                Node propertyValue = result.get("n").asNode();
 
-                    nodesByLabelAndProperty.add(namespace);
+                    nodesByLabelAndProperty.add(propertyValue);
 
                 });
 
@@ -132,6 +134,20 @@ public class SourceNodeRepository {
         int numberOfVisualizedPackages = tests.get("result").asInt();
 
         return numberOfVisualizedPackages;
+    }
+
+    /// NEW
+    public void loadNodesByPropertyValue(SAPNodeProperties property, String value){
+
+        connector.executeRead("MATCH (n:Elements {" + property + ": '" + value + "'}) RETURN n")
+        .forEachRemaining((result) -> {
+            Node propertyValue = result.get("n").asNode();
+            System.out.println(propertyValue.values());
+
+            addNodeByID(propertyValue);
+            addNodesByProperty(propertyValue);
+
+        });
     }
     // Testende Laden Property
 

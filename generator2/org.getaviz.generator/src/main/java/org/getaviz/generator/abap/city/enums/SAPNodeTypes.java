@@ -1,4 +1,4 @@
-package org.getaviz.generator.abap.city.repository;
+package org.getaviz.generator.abap.city.enums;
 
 public enum SAPNodeTypes {
     Namespace,
