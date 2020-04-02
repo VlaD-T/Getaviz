@@ -79,21 +79,26 @@ public class ACityRepository {
         return elementsByTypeAndSourceProperty;
     }
 
-    //Test
+
     //Schreiben der ACityElemente in die Neo4j-Datenbank
     public void writeRepositoryToNeo4j() {
 
         elementsByHash.forEach((id, element) -> {
             //TODO Node mit Hash bereits in Neo4J vorhanden? -> Update der Properties
-
-            connector.executeWrite("CREATE ( :Elements { " + getACityProperties(element) + "})");
+           // connector.executeRead(" MATCH (n:Elements) WHERE hash = '" + element.getHash() + "' SET ( n:Elements { " + getACityProperties(element) + "}) RETURN n ");
+            connector.executeWrite("CREATE ( n:Elements { " + getACityProperties(element) + "})");
 
             //TODO Erstelle Source Node Relation
-            // MATCH (a:Elements {element_id: element.element.getSourceNodeID()}), (b:Elements {hash: element.getHash()})
-            // CREATE (a)<-[r:SOURCE]-(b)
-
+            Node elementsBySourceNode = element.getSourceNode();
+            if (elementsBySourceNode != null) {
+                     connector.executeWrite(
+                             "MATCH (a:Elements {element_id : '" + elementsBySourceNode.id() + "'}), " +
+                                     "(b:Elements {hash : '" + element.getHash() + "'}) " +
+                                     "CREATE (a)<-[r:SOURCE]-(b)");
+                 }
         });
     }
+
     public void writeACityElementsToNeo4j(ACityElement.ACityType aCityElementType){
 
         elementsByHash.forEach((id, element) -> {
@@ -123,7 +128,6 @@ public class ACityRepository {
 
         return propertyBuilder.toString();
     }
-    //Test Ende
 
 
     public void addElement(ACityElement element) {

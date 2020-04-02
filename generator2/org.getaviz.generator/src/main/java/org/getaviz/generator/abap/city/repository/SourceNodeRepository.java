@@ -50,12 +50,8 @@ public class SourceNodeRepository {
             addNodeByID(mNode);
             addNodeByID(nNode);
 
-            /*addNodeByLabel(mNode);
-            addNodeByLabel(nNode);*/
-
             addNodesByProperty(mNode);
             addNodesByProperty(nNode);
-
 
             addNodesByRelation(mNode, nNode, relationLabel.name());
 
@@ -112,7 +108,7 @@ public class SourceNodeRepository {
         return nodesByProperty;
     }
 
-    // Test Laden Property
+    // Laden Property
     public Collection<Node> getNodesByIdenticalPropertyValuesNodes(SAPNodeProperties property, String value){
 
         Collection<Node> nodesByLabelAndProperty = new ArrayList<>();
@@ -129,29 +125,32 @@ public class SourceNodeRepository {
     }
 
 
-    /// NEW
     public void loadNodesByPropertyValue(SAPNodeProperties property, String value){
 
         connector.executeRead("MATCH (n:Elements {" + property + ": '" + value + "'}) RETURN n")
         .forEachRemaining((result) -> {
             Node sourceNode = result.get("n").asNode();
 
-            //System.out.println(propertyValue.values());
-
             addNodeByID(sourceNode);
             addNodesByProperty(sourceNode);
 
         });
     }
-    // Testende Laden Property
 
-    //Test Laden Relationships
 
-    public Collection<Node> getNodesByRelation(SAPRelationLabels relationType){
-        return null;
+    public void loadNodesByRelation(SAPRelationLabels relationType){
+        connector.executeRead("MATCH p=(m)-[:" + relationType.name() + "]->(n) RETURN n,m AS list")
+        .forEachRemaining((result) -> {
+            Node nNode = result.get("n").asNode();
+            Node mNode = result.get("m").asNode();
+            System.out.println(nNode);
+            System.out.println(mNode);
+        });
+
+        connector.executeRead("MATCH (n:Elements) WHERE n.element_id IN ['256'] RETURN n");
     }
 
-    //Testende Laden Relationships
+
 
     public Collection<Node> getNodesByLabelAndProperty(SAPNodeLabels label, String property, String value){
         Collection<Node> nodesByLabel = getNodesByLabel(label);

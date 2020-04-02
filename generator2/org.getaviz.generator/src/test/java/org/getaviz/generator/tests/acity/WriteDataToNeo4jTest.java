@@ -107,7 +107,6 @@ public class WriteDataToNeo4jTest {
                 .single();
         int numberOfVisualized = results.get("result").asInt();
         assertEquals(118, numberOfVisualized);
-
     }
 
     @Test
@@ -124,8 +123,23 @@ public class WriteDataToNeo4jTest {
 
         Record allNodesNew = connector.executeRead("MATCH (n) RETURN count(n) AS result").single();
         int numberOfAllNodes = allNodesNew.get("result").asInt();
-        assertEquals(666, numberOfAllNodes); //340 Elelemente vorher + 100Floors + 66 chimneys + 42 Distrikte + 118 Buildings =
+        assertEquals(666, numberOfAllNodes); //340 Elelemente vorher + 100Floors + 66 chimneys + 42 Distrikte + 118 Buildings = 326 -
+    }
 
+    @Test
+    void NodesWithContainsRelation() {
+
+        Record containNodes = connector.executeRead("MATCH p=()-[r:CONTAINS]->() RETURN count(p) AS result").single();
+        int numberOfContainsNodes = containNodes.get("result").asInt();
+        assertEquals(296, numberOfContainsNodes); //40 uses -  4 fehlende contains -> 340 - 44 = 296!
+    }
+
+    @Test
+    void NodesWithSourceRelation() {
+        Record sourceResult = (Record) connector.executeRead("MATCH p=()<-[r:SOURCE]-() RETURN count(p) AS result").single();
+        int sourceResults = sourceResult.get("result").asInt();
+
+        assertEquals(66, sourceResults); // actual 185 -> 296 (contains) - typeDistrikte (25) 261
     }
 
 }

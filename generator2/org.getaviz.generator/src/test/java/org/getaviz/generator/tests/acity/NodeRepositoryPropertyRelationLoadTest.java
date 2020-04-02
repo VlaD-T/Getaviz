@@ -48,8 +48,7 @@ public class NodeRepositoryPropertyRelationLoadTest {
 
     @Test
     void NodesByRelation(){
-        Collection<Node> nodesByRelationTest = nodeRepository.getNodesByRelation(SAPRelationLabels.USES);
-        //  assertEquals(17, nodesByRelationTest.size());
+       // nodeRepository.loadNodesByRelation(SAPRelationLabels.USES);
     }
 
     @Test

@@ -43,7 +43,7 @@ public class ACityDistrictLayout {
     private void setSizeOfDistrict(Rectangle coveringRectangle) {
         district.setWidth(coveringRectangle.getWidth());
         district.setLength(coveringRectangle.getLength());
-        district.setHeight(0.2); //TODO config
+        district.setHeight(config.getACityDistrictHeight());
     }
 
     private void setPositionOfDistrict(Rectangle coveringRectangle) {
@@ -60,7 +60,7 @@ public class ACityDistrictLayout {
         double xPositionDelta = xPosition - element.getXPosition();
         element.setXPosition(xPosition);
 
-        double yPosition = element.getYPosition() + 0.2; //TODO config
+        double yPosition = element.getYPosition() + config.adjustACityDistrictYPosition();
         double yPositionDelta = yPosition - element.getYPosition();
         element.setYPosition(yPosition);
 
@@ -83,9 +83,9 @@ public class ACityDistrictLayout {
             double centerY = element.getYPosition();
             double centerZ = element.getZPosition();
 
-            double newXPosition = centerX + parentX ; // TODO + config.getBuildingHorizontalMargin();
-            double newYPosition = centerY + parentY ; // TODO + config.getBuildingVerticalMargin();
-            double newZPosition = centerZ + parentZ ; // TODO + config.getBuildingHorizontalMargin();
+            double newXPosition = centerX + parentX + config.getACityBuildingHorizontalMargin();
+            double newYPosition = centerY + parentY + config.getACityBuildingVerticalMargin();
+            double newZPosition = centerZ + parentZ + config.getACityBuildingHorizontalMargin();
 
             element.setXPosition(newXPosition);
             element.setYPosition(newYPosition);

@@ -26,13 +26,12 @@ public class ACityBuildingLayout {
         this.chimneys = chimneys;
     }
 
+
+
     public void calculate(){
 
-        setSizeOfChimneys();
-        setSizeOfFloors();
-
-        setPositionOfFloors();
-        setPositionOfChimneys();
+        ACityBuildingSegmentLayout buildingSegmentLayout = new ACityBuildingSegmentLayout(building, floors, chimneys, config);
+        buildingSegmentLayout.calculate();
 
         setSizeOfBuilding();
         setPositionOfBuilding();
@@ -67,43 +66,8 @@ public class ACityBuildingLayout {
         return biggestChimneyHeight;
     }
 
-    private void setPositionOfChimneys() {
-        if(chimneys.size() == 0){
-            return;
-        }
-
-        //TODO outsource as a new Layout
-
-        Double floorHeightSum = calculateFloorHeightSum();
-        Double groundAreaLength = calculateGroundAreaByChimneyAmount();
-
-        //TODO refactor names upperLeft upperRight and so on
-        List<ACityElement> corner1 = new ArrayList<>();
-        List<ACityElement> corner2 = new ArrayList<>();
-        List<ACityElement> corner3 = new ArrayList<>();
-        List<ACityElement> corner4 = new ArrayList<>();
-
-        int chimneyCounter = 0;
-
-        for(ACityElement chimney : chimneys){
-            int counterRemainder = chimneyCounter % 4;
-            switch (counterRemainder){
-                case 0: corner1.add(chimney); break;
-                case 1: corner2.add(chimney); break;
-                case 2: corner3.add(chimney); break;
-                case 3: corner4.add(chimney); break;
-            }
-            chimneyCounter++;
-        }
-
-        setPositionOfChimneysInCorner(corner1, groundAreaLength, floorHeightSum, -1, 1);
-        setPositionOfChimneysInCorner(corner2, groundAreaLength, floorHeightSum, 1, 1);
-        setPositionOfChimneysInCorner(corner3, groundAreaLength, floorHeightSum, 1, -1);
-        setPositionOfChimneysInCorner(corner4, groundAreaLength, floorHeightSum, -1, -1);
-    }
-
     private Double calculateFloorHeightSum() {
-        double floorHeightSum = 1.0; //TODO config
+        double floorHeightSum = config.getFloorHeightSum();
         for(ACityElement floor : floors){
             double floorTopEdge = floor.getYPosition() + ( floor.getHeight() / 2);
             if(floorTopEdge > floorHeightSum){
@@ -113,73 +77,9 @@ public class ACityBuildingLayout {
         return floorHeightSum;
     }
 
-    private void setPositionOfChimneysInCorner(List<ACityElement> corner, Double groundAreaLength, Double floorHeightSum, int cornerX, int cornerZ) {
-
-        double chimneyXPosition = 0.0;
-        double chimneyYPosition = 0.0;
-        double chimneyZPosition = 0.0;
-
-        int cornerCounter = 0;
-        for(ACityElement chimney: corner){
-
-            if(cornerCounter == 0){
-                chimneyXPosition = (groundAreaLength / 2 - chimney.getWidth() / 2) * cornerX ;
-                chimneyYPosition = floorHeightSum + chimney.getHeight() / 2;
-                chimneyZPosition = (groundAreaLength / 2 - chimney.getLength() / 2) * cornerZ;
-            }
-
-            chimney.setXPosition(chimneyXPosition);
-            chimney.setYPosition(chimneyYPosition);
-            chimney.setZPosition(chimneyZPosition);
-
-            cornerCounter++;
-            //upper left corner
-            if(cornerX < 0 && cornerZ > 0){
-                chimneyXPosition = chimneyXPosition + chimney.getWidth() + 0.0; //TODO config gap
-            }
-            //upper right corner
-            if(cornerX > 0 && cornerZ > 0){
-                chimneyZPosition = chimneyZPosition - chimney.getLength() + 0.0; //TODO config gap
-            }
-            //lower right corner
-            if(cornerX > 0 && cornerZ < 0){
-                chimneyXPosition = chimneyXPosition - chimney.getWidth() + 0.0; //TODO config gap
-            }
-            //lower left corner
-            if(cornerX < 0 && cornerZ < 0){
-                chimneyZPosition = chimneyZPosition + chimney.getLength() + 0.0; //TODO config gap
-            }
-        }
-    }
-
-
-    private void setPositionOfFloors() {
-        int floorCounter = 0;
-        for(ACityElement floor : floors){
-            floorCounter++;
-
-            Double floorSizeSum = (floorCounter - 1) * floor.getHeight();
-            Double floorGapSum = floorCounter * config.getACityFloorGap(); // default * 0.5
-            floor.setYPosition((floor.getHeight() / 2) + floorSizeSum + floorGapSum);
-
-            floor.setXPosition(0.0);
-            floor.setZPosition(0.0);
-        }
-    }
-
-    private void setSizeOfFloors() {
-        Double groundAreaLength = calculateGroundAreaByChimneyAmount();
-
-        for(ACityElement floor : floors){
-            floor.setHeight(config.getACityFloorHeight()); //default: 1
-            floor.setWidth(groundAreaLength);
-            floor.setLength(groundAreaLength);
-        }
-    }
-
     private double calculateGroundAreaByChimneyAmount() {
         if (chimneys.size() < 2){
-            return 2.0; //TODO config
+            return config.getACityGroundAreaByChimneyAmount();
         }
 
         int chimneyAmount = chimneys.size();
@@ -188,13 +88,7 @@ public class ACityBuildingLayout {
         return Math.ceil(chimneySurface);
     }
 
-    private void setSizeOfChimneys() {
-        for(ACityElement chimney : chimneys){
-            chimney.setHeight(config.getACityChimneyHeight());
-            chimney.setWidth(config.getACityChimneyWidth());
-            chimney.setLength(config.getACityChimneyLength());
-        }
-    }
+
 
 
 }

@@ -72,7 +72,7 @@ public class ACityAFrameExporter {
         builder.append("\t height=\"" + element.getHeight() + "\"");
         builder.append("\n");
 
-        if(element.getShape() == ACityElement.ACityShape.box){
+        if(element.getShape() == ACityElement.ACityShape.Box){
             builder.append("\t width=\"" + element.getWidth() + "\"");
             builder.append("\n");
             builder.append("\t depth=\"" + element.getLength() + "\"");
@@ -103,9 +103,9 @@ public class ACityAFrameExporter {
 
     private String getShapeExport(ACityElement.ACityShape shape) {
         switch (shape){
-            case box: return "a-box";
-            case cylinder: return "a-cylinder";
-            case cone: return "a-cone";
+            case Box: return "a-box";
+            case Cylinder: return "a-cylinder";
+            case Cone: return "a-cone";
         }
         return "a-sphere";
     }

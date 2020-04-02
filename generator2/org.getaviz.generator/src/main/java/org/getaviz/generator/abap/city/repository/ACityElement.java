@@ -34,9 +34,8 @@ public class ACityElement {
     }
 
 
-    //Todo Großschreibung?
     public enum ACityShape {
-        box, cylinder, cone
+        Box, Cylinder, Cone
     }
 
     private String hash;

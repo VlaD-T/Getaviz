@@ -59,7 +59,7 @@ public class DesignTest{
 
         for( ACityElement district : classDistricts){
              assertEquals("#1A5276", district.getColor());
-             assertEquals(ACityElement.ACityShape.box, district.getShape());
+             assertEquals(ACityElement.ACityShape.Box, district.getShape());
         }
     }
 
@@ -74,7 +74,7 @@ public class DesignTest{
 
         for( ACityElement building : classBuildings) {
                 assertEquals("#ffb48f", building.getColor());
-                assertEquals(ACityElement.ACityShape.cylinder, building.getShape());
+                assertEquals(ACityElement.ACityShape.Cylinder, building.getShape());
                 assertEquals(0.3, building.getWidth());
         }
     }
@@ -86,7 +86,7 @@ public class DesignTest{
 
         for( ACityElement floor : floors){
             assertEquals("#ffffff", floor.getColor());
-            assertEquals(ACityElement.ACityShape.cylinder, floor.getShape());
+            assertEquals(ACityElement.ACityShape.Cylinder, floor.getShape());
         }
     }
 
@@ -97,7 +97,7 @@ public class DesignTest{
 
         for( ACityElement chimney : chimneys){
             assertEquals("#FFFF00", chimney.getColor());
-            assertEquals(ACityElement.ACityShape.cylinder, chimney.getShape());
+            assertEquals(ACityElement.ACityShape.Cylinder, chimney.getShape());
         }
     }
 
