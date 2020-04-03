@@ -139,13 +139,16 @@ public class SourceNodeRepository {
 
 
     public void loadNodesByRelation(SAPRelationLabels relationType){
-        connector.executeRead("MATCH p=(m)-[:" + relationType.name() + "]->(n) RETURN n,m AS list")
-        .forEachRemaining((result) -> {
-            Node nNode = result.get("n").asNode();
-            Node mNode = result.get("m").asNode();
-            System.out.println(nNode);
-            System.out.println(mNode);
-        });
+       //connector.executeRead("MATCH (m)-[:" + relationType.name() + "]->(n) RETURN count([n,m]) AS result");
+        //.forEachRemaining((result) -> {
+          //  Node nNode = result.get("n").asNode();
+            //Node mNode = result.get("m").asNode();
+        //});
+
+        //TEST
+        Record result = connector.executeRead("MATCH (m)-[:" + relationType.name() + "]->(n) RETURN count([n,m]) AS result").single();
+        int numberOfVisualizedPackages = result.get("result").asInt();
+            System.out.println(numberOfVisualizedPackages); // uses: 40, typeOf: 107, contains: 296
 
         connector.executeRead("MATCH (n:Elements) WHERE n.element_id IN ['256'] RETURN n");
     }

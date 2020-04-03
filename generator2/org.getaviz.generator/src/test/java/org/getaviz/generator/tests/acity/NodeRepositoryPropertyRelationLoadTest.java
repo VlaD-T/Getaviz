@@ -47,9 +47,29 @@ public class NodeRepositoryPropertyRelationLoadTest {
     }
 
     @Test
-    void NodesByRelation(){
-       // nodeRepository.loadNodesByRelation(SAPRelationLabels.USES);
+    void NodesByTypeOfRelation(){
+        nodeRepository.loadNodesByRelation(SAPRelationLabels.TYPEOF);
     }
+
+    @Test
+    void NodesByContainsRelation(){
+        nodeRepository.loadNodesByRelation(SAPRelationLabels.CONTAINS);
+    }
+
+    @Test
+    void NodesByDeclaresRelation(){
+        nodeRepository.loadNodesByRelation(SAPRelationLabels.DECLARES);
+    }
+
+    @Test
+    void NodesByInheritRelation(){
+        nodeRepository.loadNodesByRelation(SAPRelationLabels.INHERIT);
+    }
+    @Test
+    void NodesByUsesRelation(){
+        nodeRepository.loadNodesByRelation(SAPRelationLabels.USES);
+    }
+
 
     @Test
     void NodesByProperty(){
