@@ -2,6 +2,7 @@ package org.getaviz.generator.abap.city.repository;
 
 import org.getaviz.generator.abap.city.enums.SAPNodeProperties;
 import org.getaviz.generator.database.DatabaseConnector;
+import org.neo4j.driver.v1.Record;
 import org.neo4j.driver.v1.Value;
 import org.neo4j.driver.v1.types.Node;
 
@@ -85,17 +86,34 @@ public class ACityRepository {
 
         elementsByHash.forEach((id, element) -> {
             //TODO Node mit Hash bereits in Neo4J vorhanden? -> Update der Properties
-           // connector.executeRead(" MATCH (n:Elements) WHERE hash = '" + element.getHash() + "' SET ( n:Elements { " + getACityProperties(element) + "}) RETURN n ");
-            connector.executeWrite("CREATE ( n:Elements { " + getACityProperties(element) + "})");
 
-            //TODO Erstelle Source Node Relation
+            Long aCityNodeID = connector.addNode("CREATE ( n:Elements { " + getACityProperties(element) + "})", "n").id();
+
+            element.setNodeID(aCityNodeID);
+
+        });
+
+        elementsByHash.forEach((id, element) -> {
             Node elementsBySourceNode = element.getSourceNode();
             if (elementsBySourceNode != null) {
-                     connector.executeWrite(
-                             "MATCH (a:Elements {element_id : '" + elementsBySourceNode.id() + "'}), " +
-                                     "(b:Elements {hash : '" + element.getHash() + "'}) " +
-                                     "CREATE (a)<-[r:SOURCE]-(b)");
-                 }
+
+                String statement = "MATCH (sourceNode:Elements), (acityNode:Elements)" +
+                        "WHERE ID(sourceNode) = " + elementsBySourceNode.id() +
+                        "  AND ID(acityNode) =  " + element.getNodeID() +
+                        "  CREATE (sourceNode)<-[r:SOURCE]-(acityNode)";
+
+                connector.executeWrite(statement);
+            }
+
+            ACityElement parentElement = element.getParentElement();
+            if (parentElement != null){
+                String statement = "MATCH (acityNode:Elements), (acityParentNode:Elements)" +
+                        "WHERE ID(acityNode) =  " + element.getNodeID() +
+                        "  AND ID(acityParentNode) =  " + parentElement.getNodeID() +
+                        "  CREATE (acityParentNode)-[r:CHILD]->(acityNode)";
+
+                connector.executeWrite(statement);
+            }
         });
     }
 

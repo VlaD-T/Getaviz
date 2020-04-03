@@ -61,16 +61,6 @@ public class WriteDataToNeo4jTest {
     }
 
     @Test
-    void checkIfElementsAreAddedToNeo4j() {
-
-        Record result = connector
-                .executeRead("MATCH (n:Elements {cityType : '" + ACityElement.ACityType.Chimney + "' }) RETURN count(n) AS result")
-                .single();
-        int numberOfVisualizedPackages = result.get("result").asInt();
-        assertEquals(66, numberOfVisualizedPackages);
-    }
-
-    @Test
     void checkIfElementsAreAddedToNeo4jD() {
 
         Record districtResult = connector
@@ -78,25 +68,6 @@ public class WriteDataToNeo4jTest {
                 .single();
         int numberOfVisualizedPackages = districtResult.get("result").asInt();
         assertEquals(42, numberOfVisualizedPackages);
-    }
-
-    @Test
-    void checkIfElementsAreAddedToNeo4jF() {
-
-        Record floorResult = connector
-                .executeRead("MATCH (n:Elements {cityType : '" + ACityElement.ACityType.Floor + "' }) RETURN count(n) AS result")
-                .single();
-        int numberOfVisualizedPackages = floorResult.get("result").asInt();
-        assertEquals(100, numberOfVisualizedPackages);
-    }
-
-    @Test
-    void checkPropertiesFromAddedElementsToNeo4j() {
-
-        Record colorResult = connector
-                .executeRead("MATCH (n:Elements {cityType : '" + ACityElement.ACityType.Chimney + "' }) RETURN n.color AS result").next();
-        String color = colorResult.get("result").asString();
-        assertEquals("#FFFF00", color);
     }
 
     @Test
@@ -108,6 +79,43 @@ public class WriteDataToNeo4jTest {
         int numberOfVisualized = results.get("result").asInt();
         assertEquals(118, numberOfVisualized);
     }
+
+
+    @Test
+    void checkIfElementsAreAddedToNeo4j() {
+
+        Record result = connector
+                .executeRead("MATCH (n:Elements {cityType : '" + ACityElement.ACityType.Chimney + "' }) RETURN count(n) AS result")
+                .single();
+        int numberOfVisualizedPackages = result.get("result").asInt();
+        assertEquals(66, numberOfVisualizedPackages);
+    }
+
+
+
+    @Test
+    void checkIfElementsAreAddedToNeo4jF() {
+
+        Record floorResult = connector
+                .executeRead("MATCH (n:Elements {cityType : '" + ACityElement.ACityType.Floor + "' }) RETURN count(n) AS result")
+                .single();
+        int numberOfVisualizedPackages = floorResult.get("result").asInt();
+        assertEquals(100, numberOfVisualizedPackages);
+    }
+
+
+
+
+
+    @Test
+    void checkPropertiesFromAddedElementsToNeo4j() {
+
+        Record colorResult = connector
+                .executeRead("MATCH (n:Elements {cityType : '" + ACityElement.ACityType.Chimney + "' }) RETURN n.color AS result").next();
+        String color = colorResult.get("result").asString();
+        assertEquals("#FFFF00", color);
+    }
+
 
     @Test
     void checkBuildingLayout(){
@@ -136,10 +144,21 @@ public class WriteDataToNeo4jTest {
 
     @Test
     void NodesWithSourceRelation() {
+
         Record sourceResult = (Record) connector.executeRead("MATCH p=()<-[r:SOURCE]-() RETURN count(p) AS result").single();
         int sourceResults = sourceResult.get("result").asInt();
 
-        assertEquals(66, sourceResults); // actual 185 -> 296 (contains) - typeDistrikte (25) 261
+        assertEquals(301, sourceResults); // 326 (contains) - typeDistricts (25) = 301
+    }
+
+    @Test
+    void NodesWithChildRelation() {
+
+        Record sourceResult = (Record) connector.executeRead("MATCH p=()-[r:CHILD]->() RETURN count(p) AS result").single();
+        int sourceResults = sourceResult.get("result").asInt();
+
+        //TODO Amount not reasonable
+        assertEquals(308, sourceResults); // 326 (contains) + 25 typedistricts = 351
     }
 
 }

@@ -139,7 +139,14 @@ public class SourceNodeRepository {
 
 
     public void loadNodesByRelation(SAPRelationLabels relationType){
-       //connector.executeRead("MATCH (m)-[:" + relationType.name() + "]->(n) RETURN count([n,m]) AS result");
+        //TODO
+        // Liste mit den IDs der Nodes, die schon geladen sind -> nodeById.keySet()
+        // Liste umwandeln in String
+        // Statement aufbauen, mit WHERE ID(m) IN der neuen Liste
+        // Zurückgegebene Knoten müssen dem Repository hinzugefügt werden
+
+
+        //connector.executeRead("MATCH (m)-[:" + relationType.name() + "]->(n) RETURN count([n,m]) AS result");
         //.forEachRemaining((result) -> {
           //  Node nNode = result.get("n").asNode();
             //Node mNode = result.get("m").asNode();

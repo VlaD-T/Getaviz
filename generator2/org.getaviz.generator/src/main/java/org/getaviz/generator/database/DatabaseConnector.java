@@ -60,6 +60,8 @@ public class DatabaseConnector implements AutoCloseable {
 					return 1;
 				}
 			});		
+		} catch (Exception myException){
+			//TODO Exception Handling
 		}
 	}
 	

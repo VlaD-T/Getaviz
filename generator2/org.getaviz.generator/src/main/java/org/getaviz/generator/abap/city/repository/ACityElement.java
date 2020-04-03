@@ -39,6 +39,10 @@ public class ACityElement {
     }
 
     private String hash;
+
+
+
+    private Long nodeID;
     private Long sourceNodeID;
 
     private Node sourceNode;
@@ -183,5 +187,13 @@ public class ACityElement {
 
     public ACityType getType() {
         return type;
+    }
+
+    public Long getNodeID() {
+        return nodeID;
+    }
+
+    public void setNodeID(Long nodeID) {
+        this.nodeID = nodeID;
     }
 }
