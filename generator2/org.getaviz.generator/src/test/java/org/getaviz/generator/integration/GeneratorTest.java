@@ -1,6 +1,8 @@
 package org.getaviz.generator.integration;
 
 import org.getaviz.generator.SettingsConfiguration;
+import org.getaviz.generator.abap.city.enums.SAPNodeProperties;
+import org.getaviz.generator.abap.city.enums.SAPNodeTypes;
 import org.getaviz.generator.abap.city.enums.SAPRelationLabels;
 import org.getaviz.generator.abap.city.repository.ACityRepository;
 import org.getaviz.generator.abap.city.repository.SourceNodeRepository;
@@ -55,9 +57,8 @@ public class GeneratorTest {
         mockUp.loadProperties("ABAPCityTest.properties");
 
         nodeRepository = new SourceNodeRepository();
-        nodeRepository.loadNodesWithRelation(SAPRelationLabels.CONTAINS);
-        nodeRepository.loadNodesWithRelation(SAPRelationLabels.TYPEOF);
-        nodeRepository.loadNodesWithRelation(SAPRelationLabels.USES);
+        nodeRepository.loadNodesByPropertyValue(SAPNodeProperties.type_name, SAPNodeTypes.Namespace.name());
+        nodeRepository.loadNodesByRelation(SAPRelationLabels.CONTAINS, true);
 
         aCityRepository = new ACityRepository();
 
