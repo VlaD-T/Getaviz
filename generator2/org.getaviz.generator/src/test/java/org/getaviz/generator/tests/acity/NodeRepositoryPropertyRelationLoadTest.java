@@ -36,10 +36,6 @@ public class NodeRepositoryPropertyRelationLoadTest {
         mockUp.runCypherScript("SAPExportCreateTypeOfRelation.cypher");
         mockUp.loadProperties("CityBankTest.properties");
         connector = mockUp.getConnector();
-
-        nodeRepository = new SourceNodeRepository();
-
-        nodeRepository.loadNodesByPropertyValue(SAPNodeProperties.type_name, SAPNodeTypes.DataElement.name());
     }
 
     @AfterAll
@@ -47,10 +43,19 @@ public class NodeRepositoryPropertyRelationLoadTest {
         mockUp.close();
     }
 
+
     @Test
-    void NodesByTypeOfRelation(){
-        //TODO
+    void loadDataElementsTest(){
+
+        nodeRepository = new SourceNodeRepository();
+
+        nodeRepository.loadNodesByPropertyValue(SAPNodeProperties.type_name, SAPNodeTypes.DataElement.name());
+
+        int nodeAmount = nodeRepository.getNodes().size();
+
+        assertEquals(19, nodeAmount);
     }
+
 
     @Test
     void NodesByContainsRelation(){
@@ -89,31 +94,10 @@ public class NodeRepositoryPropertyRelationLoadTest {
     }
 
     @Test
-    void NodesByDeclaresRelation(){
-        //TODO
+    void loadNodesByRelations(){
+        //TODO CONTAINS, USES und TYPEOF laden und auf Vorhandensein prüfen
     }
 
-    @Test
-    void NodesByInheritRelation(){
-        //TODO
-    }
-    @Test
-    void NodesByUsesRelation(){
-        //TODO
-    }
-
-
-    @Test
-    void loadDataElementsTest(){
-
-        nodeRepository = new SourceNodeRepository();
-
-        nodeRepository.loadNodesByPropertyValue(SAPNodeProperties.type_name, SAPNodeTypes.DataElement.name());
-
-        int nodeAmount = nodeRepository.getNodes().size();
-
-        assertEquals(19, nodeAmount);
-    }
 
 
 
