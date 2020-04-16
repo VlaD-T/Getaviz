@@ -39,6 +39,71 @@ public class SourceNodeRepository {
         nodesByRelation = new HashMap<>();
     }
 
+
+
+    public void loadNodesByPropertyValue(SAPNodeProperties property, String value){
+
+        connector.executeRead("MATCH (n:Elements {" + property + ": '" + value + "'}) RETURN n")
+        .forEachRemaining((result) -> {
+            Node sourceNode = result.get("n").asNode();
+
+            addNodeByID(sourceNode);
+            addNodesByProperty(sourceNode);
+
+        });
+    }
+
+    public void loadNodesByRelation(SAPRelationLabels relationType){
+        loadNodesByRelation(relationType, false);
+    }
+
+    public void loadNodesByRelation(SAPRelationLabels relationType, boolean recursive){
+
+        Set<Long> nodeIds = nodeById.keySet();
+
+        loadNodesByRelation(nodeIds, relationType, recursive);
+    }
+
+    public void loadNodesByRelation(Set<Long> nodeIds, SAPRelationLabels relationType, boolean recursive){
+
+        String nodeIDString = computeNodeIDString(nodeIds);
+        String relatedNodesStatement = "MATCH (m)-[:" + relationType.name() + "]->(n) WHERE ID(m) IN " + nodeIDString + " RETURN m, n";
+
+        Set<Long> newNodeIds = new TreeSet<>();
+
+        connector.executeRead(relatedNodesStatement).forEachRemaining((result) -> {
+            Node nNode = result.get("n").asNode();
+
+            addNodeByID(nNode);
+            addNodesByProperty(nNode);
+
+            Node mNode = result.get("m").asNode();
+            mNode = nodeById.get(mNode.id());
+
+            addNodesByRelation(mNode, nNode, relationType.name());
+
+            newNodeIds.add(nNode.id());
+        });
+
+        if(recursive && !newNodeIds.isEmpty()){
+            loadNodesByRelation(newNodeIds, relationType, true);
+        }
+    }
+
+
+    private String computeNodeIDString(Set<Long> nodeIds) {
+
+        String nodeIdString = "[";
+        for (Long nodeId: nodeIds) {
+            nodeIdString += nodeId + ", ";
+        }
+        nodeIdString = nodeIdString.substring(0, nodeIdString.length()-2);
+        nodeIdString += "]";
+
+        return nodeIdString;
+    }
+
+
     public void loadNodesWithRelation(SAPRelationLabels relationLabel){
 
         connector.executeRead(
@@ -125,40 +190,10 @@ public class SourceNodeRepository {
     }
 
 
-    public void loadNodesByPropertyValue(SAPNodeProperties property, String value){
-
-        connector.executeRead("MATCH (n:Elements {" + property + ": '" + value + "'}) RETURN n")
-        .forEachRemaining((result) -> {
-            Node sourceNode = result.get("n").asNode();
-
-            addNodeByID(sourceNode);
-            addNodesByProperty(sourceNode);
-
-        });
-    }
 
 
-    public void loadNodesByRelation(SAPRelationLabels relationType){
-        //TODO
-        // Liste mit den IDs der Nodes, die schon geladen sind -> nodeById.keySet()
-        // Liste umwandeln in String
-        // Statement aufbauen, mit WHERE ID(m) IN der neuen Liste
-        // Zurückgegebene Knoten müssen dem Repository hinzugefügt werden
 
 
-        //connector.executeRead("MATCH (m)-[:" + relationType.name() + "]->(n) RETURN count([n,m]) AS result");
-        //.forEachRemaining((result) -> {
-          //  Node nNode = result.get("n").asNode();
-            //Node mNode = result.get("m").asNode();
-        //});
-
-        //TEST
-        Record result = connector.executeRead("MATCH (m)-[:" + relationType.name() + "]->(n) RETURN count([n,m]) AS result").single();
-        int numberOfVisualizedPackages = result.get("result").asInt();
-            System.out.println(numberOfVisualizedPackages); // uses: 40, typeOf: 107, contains: 296
-
-        connector.executeRead("MATCH (n:Elements) WHERE n.element_id IN ['256'] RETURN n");
-    }
 
 
 

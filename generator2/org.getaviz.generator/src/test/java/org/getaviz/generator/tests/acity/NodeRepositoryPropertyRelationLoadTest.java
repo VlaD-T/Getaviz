@@ -15,6 +15,7 @@ import org.neo4j.driver.v1.Record;
 import org.neo4j.driver.v1.types.Node;
 
 import java.util.Collection;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -48,31 +49,67 @@ public class NodeRepositoryPropertyRelationLoadTest {
 
     @Test
     void NodesByTypeOfRelation(){
-        nodeRepository.loadNodesByRelation(SAPRelationLabels.TYPEOF);
+        //TODO
     }
 
     @Test
     void NodesByContainsRelation(){
+        nodeRepository = new SourceNodeRepository();
+
+        nodeRepository.loadNodesByPropertyValue(SAPNodeProperties.type_name, SAPNodeTypes.Class.name());
         nodeRepository.loadNodesByRelation(SAPRelationLabels.CONTAINS);
+
+        Collection<Node> classSourceNodes = nodeRepository.getNodesByProperty(SAPNodeProperties.type_name, SAPNodeTypes.Class.name());
+        assertEquals(21, classSourceNodes.size());
+
+        Collection<Node> methodSourceNodes = nodeRepository.getNodesByProperty(SAPNodeProperties.type_name, SAPNodeTypes.Method.name());
+        assertEquals(35, methodSourceNodes.size());
+
+        Collection<Node> attributeSourceNodes = nodeRepository.getNodesByProperty(SAPNodeProperties.type_name, SAPNodeTypes.Attribute.name());
+        assertEquals(14, attributeSourceNodes.size());
+    }
+
+    @Test
+    void NodesByContainsRelationRecursive(){
+        nodeRepository = new SourceNodeRepository();
+
+        nodeRepository.loadNodesByPropertyValue(SAPNodeProperties.type_name, SAPNodeTypes.Namespace.name());
+        nodeRepository.loadNodesByRelation(SAPRelationLabels.CONTAINS, true);
+
+        //21 classes in total - 1 local class that has a USES relation
+        Collection<Node> classSourceNodes = nodeRepository.getNodesByProperty(SAPNodeProperties.type_name, SAPNodeTypes.Class.name());
+        assertEquals(20, classSourceNodes.size());
+
+        Collection<Node> methodSourceNodes = nodeRepository.getNodesByProperty(SAPNodeProperties.type_name, SAPNodeTypes.Method.name());
+        assertEquals(37, methodSourceNodes.size());
+
+        Collection<Node> attributeSourceNodes = nodeRepository.getNodesByProperty(SAPNodeProperties.type_name, SAPNodeTypes.Attribute.name());
+        assertEquals(61, attributeSourceNodes.size());
+
     }
 
     @Test
     void NodesByDeclaresRelation(){
-        nodeRepository.loadNodesByRelation(SAPRelationLabels.DECLARES);
+        //TODO
     }
 
     @Test
     void NodesByInheritRelation(){
-        nodeRepository.loadNodesByRelation(SAPRelationLabels.INHERIT);
+        //TODO
     }
     @Test
     void NodesByUsesRelation(){
-        nodeRepository.loadNodesByRelation(SAPRelationLabels.USES);
+        //TODO
     }
 
 
     @Test
-    void NodesByProperty(){
+    void loadDataElementsTest(){
+
+        nodeRepository = new SourceNodeRepository();
+
+        nodeRepository.loadNodesByPropertyValue(SAPNodeProperties.type_name, SAPNodeTypes.DataElement.name());
+
         int nodeAmount = nodeRepository.getNodes().size();
 
         assertEquals(19, nodeAmount);

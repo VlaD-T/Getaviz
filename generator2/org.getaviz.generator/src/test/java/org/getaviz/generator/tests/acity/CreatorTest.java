@@ -2,6 +2,7 @@ package org.getaviz.generator.tests.acity;
 
 import org.getaviz.generator.SettingsConfiguration;
 import org.getaviz.generator.abap.city.enums.SAPNodeProperties;
+import org.getaviz.generator.abap.city.enums.SAPNodeTypes;
 import org.getaviz.generator.abap.city.enums.SAPRelationLabels;
 import org.getaviz.generator.abap.city.repository.*;
 import org.getaviz.generator.abap.city.steps.ACityCreator;
@@ -35,7 +36,9 @@ public class CreatorTest {
         connector = mockUp.getConnector();
 
         nodeRepository = new SourceNodeRepository();
-        nodeRepository.loadNodesWithRelation(SAPRelationLabels.CONTAINS);
+        nodeRepository.loadNodesByPropertyValue(SAPNodeProperties.type_name, SAPNodeTypes.Namespace.name());
+        nodeRepository.loadNodesByRelation(SAPRelationLabels.CONTAINS, true);
+
         aCityRepository = new ACityRepository();
 
         ACityCreator aCityCreator = new ACityCreator(aCityRepository, config);
@@ -61,7 +64,7 @@ public class CreatorTest {
     @Test
     void numberOfBuildings() {
         Collection<ACityElement> buildings = aCityRepository.getElementsByType(ACityElement.ACityType.Building);
-        assertEquals(118, buildings.size());
+        assertEquals(117, buildings.size());
     }
 
     @Test
