@@ -29,7 +29,7 @@ public class GeneratorTest {
 
         String cypherScript = "SAPTestExportCreateNodes.cypher";
         String cypherScriptDirectory = "C:\\Getaviz\\generator2\\org.getaviz.generator\\target\\test-classes\\";
-        String testFile = "20200214_Test.csv";
+        String testFile = "20200329_Test.csv";
 
         String outputFile = "Test.html";
         String outputDirectory = "C:\\Getaviz\\generator2\\org.getaviz.generator\\test\\output\\";
@@ -83,7 +83,13 @@ public class GeneratorTest {
             System.out.print(htmlFile);
         }
 
-        return;
+        mockUp.close();
+        
+        try {
+            mockUp.getConnector().close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
 }
