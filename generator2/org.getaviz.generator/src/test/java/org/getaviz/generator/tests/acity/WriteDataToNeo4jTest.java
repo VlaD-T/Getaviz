@@ -1,6 +1,8 @@
 package org.getaviz.generator.tests.acity;
 
 import org.getaviz.generator.SettingsConfiguration;
+import org.getaviz.generator.abap.city.enums.SAPNodeProperties;
+import org.getaviz.generator.abap.city.enums.SAPNodeTypes;
 import org.getaviz.generator.abap.city.repository.ACityElement;
 import org.getaviz.generator.abap.city.repository.ACityRepository;
 import org.getaviz.generator.abap.city.enums.SAPNodeLabels;
@@ -35,21 +37,24 @@ public class WriteDataToNeo4jTest {
     @BeforeAll
     static void setup() {
         mockUp.setupDatabase("./test/databases/CityBankTest.db", "SAPExportCreateNodes.cypher");
+
         mockUp.runCypherScript("SAPExportCreateContainsRelation.cypher");
+        mockUp.runCypherScript("SAPExportCreateTypeOfRelation.cypher");
+
         mockUp.loadProperties("ABAPCityTest.properties");
-        connector = mockUp.getConnector();
 
         nodeRepository = new SourceNodeRepository();
-        nodeRepository.loadNodesWithRelation(SAPRelationLabels.CONTAINS);
-        aCityRepository = new ACityRepository();
+        nodeRepository.loadNodesByPropertyValue(SAPNodeProperties.type_name, SAPNodeTypes.Namespace.name());
+        nodeRepository.loadNodesByRelation(SAPRelationLabels.CONTAINS, true);
+        nodeRepository.loadNodesByRelation(SAPRelationLabels.TYPEOF, true);
 
-        ACityCreator aCityCreator = new ACityCreator(aCityRepository, config);
-        aCityCreator.createRepositoryFromNodeRepository(nodeRepository);
+        ACityCreator aCityCreator = new ACityCreator(aCityRepository, nodeRepository, config);
+        aCityCreator.createRepositoryFromNodeRepository();
 
-        ACityDesigner designer = new ACityDesigner(aCityRepository, config);
+        ACityDesigner designer = new ACityDesigner(aCityRepository, nodeRepository, config);
         designer.designRepository();
 
-        ACityLayouter aCityLayouter = new ACityLayouter(aCityRepository, config);
+        ACityLayouter aCityLayouter = new ACityLayouter(aCityRepository, nodeRepository, config);
         aCityLayouter.layoutRepository();
 
         aCityRepository.writeRepositoryToNeo4j();

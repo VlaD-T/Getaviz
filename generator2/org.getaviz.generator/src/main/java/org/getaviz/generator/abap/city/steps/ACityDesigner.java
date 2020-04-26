@@ -10,6 +10,7 @@ import org.getaviz.generator.abap.city.repository.ACityElement;
 import org.getaviz.generator.abap.city.repository.ACityRepository;
 import org.getaviz.generator.abap.city.enums.SAPNodeProperties;
 import org.getaviz.generator.abap.city.enums.SAPNodeTypes;
+import org.getaviz.generator.abap.city.repository.SourceNodeRepository;
 import org.neo4j.driver.v1.types.Node;
 
 public class ACityDesigner {
@@ -17,12 +18,15 @@ public class ACityDesigner {
     private Log log = LogFactory.getLog(this.getClass());
     private SettingsConfiguration config;
 
+
+    private SourceNodeRepository nodeRepository;
     private ACityRepository repository;
 
-    public ACityDesigner(ACityRepository aCityRepository, SettingsConfiguration config) {
+    public ACityDesigner(ACityRepository aCityRepository, SourceNodeRepository sourceNodeRepository, SettingsConfiguration config) {
         this.config = config;
 
         repository = aCityRepository;
+        nodeRepository = sourceNodeRepository;
     }
 
     public void designRepository(){

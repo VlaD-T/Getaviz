@@ -40,10 +40,10 @@ public class DesignTest{
 
         aCityRepository = new ACityRepository();
 
-        ACityCreator aCityCreator = new ACityCreator(aCityRepository, config);
-        aCityCreator.createRepositoryFromNodeRepository(nodeRepository);
+        ACityCreator aCityCreator = new ACityCreator(aCityRepository, nodeRepository, config);
+        aCityCreator.createRepositoryFromNodeRepository();
 
-        ACityDesigner designer = new ACityDesigner(aCityRepository, config);
+        ACityDesigner designer = new ACityDesigner(aCityRepository, nodeRepository, config);
         designer.designRepository();
     }
 
@@ -74,7 +74,7 @@ public class DesignTest{
 
         for( ACityElement building : classBuildings) {
                 assertEquals("#ffb48f", building.getColor());
-                assertEquals(ACityElement.ACityShape.Cylinder, building.getShape());
+                assertEquals(ACityElement.ACityShape.Box, building.getShape());
                 assertEquals(0.3, building.getWidth());
         }
     }

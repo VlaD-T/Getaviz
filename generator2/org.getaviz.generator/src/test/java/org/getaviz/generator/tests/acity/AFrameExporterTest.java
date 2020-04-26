@@ -32,8 +32,9 @@ public class AFrameExporterTest {
     static void setup() {
 
         mockUp.setupDatabase("./test/databases/CityBankTest.db", "SAPExportCreateNodes.cypher");
-        mockUp.runCypherScript("SAPExportCreateTypeOfRelation.cypher");
+
         mockUp.runCypherScript("SAPExportCreateContainsRelation.cypher");
+        mockUp.runCypherScript("SAPExportCreateTypeOfRelation.cypher");
 
         mockUp.loadProperties("ABAPCityTest.properties");
 
@@ -44,13 +45,13 @@ public class AFrameExporterTest {
 
         aCityRepository = new ACityRepository();
 
-        ACityCreator aCityCreator = new ACityCreator(aCityRepository, config);
-        aCityCreator.createRepositoryFromNodeRepository(nodeRepository);
+        ACityCreator aCityCreator = new ACityCreator(aCityRepository, nodeRepository, config);
+        aCityCreator.createRepositoryFromNodeRepository();
 
-        ACityLayouter aCityLayouter = new ACityLayouter(aCityRepository, config);
+        ACityLayouter aCityLayouter = new ACityLayouter(aCityRepository, nodeRepository, config);
         aCityLayouter.layoutRepository();
 
-        ACityDesigner designer = new ACityDesigner(aCityRepository, config);
+        ACityDesigner designer = new ACityDesigner(aCityRepository, nodeRepository, config);
         designer.designRepository();
 
         ACityAFrameExporter aCityAFrameExporter = new ACityAFrameExporter(aCityRepository, config);

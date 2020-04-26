@@ -2,6 +2,8 @@ package org.getaviz.generator.abap.city.repository;
 
 import java.util.*;
 
+import org.getaviz.generator.abap.city.enums.SAPNodeProperties;
+import org.getaviz.generator.abap.city.enums.SAPNodeTypes;
 import org.neo4j.driver.v1.types.Node;
 
 public class ACityElement {
@@ -85,7 +87,13 @@ public class ACityElement {
         this.sourceNode = sourceNode;
     }
 
-
+    public SAPNodeTypes getSourceNodeType(){
+        Node sourceNode = getSourceNode();
+        if( sourceNode == null){
+            return null;
+        }
+        return SAPNodeTypes.valueOf(sourceNode.get(SAPNodeProperties.type_name.name()).asString());
+    }
 
 
     public double getHeight() {

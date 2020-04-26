@@ -62,13 +62,13 @@ public class GeneratorTest {
 
         aCityRepository = new ACityRepository();
 
-        ACityCreator aCityCreator = new ACityCreator(aCityRepository, config);
-        aCityCreator.createRepositoryFromNodeRepository(nodeRepository);
+        ACityCreator aCityCreator = new ACityCreator(aCityRepository, nodeRepository, config);
+        aCityCreator.createRepositoryFromNodeRepository();
 
-        ACityLayouter aCityLayouter = new ACityLayouter(aCityRepository, config);
+        ACityLayouter aCityLayouter = new ACityLayouter(aCityRepository, nodeRepository, config);
         aCityLayouter.layoutRepository();
 
-        ACityDesigner designer = new ACityDesigner(aCityRepository, config);
+        ACityDesigner designer = new ACityDesigner(aCityRepository, nodeRepository, config);
         designer.designRepository();
 
         ACityAFrameExporter aCityAFrameExporter = new ACityAFrameExporter(aCityRepository, config);

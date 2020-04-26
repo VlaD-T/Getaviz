@@ -41,10 +41,10 @@ public class CreatorTest {
 
         aCityRepository = new ACityRepository();
 
-        ACityCreator aCityCreator = new ACityCreator(aCityRepository, config);
-        aCityCreator.createRepositoryFromNodeRepository(nodeRepository);
+        ACityCreator aCityCreator = new ACityCreator(aCityRepository, nodeRepository, config);
+        aCityCreator.createRepositoryFromNodeRepository();
 
-        ACityDesigner designer = new ACityDesigner(aCityRepository, config);
+        ACityDesigner designer = new ACityDesigner(aCityRepository, nodeRepository, config);
         designer.designRepository();
     }
 

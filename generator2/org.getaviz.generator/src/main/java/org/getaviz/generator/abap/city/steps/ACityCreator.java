@@ -13,29 +13,25 @@ import java.util.*;
 
 public class ACityCreator {
 
-    //TODO
-    // Aufteilung TypeDistrikte nicht optimal
-    // Integration TableTypeElements nicht optimal
+
 
     private Log log = LogFactory.getLog(this.getClass());
     private SettingsConfiguration config;
 
+    private SourceNodeRepository nodeRepository;
     private ACityRepository repository;
 
-    public ACityCreator(ACityRepository aCityRepository,SettingsConfiguration config) {
+    public ACityCreator(ACityRepository aCityRepository, SourceNodeRepository sourceNodeRepository, SettingsConfiguration config) {
         this.config = config;
 
         repository = aCityRepository;
+        nodeRepository = sourceNodeRepository;
 
         log.info("created");
     }
 
 
-    //TODO SourceNodeRepository in Konstruktor aufnehmen
-    public void createRepositoryFromNodeRepository(SourceNodeRepository nodeRepository){
-
-        log.info("Create tableType Elements");
-        createACityElementsFromTableTypeTypeOfRelation(nodeRepository);
+    public void createRepositoryFromNodeRepository(){
 
         log.info("Create City Elements");
         createAllACityElements(nodeRepository);
@@ -66,6 +62,8 @@ public class ACityCreator {
 
         createACityElementsFromSourceNodes(nodeRepository, ACityElement.ACityType.Building,SAPNodeProperties.type_name, SAPNodeTypes.Table);
         createACityElementsFromSourceNodes(nodeRepository, ACityElement.ACityType.Floor,SAPNodeProperties.type_name, SAPNodeTypes.TableElement);
+
+        createACityElementsFromSourceNodes(nodeRepository, ACityElement.ACityType.Building,SAPNodeProperties.type_name, SAPNodeTypes.TableType);
 
         createACityElementsFromSourceNodes(nodeRepository, ACityElement.ACityType.Building,SAPNodeProperties.type_name, SAPNodeTypes.Structure);
         createACityElementsFromSourceNodes(nodeRepository, ACityElement.ACityType.Floor,SAPNodeProperties.type_name, SAPNodeTypes.StructureElement);
@@ -138,6 +136,7 @@ public class ACityCreator {
             addChildToTypeDistrict(parentDistrict, childElement, typeDistrictMap, ACityElement.ACitySubType.DDIC, SAPNodeTypes.TableType);
         }
 
+        //TODO hier und an allen anderen Stellen eine neue Methode auf ACityElement.getSourceNodeProperty(SAPNodeProperties) verwenden
         String districtName = parentDistrict.getSourceNode().get(SAPNodeProperties.object_name.name()).asString();
         log.info(typeDistrictMap.size() + " typeDistricts created for district \"" + districtName + "\"");
     }
@@ -145,7 +144,7 @@ public class ACityCreator {
     private void addChildToTypeDistrict(ACityElement parentDistrict, ACityElement childElement, Map<ACityElement.ACitySubType, ACityElement> typeDistrictMap, ACityElement.ACitySubType districtType, SAPNodeTypes sapNodeTypes) {
 
         Node childSourceNode = childElement.getSourceNode();
-        String typeNameProperty = childSourceNode.get(String.valueOf(SAPNodeProperties.type_name)).asString();
+        String typeNameProperty = childSourceNode.get(SAPNodeProperties.type_name.name()).asString();
 
         if( typeNameProperty.equals(sapNodeTypes.name())){
 
@@ -182,71 +181,7 @@ public class ACityCreator {
     }
 
 
-    private void createACityElementsFromTableTypeTypeOfRelation(SourceNodeRepository nodeRepository) {
 
-
-        //Create tableType ACityElements
-        Collection<Node> tableTypeSourceNodes = nodeRepository.getNodesByProperty(SAPNodeProperties.type_name, SAPNodeTypes.TableType.name() );
-        log.info(tableTypeSourceNodes.size() + " SourceNodes with property \"type_name\" and value \"TableType\" loaded");
-
-        List<ACityElement> tableTypeElements = createACityElements(tableTypeSourceNodes, ACityElement.ACityType.Building);
-        repository.addElements(tableTypeElements);
-        log.info(tableTypeElements.size() + " ACityElements of type \"Building\" created");
-
-        //Create tableType subElements
-        for(ACityElement tableTypeElement : tableTypeElements){
-
-            //get TYPEOF node
-            Node tableTypeSourceNode = tableTypeElement.getSourceNode();
-
-            Collection<Node> typeOfNodes = nodeRepository.getRelatedNodes(tableTypeSourceNode, SAPRelationLabels.TYPEOF, true);
-            if(typeOfNodes.isEmpty()){
-                String tableTypeName = tableTypeSourceNode.get(SAPNodeProperties.object_name.name()).asString();
-                log.warn("TYPEOF related nodes not found for tableType \"" + tableTypeName + "\"");
-                continue;
-            }
-            if(typeOfNodes.size() != 1){
-                String tableTypeName = tableTypeSourceNode.get(SAPNodeProperties.object_name.name()).asString();
-                log.error("TYPEOF related nodes more than 1 for tableType \"" + tableTypeName + "\"");
-                continue;
-            }
-            Node typeOfNode = typeOfNodes.iterator().next();
-
-            //create subElements
-            Collection<Node> subNodes = nodeRepository.getRelatedNodes(typeOfNode,SAPRelationLabels.CONTAINS, true);
-
-            List<ACityElement> tableTypeSubElements;
-
-
-            //TYPEOF node has no subElements it is a data element
-            //TYPEOF node has subElements it is a structure or table element
-            if( subNodes.isEmpty() ){
-
-                String propertyTypeName = typeOfNode.get(SAPNodeProperties.type_name.name()).asString();
-
-                if(propertyTypeName.equals(SAPNodeTypes.Table.name()) || propertyTypeName.equals(SAPNodeTypes.Structure.name()) ) {
-                    String structureTypeName = typeOfNode.get(SAPNodeProperties.object_name.name()).asString();
-                    String tableTypeName = tableTypeSourceNode.get(SAPNodeProperties.object_name.name()).asString();
-                    log.error("Structure-/Table-Elements for \"" + structureTypeName + "\" not loaded for tableType \"" + tableTypeName + "\"");
-                    continue;
-                }
-                tableTypeSubElements = createACityElements(typeOfNodes, ACityElement.ACityType.Floor);
-            } else {
-                tableTypeSubElements = createACityElements(subNodes, ACityElement.ACityType.Floor);
-            }
-
-            repository.addElements(tableTypeSubElements);
-            log.info(tableTypeSubElements.size() + " ACityElements of type \"Floor\" created");
-
-            //create relations for subElements
-            for(ACityElement tableTypeSubElement : tableTypeSubElements){
-                tableTypeSubElement.setParentElement(tableTypeElement);
-                tableTypeElement.addSubElement(tableTypeSubElement);
-            }
-            log.info(tableTypeSubElements.size() + " child relations for relation \"TYPEOF\" created");
-
-        }
-    }
 
 
 
