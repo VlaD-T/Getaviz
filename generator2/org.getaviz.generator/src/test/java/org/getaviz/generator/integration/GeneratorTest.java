@@ -84,7 +84,7 @@ public class GeneratorTest {
         }
 
         mockUp.close();
-        
+
         try {
             mockUp.getConnector().close();
         } catch (Exception e) {

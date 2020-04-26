@@ -13,6 +13,7 @@ import org.getaviz.generator.SettingsConfiguration;
 import org.getaviz.generator.database.DatabaseConnector;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class SourceNodeRepository {
 
@@ -37,11 +38,15 @@ public class SourceNodeRepository {
         nodeById = new HashMap<>();
         nodesByLabel = new HashMap<>();
         nodesByRelation = new HashMap<>();
+
+        log.info("Created");
     }
 
 
 
     public void loadNodesByPropertyValue(SAPNodeProperties property, String value){
+
+        AtomicInteger counter = new AtomicInteger(0);
 
         connector.executeRead("MATCH (n:Elements {" + property + ": '" + value + "'}) RETURN n")
         .forEachRemaining((result) -> {
@@ -50,43 +55,73 @@ public class SourceNodeRepository {
             addNodeByID(sourceNode);
             addNodesByProperty(sourceNode);
 
+            counter.addAndGet(1);
         });
+
+        log.info(counter.get() + " Nodes added with property \"" + property + "\" and value \"" + value + "\"");
     }
+
 
     public void loadNodesByRelation(SAPRelationLabels relationType){
         loadNodesByRelation(relationType, false);
     }
 
     public void loadNodesByRelation(SAPRelationLabels relationType, boolean recursive){
+        loadNodesByRelation(relationType, recursive, true);
+    }
+
+    public void loadNodesByRelation(SAPRelationLabels relationType, boolean recursive, boolean forward){
 
         Set<Long> nodeIds = nodeById.keySet();
 
-        loadNodesByRelation(nodeIds, relationType, recursive);
+        loadNodesByRelation(nodeIds, relationType, recursive, forward);
     }
 
-    public void loadNodesByRelation(Set<Long> nodeIds, SAPRelationLabels relationType, boolean recursive){
+    public void loadNodesByRelation(Set<Long> nodeIds, SAPRelationLabels relationType, boolean recursive, boolean forward){
 
         String nodeIDString = computeNodeIDString(nodeIds);
-        String relatedNodesStatement = "MATCH (m)-[:" + relationType.name() + "]->(n) WHERE ID(m) IN " + nodeIDString + " RETURN m, n";
+
+        String relatedNodesStatement = "";
+        if(forward) {
+            relatedNodesStatement = "MATCH (m)-[:" + relationType.name() + "]->(n) WHERE ID(m) IN " + nodeIDString + " RETURN m, n";
+        } else {
+            relatedNodesStatement = "MATCH (m)<-[:" + relationType.name() + "]-(n) WHERE ID(m) IN " + nodeIDString + " RETURN m, n";
+        }
+
+        AtomicInteger nodeCounter = new AtomicInteger(0);
+        AtomicInteger relationCounter = new AtomicInteger(0);
 
         Set<Long> newNodeIds = new TreeSet<>();
 
+        int nodesBefore = nodeById.size();
         connector.executeRead(relatedNodesStatement).forEachRemaining((result) -> {
             Node nNode = result.get("n").asNode();
 
-            addNodeByID(nNode);
-            addNodesByProperty(nNode);
+            if(!nodeExist(nNode)){
+                addNodeByID(nNode);
+                addNodesByProperty(nNode);
+
+                newNodeIds.add(nNode.id());
+                nodeCounter.addAndGet(1);
+            }
 
             Node mNode = result.get("m").asNode();
             mNode = nodeById.get(mNode.id());
 
             addNodesByRelation(mNode, nNode, relationType.name());
-
-            newNodeIds.add(nNode.id());
+            relationCounter.addAndGet(1);
         });
+        int nodesAfter = nodeById.size();
+
+        log.info(nodeCounter.get() + " nodes added with relation \"" + relationType + "\" loaded");
+        log.info( relationCounter.get() + " relations of type \"" + relationType + "\" loaded");
+
+        if (nodesAfter - nodesBefore != newNodeIds.size()){
+            log.warn(newNodeIds.size() - nodesAfter - nodesBefore + " nodes reloaded!");
+        }
 
         if(recursive && !newNodeIds.isEmpty()){
-            loadNodesByRelation(newNodeIds, relationType, true);
+            loadNodesByRelation(newNodeIds, relationType, true, forward);
         }
     }
 
@@ -217,11 +252,17 @@ public class SourceNodeRepository {
         return nodesByLabelAndProperty;
     }
 
+    private boolean nodeExist(Node node){
+        Long nodeID = node.id();
+        if( nodeById.containsKey(nodeID)){
+            return true;
+        }
+        return false;
+    }
 
     private void addNodeByID(Node node) {
-        Long nodeID = node.id();
-        if( !nodeById.containsKey(nodeID)){
-            nodeById.put(nodeID, node);
+        if( !nodeExist(node)){
+            nodeById.put(node.id(), node);
         }
     }
 

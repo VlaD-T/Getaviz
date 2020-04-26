@@ -151,7 +151,7 @@ public class ACityDesigner {
 
         if (sourceNode != null) {
 
-            String propertyTypeName = sourceNode.get(String.valueOf(SAPNodeProperties.type_name)).asString();
+            String propertyTypeName = sourceNode.get(SAPNodeProperties.type_name.name()).asString();
 
             switch (SAPNodeTypes.valueOf(propertyTypeName)) {
                 case Method:
@@ -185,6 +185,9 @@ public class ACityDesigner {
                     floor.setYPosition(floor.getYPosition() - config.adjustACityFloorYPosition());
                     floor.setWidth(floor.getWidth() - config.adjustACityFloorWidth());
                     floor.setLength(floor.getLength() - config.adjustACityFloorLength());
+                    break;
+                default:
+                    log.error(propertyTypeName + " is not a valid type for \"floor\"");
                     break;
             }
         } else

@@ -21,6 +21,8 @@ public class ACityLayouter {
         this.config = config;
 
         repository = aCityRepository;
+
+        log.info("created");
     }
 
 

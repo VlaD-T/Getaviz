@@ -78,11 +78,7 @@ public class NodeRepositoryRelationLoadTest {
 
         Node firstTableType = tableTypeNodes.iterator().next();
         Collection<Node> subNodes = nodeRepository.getRelatedNodes(firstTableType, SAPRelationLabels.TYPEOF,true);
-        assertEquals(0, subNodes.size());
-
-        /*Node subNode = subNodes.iterator().next();
-        Collection<Node> parentNodes = nodeRepository.getRelatedNodes(subNode, SAPRelationLabels.TYPEOF,false);
-        assertEquals(1, parentNodes.size());*/
+        assertEquals(1, subNodes.size());
     }
 
 

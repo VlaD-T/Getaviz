@@ -1,12 +1,6 @@
 package org.getaviz.generator.database;
 
-import org.neo4j.driver.v1.AccessMode;
-import org.neo4j.driver.v1.Driver;
-import org.neo4j.driver.v1.GraphDatabase;
-import org.neo4j.driver.v1.Session;
-import org.neo4j.driver.v1.StatementResult;
-import org.neo4j.driver.v1.Transaction;
-import org.neo4j.driver.v1.TransactionWork;
+import org.neo4j.driver.v1.*;
 import org.neo4j.driver.v1.types.Node;
 
 public class DatabaseConnector implements AutoCloseable {
@@ -61,7 +55,7 @@ public class DatabaseConnector implements AutoCloseable {
 				}
 			});		
 		} catch (Exception myException){
-			//TODO Exception Handling
+			myException.printStackTrace();
 		}
 	}
 	

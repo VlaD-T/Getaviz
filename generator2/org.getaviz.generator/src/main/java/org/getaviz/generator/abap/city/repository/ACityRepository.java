@@ -1,5 +1,7 @@
 package org.getaviz.generator.abap.city.repository;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.getaviz.generator.abap.city.enums.SAPNodeProperties;
 import org.getaviz.generator.database.DatabaseConnector;
 import org.neo4j.driver.v1.Record;
@@ -9,6 +11,9 @@ import org.neo4j.driver.v1.types.Node;
 import java.util.*;
 
 public class ACityRepository {
+
+    private Log log = LogFactory.getLog(this.getClass());
+
     private DatabaseConnector connector = DatabaseConnector.getInstance();
 
     private Map<Long, ACityElement> elementsBySourceID;
@@ -21,6 +26,8 @@ public class ACityRepository {
         elementsBySourceID = new HashMap<>();
         elementsByHash = new HashMap<>();
         elementsByType = new HashMap<>();
+
+        log.info("created");
     }
 
 
