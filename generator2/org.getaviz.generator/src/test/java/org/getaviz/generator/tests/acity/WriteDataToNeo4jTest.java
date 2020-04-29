@@ -37,6 +37,7 @@ public class WriteDataToNeo4jTest {
     @BeforeAll
     static void setup() {
         mockUp.setupDatabase("./test/databases/CityBankTest.db", "SAPExportCreateNodes.cypher");
+        connector = mockUp.getConnector();
 
         mockUp.runCypherScript("SAPExportCreateContainsRelation.cypher");
         mockUp.runCypherScript("SAPExportCreateTypeOfRelation.cypher");
@@ -48,14 +49,16 @@ public class WriteDataToNeo4jTest {
         nodeRepository.loadNodesByRelation(SAPRelationLabels.CONTAINS, true);
         nodeRepository.loadNodesByRelation(SAPRelationLabels.TYPEOF, true);
 
+        aCityRepository = new ACityRepository();
+
         ACityCreator aCityCreator = new ACityCreator(aCityRepository, nodeRepository, config);
         aCityCreator.createRepositoryFromNodeRepository();
 
-        ACityDesigner designer = new ACityDesigner(aCityRepository, nodeRepository, config);
-        designer.designRepository();
-
         ACityLayouter aCityLayouter = new ACityLayouter(aCityRepository, nodeRepository, config);
         aCityLayouter.layoutRepository();
+
+        ACityDesigner designer = new ACityDesigner(aCityRepository, nodeRepository, config);
+        designer.designRepository();
 
         aCityRepository.writeRepositoryToNeo4j();
     }
