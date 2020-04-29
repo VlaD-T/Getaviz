@@ -66,6 +66,11 @@ public class Mockup {
 	
 	public void close() {
 		graphDb.shutdown();
+		try {
+			connector.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 	
 	public DatabaseConnector getConnector() {
