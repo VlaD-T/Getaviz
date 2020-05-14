@@ -38,6 +38,7 @@ public class WriteDataToNeo4jTest {
     @BeforeAll
     static void setup() {
         mockUp.setupDatabase("./test/databases/CityBankTest.db", "SAPExportCreateNodes.cypher");
+        connector = mockUp.getConnector();
 
         mockUp.runCypherScript("SAPExportCreateContainsRelation.cypher");
         mockUp.runCypherScript("SAPExportCreateTypeOfRelation.cypher");
