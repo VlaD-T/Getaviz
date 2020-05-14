@@ -62,7 +62,7 @@ public class ACityDesigner {
                 case Floor: designFloor(aCityElement); break;
                 case Chimney: designChimney(aCityElement); break;
                 default:
-                    //TODO Error
+                    //TODO default building + err log
             }
             countACityElementByType(counterMap, aCityElement);
         }
@@ -97,87 +97,81 @@ public class ACityDesigner {
 
         district.setShape(config.getACityDistrictShape());
 
-        if (district.getSourceNode() == null){
-
+        if (district.getSourceNode() != null){
+            //namespace district
+            district.setColor(config.getACityDistrictColorHex("packageDistrict"));
+        } else {
+            //type district
             switch (district.getSubType()){
                 case Class:         district.setColor(config.getACityDistrictColorHex("classDistrict"));break;
                 case Report:        district.setColor(config.getACityDistrictColorHex("reportDistrict")); break;
                 case FunctionGroup: district.setColor(config.getACityDistrictColorHex("functionGroupDistrict")); break;
                 case Table:         district.setColor(config.getACityDistrictColorHex("tableDistrict")); break;
                 case DDIC:          district.setColor(config.getACityDistrictColorHex("dataDictionaryDistrict")); break;
+                //TODO default
             }
-
-        } else {
-            district.setColor(config.getACityDistrictColorHex("packageDistrict"));
         }
     }
 
     private void designBuilding(ACityElement building) {
+        String propertyTypeName = building.getSourceNodeProperty(SAPNodeProperties.type_name);
 
-        Node sourceNode = building.getSourceNode();
+        switch (SAPNodeTypes.valueOf(propertyTypeName)) {
 
-        if (sourceNode == null) {
-            log.error("SourceNode nicht vorhanden");
-        } else {
-
-            String propertyTypeName = building.getSourceNodeProperty(SAPNodeProperties.type_name);
-
-            switch (SAPNodeTypes.valueOf(propertyTypeName)) {
-
-                case Class:
-                    building.setColor(config.getACityBuildingColorHex("classBuilding"));
-                    building.setShape(config.getACityBuildingShape("classBuilding"));
-                    building.setWidth(building.getWidth() - config.adjustACityBuildingWidth());
-                    building.setLength(building.getLength() - config.adjustACityBuildingLength());
-                    break;
-                case Interface:
-                    building.setColor(config.getACityBuildingColorHex("interfaceBuilding"));
-                    building.setShape(config.getACityBuildingShape("interfaceBuilding"));
-                    building.setWidth(building.getWidth() - config.adjustACityBuildingWidth());
-                    building.setLength(building.getLength() - config.adjustACityBuildingLength());
-                    break;
-                case Report:
-                    building.setColor(config.getACityBuildingColorHex("reportBuilding"));
-                    building.setShape(config.getACityBuildingShape("reportBuilding"));
-                    building.setWidth(building.getWidth() - config.adjustACityBuildingWidth());
-                    building.setLength(building.getLength() - config.adjustACityBuildingLength());
-                    break;
-                case FunctionGroup:
-                    building.setColor(config.getACityBuildingColorHex("functionGroupBuilding"));
-                    building.setShape(config.getACityBuildingShape("functionGroupBuilding"));
-                    building.setWidth(building.getWidth() - config.adjustACityBuildingWidth());
-                    building.setLength(building.getLength() - config.adjustACityBuildingLength());
-                    break;
-                case Table:
-                    building.setColor(config.getACityBuildingColorHex("tableBuilding"));
-                    building.setShape(config.getACityBuildingShape("tableBuilding"));
-                    building.setWidth(building.getWidth() - config.adjustACityBuildingWidth());
-                    building.setLength(building.getLength() - config.adjustACityBuildingLength());
-                    break;
-                case DataElement:
-                    building.setColor(config.getACityBuildingColorHex("dataElementBuilding"));
-                    building.setShape(config.getACityBuildingShape("dataElementBuilding"));
-                    building.setWidth(building.getWidth() - config.adjustACityBuildingWidth());
-                    building.setLength(building.getLength() - config.adjustACityBuildingLength());
-                    break;
-                case Domain:
-                    building.setColor(config.getACityBuildingColorHex("domainBuilding"));
-                    building.setShape(config.getACityBuildingShape("domainBuilding"));
-                    building.setWidth(building.getWidth() - config.adjustACityBuildingWidth());
-                    building.setLength(building.getLength() - config.adjustACityBuildingLength());
-                    break;
-                case Structure:
-                    building.setColor(config.getACityBuildingColorHex("structureBuilding"));
-                    building.setShape(config.getACityBuildingShape("structureBuilding"));
-                    building.setWidth(config.getACityBuildingWidth("structureBuilding"));
-                    building.setLength(config.getACityBuildingLength("structureBuilding"));
-                    break;
-                case TableType:
-                    building.setColor(config.getACityBuildingColorHex("tableTypeBuilding"));
-                    building.setShape(config.getACityBuildingShape("tableTypeBuilding"));
-                    building.setWidth(config.getACityBuildingWidth("tableTypeBuilding"));
-                    building.setLength(config.getACityBuildingLength("tableTypeBuilding"));
-            }
+            case Class:
+                building.setColor(config.getACityBuildingColorHex("classBuilding"));
+                building.setShape(config.getACityBuildingShape("classBuilding"));
+                building.setWidth(building.getWidth() - config.adjustACityBuildingWidth());
+                building.setLength(building.getLength() - config.adjustACityBuildingLength());
+                break;
+            case Interface:
+                building.setColor(config.getACityBuildingColorHex("interfaceBuilding"));
+                building.setShape(config.getACityBuildingShape("interfaceBuilding"));
+                building.setWidth(building.getWidth() - config.adjustACityBuildingWidth());
+                building.setLength(building.getLength() - config.adjustACityBuildingLength());
+                break;
+            case Report:
+                building.setColor(config.getACityBuildingColorHex("reportBuilding"));
+                building.setShape(config.getACityBuildingShape("reportBuilding"));
+                building.setWidth(building.getWidth() - config.adjustACityBuildingWidth());
+                building.setLength(building.getLength() - config.adjustACityBuildingLength());
+                break;
+            case FunctionGroup:
+                building.setColor(config.getACityBuildingColorHex("functionGroupBuilding"));
+                building.setShape(config.getACityBuildingShape("functionGroupBuilding"));
+                building.setWidth(building.getWidth() - config.adjustACityBuildingWidth());
+                building.setLength(building.getLength() - config.adjustACityBuildingLength());
+                break;
+            case Table:
+                building.setColor(config.getACityBuildingColorHex("tableBuilding"));
+                building.setShape(config.getACityBuildingShape("tableBuilding"));
+                building.setWidth(building.getWidth() - config.adjustACityBuildingWidth());
+                building.setLength(building.getLength() - config.adjustACityBuildingLength());
+                break;
+            case DataElement:
+                building.setColor(config.getACityBuildingColorHex("dataElementBuilding"));
+                building.setShape(config.getACityBuildingShape("dataElementBuilding"));
+                building.setWidth(building.getWidth() - config.adjustACityBuildingWidth());
+                building.setLength(building.getLength() - config.adjustACityBuildingLength());
+                break;
+            case Domain:
+                building.setColor(config.getACityBuildingColorHex("domainBuilding"));
+                building.setShape(config.getACityBuildingShape("domainBuilding"));
+                building.setWidth(building.getWidth() - config.adjustACityBuildingWidth());
+                building.setLength(building.getLength() - config.adjustACityBuildingLength());
+                break;
+            case Structure:
+                building.setColor(config.getACityBuildingColorHex("structureBuilding"));
+                building.setShape(config.getACityBuildingShape("structureBuilding"));
+                building.setWidth(config.getACityBuildingWidth("structureBuilding"));
+                building.setLength(config.getACityBuildingLength("structureBuilding"));
+                break;
+            case TableType:
+                building.setColor(config.getACityBuildingColorHex("tableTypeBuilding"));
+                building.setShape(config.getACityBuildingShape("tableTypeBuilding"));
+                building.setWidth(config.getACityBuildingWidth("tableTypeBuilding"));
+                building.setLength(config.getACityBuildingLength("tableTypeBuilding"));
+                //TODO default
         }
     }
 
@@ -191,55 +185,45 @@ public class ACityDesigner {
 
     private void designFloor(ACityElement floor) {
 
-        Node sourceNode = floor.getSourceNode();
+        String propertyTypeName = floor.getSourceNodeProperty(SAPNodeProperties.type_name);
 
-        if (sourceNode != null) {
-
-            String propertyTypeName = floor.getSourceNodeProperty(SAPNodeProperties.type_name);
-
-            switch (SAPNodeTypes.valueOf(propertyTypeName)) {
-                case Method:
-                    floor.setColor(config.getACityFloorColorHex("methodFloor"));
-                    floor.setShape(config.getACityFloorShape("methodFloor"));
-                    floor.setYPosition(floor.getYPosition() - config.adjustACityFloorYPosition());
-                    break;
-                case FormRoutine:
-                    floor.setColor(config.getACityFloorColorHex("formroutineFloor"));
-                    floor.setShape(config.getACityFloorShape("formroutineFloor"));
-                    floor.setYPosition(floor.getYPosition() - config.adjustACityFloorYPosition());
-                    break;
-                case FunctionModule:
-                    floor.setColor(config.getACityFloorColorHex("functionModuleFloor"));
-                    floor.setShape(config.getACityFloorShape("functionModuleFloor"));
-                    floor.setYPosition(floor.getYPosition() - config.adjustACityFloorYPosition());
-                    break;
-                case TableElement:
-                    floor.setColor(config.getACityFloorColorHex("tableElementFloor"));
-                    floor.setShape(config.getACityFloorShape("tableElementFloor"));
-                    floor.setYPosition(floor.getYPosition() - config.adjustACityFloorYPosition());
-                    break;
-                case StructureElement:
-                    floor.setColor(config.getACityFloorColorHex("structureElementFloor"));
-                    floor.setShape(config.getACityFloorShape("structureElementFloor"));
-                    floor.setYPosition(floor.getYPosition() - config.adjustACityFloorYPosition());
-                    break;
-                case DataElement:
-                    floor.setColor(config.getACityFloorColorHex("dataElementFloor"));
-                    floor.setShape(config.getACityFloorShape("dataElementFloor"));
-                    floor.setYPosition(floor.getYPosition() - config.adjustACityFloorYPosition());
-                    floor.setWidth(floor.getWidth() - config.adjustACityFloorWidth());
-                    floor.setLength(floor.getLength() - config.adjustACityFloorLength());
-                    break;
-                default:
-                    log.error(propertyTypeName + " is not a valid type for \"floor\"");
-                    break;
-            }
-
-
-        } else {
-                floor.setColor("#ffffcc");
-                floor.setShape(ACityElement.ACityShape.Cone);
+        switch (SAPNodeTypes.valueOf(propertyTypeName)) {
+            case Method:
+                floor.setColor(config.getACityFloorColorHex("methodFloor"));
+                floor.setShape(config.getACityFloorShape("methodFloor"));
                 floor.setYPosition(floor.getYPosition() - config.adjustACityFloorYPosition());
+                break;
+            case FormRoutine:
+                floor.setColor(config.getACityFloorColorHex("formroutineFloor"));
+                floor.setShape(config.getACityFloorShape("formroutineFloor"));
+                floor.setYPosition(floor.getYPosition() - config.adjustACityFloorYPosition());
+                break;
+            case FunctionModule:
+                floor.setColor(config.getACityFloorColorHex("functionModuleFloor"));
+                floor.setShape(config.getACityFloorShape("functionModuleFloor"));
+                floor.setYPosition(floor.getYPosition() - config.adjustACityFloorYPosition());
+                break;
+            case TableElement:
+                floor.setColor(config.getACityFloorColorHex("tableElementFloor"));
+                floor.setShape(config.getACityFloorShape("tableElementFloor"));
+                floor.setYPosition(floor.getYPosition() - config.adjustACityFloorYPosition());
+                break;
+            case StructureElement:
+                floor.setColor(config.getACityFloorColorHex("structureElementFloor"));
+                floor.setShape(config.getACityFloorShape("structureElementFloor"));
+                floor.setYPosition(floor.getYPosition() - config.adjustACityFloorYPosition());
+                break;
+            case DataElement:
+                floor.setColor(config.getACityFloorColorHex("dataElementFloor"));
+                floor.setShape(config.getACityFloorShape("dataElementFloor"));
+                floor.setYPosition(floor.getYPosition() - config.adjustACityFloorYPosition());
+                floor.setWidth(floor.getWidth() - config.adjustACityFloorWidth());
+                floor.setLength(floor.getLength() - config.adjustACityFloorLength());
+                break;
+            default:
+                //TODO default design
+                log.error(propertyTypeName + " is not a valid type for \"floor\"");
+                break;
         }
     }
 }

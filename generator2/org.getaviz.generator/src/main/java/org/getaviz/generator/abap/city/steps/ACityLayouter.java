@@ -37,6 +37,8 @@ public class ACityLayouter {
 
     public void layoutRepository(){
 
+        //TODO Log Layouting
+
         AtomicInteger counter = new AtomicInteger(0);
 
         Collection<ACityElement> buildings = repository.getElementsByType(ACityElement.ACityType.Building);
@@ -103,6 +105,7 @@ public class ACityLayouter {
             case DataElement:
                 building.setHeight(config.getACityTableTypeBuildingHeight("tableTypeBuilding_dateElement"));
             default:
+                building.setHeight(1);
                 String tableTypeName = building.getSourceNodeProperty(SAPNodeProperties.type_name);
                 log.error("Type \"" + typeOfType + "\" not allowed for tableType-Element \"" +  tableTypeName );
         }
