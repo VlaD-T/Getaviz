@@ -96,6 +96,7 @@ public class NodeRepositoryPropertyRelationLoadTest {
     @Test
     void loadNodesByRelations(){
         //TODO CONTAINS, USES und TYPEOF laden und auf Vorhandensein prüfen
+
     }
 
 

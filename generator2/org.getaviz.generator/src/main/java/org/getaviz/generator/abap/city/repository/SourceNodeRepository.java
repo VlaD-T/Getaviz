@@ -225,13 +225,6 @@ public class SourceNodeRepository {
     }
 
 
-
-
-
-
-
-
-
     public Collection<Node> getNodesByLabelAndProperty(SAPNodeLabels label, String property, String value){
         Collection<Node> nodesByLabel = getNodesByLabel(label);
         List<Node> nodesByLabelAndProperty = new ArrayList<>();

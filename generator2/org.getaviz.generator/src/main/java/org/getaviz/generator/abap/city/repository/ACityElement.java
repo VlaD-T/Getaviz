@@ -177,6 +177,13 @@ public class ACityElement {
         return subElementsOfType;
     }
 
+    public String getSourceNodeProperty(SAPNodeProperties sapNodeProperties) {
+
+             String sourceNodeProperty = getSourceNode().get(sapNodeProperties.name()).asString();
+
+        return sourceNodeProperty;
+    }
+
     public void addSubElement(ACityElement subElement) {
         this.subElements.add(subElement);
     }
@@ -184,10 +191,6 @@ public class ACityElement {
     public void removeSubElement(ACityElement subElement) {
         this.subElements.remove(subElement);
     }
-
-
-
-
 
     public String getHash() {
         return hash;

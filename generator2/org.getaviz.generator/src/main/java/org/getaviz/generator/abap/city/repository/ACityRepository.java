@@ -4,11 +4,11 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.getaviz.generator.abap.city.enums.SAPNodeProperties;
 import org.getaviz.generator.database.DatabaseConnector;
-import org.neo4j.driver.v1.Record;
 import org.neo4j.driver.v1.Value;
 import org.neo4j.driver.v1.types.Node;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class ACityRepository {
 
@@ -91,15 +91,38 @@ public class ACityRepository {
     //Schreiben der ACityElemente in die Neo4j-Datenbank
     public void writeRepositoryToNeo4j() {
 
+        AtomicInteger cityBuildingCounter = new AtomicInteger(0);
+        AtomicInteger cityFloorCounter = new AtomicInteger(0);
+        AtomicInteger cityChimneyCounter = new AtomicInteger(0);
+        AtomicInteger cityDistrictCounter = new AtomicInteger(0);
+
         elementsByHash.forEach((id, element) -> {
             //TODO Node mit Hash bereits in Neo4J vorhanden? -> Update der Properties
+
 
             Long aCityNodeID = connector.addNode("CREATE ( n:Elements { " + getACityProperties(element) + "})", "n").id();
 
             element.setNodeID(aCityNodeID);
 
+            switch (element.getType()) {
+                case Building:
+                    cityBuildingCounter.getAndAdd(1); break;
+                case Floor:
+                    cityFloorCounter.getAndAdd(1); break;
+                case Chimney:
+                    cityChimneyCounter.getAndAdd(1); break;
+                case District:
+                    cityDistrictCounter.getAndAdd(1); break;
+            }
         });
 
+        log.info(cityFloorCounter + " new Floors added");
+        log.info(cityBuildingCounter + " new Buildings added");
+        log.info(cityChimneyCounter + " new Chimneys added");
+        log.info(cityDistrictCounter + " new Districts added");
+
+        AtomicInteger sourceRelationCounter = new AtomicInteger(0);
+        AtomicInteger childRelationCounter = new AtomicInteger(0);
         elementsByHash.forEach((id, element) -> {
             Node elementsBySourceNode = element.getSourceNode();
             if (elementsBySourceNode != null) {
@@ -110,6 +133,7 @@ public class ACityRepository {
                         "  CREATE (sourceNode)<-[r:SOURCE]-(acityNode)";
 
                 connector.executeWrite(statement);
+                sourceRelationCounter.addAndGet(1);
             }
 
             ACityElement parentElement = element.getParentElement();
@@ -120,19 +144,39 @@ public class ACityRepository {
                         "  CREATE (acityParentNode)-[r:CHILD]->(acityNode)";
 
                 connector.executeWrite(statement);
+
+                childRelationCounter.addAndGet(1);
             }
         });
+
+        log.info(sourceRelationCounter.get() + " source relations created");
+        log.info(childRelationCounter.get() + " child relations created");
     }
 
     public void writeACityElementsToNeo4j(ACityElement.ACityType aCityElementType){
 
         elementsByHash.forEach((id, element) -> {
-            if(element.getType() == aCityElementType){
-                    connector.executeWrite("CREATE ( :Elements { " + getACityProperties(element) + "})");
+            if(element.getType() == aCityElementType) {
+                connector.executeWrite("CREATE ( :Elements { " + getACityProperties(element) + "})");
 
-                    //TODO Erstelle Source Node Relation
+                Long aCityNodeID = connector.addNode("CREATE ( n:Elements { " + getACityProperties(element) + "})", "n").id();
+
+                element.setNodeID(aCityNodeID);
             }
         });
+
+            elementsByHash.forEach((id, element) -> {
+                Node elementsBySourceNode = element.getSourceNode();
+                if (elementsBySourceNode != null) {
+
+                    String statement = "MATCH (sourceNode:Elements), (acityNode:Elements)" +
+                            "WHERE ID(sourceNode) = " + elementsBySourceNode.id() +
+                            "  AND ID(acityNode) =  " + element.getNodeID() +
+                            "  CREATE (sourceNode)<-[r:SOURCE]-(acityNode)";
+
+                    connector.executeWrite(statement);
+                }
+            });
     }
 
     private String getACityProperties(ACityElement element) {
@@ -146,7 +190,6 @@ public class ACityRepository {
         propertyBuilder.append(" height :  " + element.getHeight() + ",");
         propertyBuilder.append(" width :  " + element.getWidth() + ",");
         propertyBuilder.append(" length :  " + element.getLength() + ",");
-        propertyBuilder.append(" height :  " + element.getHeight() + ",");
         propertyBuilder.append(" xPosition :  " + element.getXPosition() + ",");
         propertyBuilder.append(" yPosition :  " + element.getYPosition() + ",");
         propertyBuilder.append(" zPosition :  " + element.getZPosition() + "");

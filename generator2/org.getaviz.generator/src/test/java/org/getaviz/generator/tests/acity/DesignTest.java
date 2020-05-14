@@ -75,7 +75,7 @@ public class DesignTest{
         for( ACityElement building : classBuildings) {
                 assertEquals("#ffb48f", building.getColor());
                 assertEquals(ACityElement.ACityShape.Box, building.getShape());
-                assertEquals(0.3, building.getWidth());
+                assertEquals(0.8, building.getWidth());
         }
     }
 

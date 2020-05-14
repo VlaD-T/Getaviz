@@ -17,6 +17,7 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.neo4j.driver.v1.Record;
+import org.neo4j.driver.v1.StatementResult;
 import org.neo4j.driver.v1.types.Node;
 
 import java.util.Collection;
@@ -43,19 +44,23 @@ public class WriteDataToNeo4jTest {
 
         mockUp.loadProperties("ABAPCityTest.properties");
 
+        connector = mockUp.getConnector();
+
         nodeRepository = new SourceNodeRepository();
         nodeRepository.loadNodesByPropertyValue(SAPNodeProperties.type_name, SAPNodeTypes.Namespace.name());
         nodeRepository.loadNodesByRelation(SAPRelationLabels.CONTAINS, true);
         nodeRepository.loadNodesByRelation(SAPRelationLabels.TYPEOF, true);
 
+        aCityRepository = new ACityRepository();
+
         ACityCreator aCityCreator = new ACityCreator(aCityRepository, nodeRepository, config);
         aCityCreator.createRepositoryFromNodeRepository();
 
-        ACityDesigner designer = new ACityDesigner(aCityRepository, nodeRepository, config);
-        designer.designRepository();
-
         ACityLayouter aCityLayouter = new ACityLayouter(aCityRepository, nodeRepository, config);
         aCityLayouter.layoutRepository();
+
+        ACityDesigner designer = new ACityDesigner(aCityRepository, nodeRepository, config);
+        designer.designRepository();
 
         aCityRepository.writeRepositoryToNeo4j();
     }
@@ -82,7 +87,7 @@ public class WriteDataToNeo4jTest {
                 .executeRead("MATCH (n:Elements {cityType : '" + ACityElement.ACityType.Building + "' }) RETURN count(n) AS result")
                 .single();
         int numberOfVisualized = results.get("result").asInt();
-        assertEquals(118, numberOfVisualized);
+        assertEquals(117, numberOfVisualized);
     }
 
 
@@ -93,7 +98,7 @@ public class WriteDataToNeo4jTest {
                 .executeRead("MATCH (n:Elements {cityType : '" + ACityElement.ACityType.Chimney + "' }) RETURN count(n) AS result")
                 .single();
         int numberOfVisualizedPackages = result.get("result").asInt();
-        assertEquals(66, numberOfVisualizedPackages);
+        assertEquals(61, numberOfVisualizedPackages);
     }
 
 
@@ -105,12 +110,8 @@ public class WriteDataToNeo4jTest {
                 .executeRead("MATCH (n:Elements {cityType : '" + ACityElement.ACityType.Floor + "' }) RETURN count(n) AS result")
                 .single();
         int numberOfVisualizedPackages = floorResult.get("result").asInt();
-        assertEquals(100, numberOfVisualizedPackages);
+        assertEquals(99, numberOfVisualizedPackages);
     }
-
-
-
-
 
     @Test
     void checkPropertiesFromAddedElementsToNeo4j() {
@@ -136,7 +137,7 @@ public class WriteDataToNeo4jTest {
 
         Record allNodesNew = connector.executeRead("MATCH (n) RETURN count(n) AS result").single();
         int numberOfAllNodes = allNodesNew.get("result").asInt();
-        assertEquals(666, numberOfAllNodes); //340 Elelemente vorher + 100Floors + 66 chimneys + 42 Distrikte + 118 Buildings = 326 -
+        assertEquals(659, numberOfAllNodes); //340 Elelemente vorher + 99Floors + 61 chimneys + 42 Distrikte + 117 Buildings = 319
     }
 
     @Test
@@ -153,17 +154,30 @@ public class WriteDataToNeo4jTest {
         Record sourceResult = (Record) connector.executeRead("MATCH p=()<-[r:SOURCE]-() RETURN count(p) AS result").single();
         int sourceResults = sourceResult.get("result").asInt();
 
-        assertEquals(301, sourceResults); // 326 (contains) - typeDistricts (25) = 301
+        assertEquals(294, sourceResults); // 326 (contains) - typeDistricts (25) = 301
     }
 
     @Test
     void NodesWithChildRelation() {
 
-        Record sourceResult = (Record) connector.executeRead("MATCH p=()-[r:CHILD]->() RETURN count(p) AS result").single();
+        Record sourceResult = connector.executeRead("MATCH p=()-[r:CHILD]->() RETURN count(p) AS result").single();
         int sourceResults = sourceResult.get("result").asInt();
 
         //TODO Amount not reasonable
-        assertEquals(308, sourceResults); // 326 (contains) + 25 typedistricts = 351
+        assertEquals(302, sourceResults); // 326 (contains) + 25 typedistricts = 351
     }
 
+    @Test
+    void NodesWithChildRelation2() {
+
+       // StatementResult sourceResult = connector.executeRead("MATCH (x)-[r:CHILD]->() RETURN x");
+        //sourceResult.forEachRemaining((result) -> {
+            //Node propertyValue = result.get("x").asNode();
+
+           // System.out.println(propertyValue.values());
+        //});
+
+        //TODO Amount not reasonable
+       // assertEquals(302, sourceResults); // 326 (contains) + 25 typedistricts = 351
+    }
 }

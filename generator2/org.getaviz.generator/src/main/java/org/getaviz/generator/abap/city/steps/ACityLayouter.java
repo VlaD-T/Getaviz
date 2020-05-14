@@ -14,6 +14,7 @@ import org.getaviz.generator.abap.city.repository.SourceNodeRepository;
 import org.neo4j.driver.v1.types.Node;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class ACityLayouter {
 
@@ -36,14 +37,19 @@ public class ACityLayouter {
 
     public void layoutRepository(){
 
+        AtomicInteger counter = new AtomicInteger(0);
+
         Collection<ACityElement> buildings = repository.getElementsByType(ACityElement.ACityType.Building);
+        log.info(buildings.size() + " buildings loaded");
         for (ACityElement building: buildings) {
 
             SAPNodeTypes sourceNodeType = building.getSourceNodeType();
 
             if(sourceNodeType == SAPNodeTypes.TableType) {
                 SAPNodeTypes buildingSourceType = getTableTypeTypeOfType(building);
+
                 if(buildingSourceType != null){
+                    counter.addAndGet(1);
                     layoutTableTypeBuilding(building, buildingSourceType);
                 }
             } else {
@@ -52,6 +58,8 @@ public class ACityLayouter {
         }
 
         layoutParentDistricts(buildings);
+
+        log.info(counter + " tabletypes exists");
     }
 
     private SAPNodeTypes getTableTypeTypeOfType(ACityElement building) {
@@ -60,19 +68,20 @@ public class ACityLayouter {
 
         Collection<Node> typeOfNodes = nodeRepository.getRelatedNodes(tableTypeSourceNode, SAPRelationLabels.TYPEOF, true);
         if(typeOfNodes.isEmpty()){
-            String tableTypeName = tableTypeSourceNode.get(SAPNodeProperties.object_name.name()).asString();
+            String tableTypeName = building.getSourceNodeProperty(SAPNodeProperties.object_name);
             log.warn("TYPEOF related nodes not found for tableType \"" + tableTypeName + "\"");
             return null;
         }
         if(typeOfNodes.size() != 1){
-            String tableTypeName = tableTypeSourceNode.get(SAPNodeProperties.object_name.name()).asString();
+            String tableTypeName = building.getSourceNodeProperty(SAPNodeProperties.object_name);
             log.error("TYPEOF related nodes more than 1 for tableType \"" + tableTypeName + "\"");
             return null;
         }
 
-        Node typeOfNode = typeOfNodes.iterator().next();
+        //Node typeOfNode = typeOfNodes.iterator().next();
 
-        String typeOfNodeTypeProperty = typeOfNode.get(SAPNodeProperties.type_name.name()).asString();
+        //String typeOfNodeTypeProperty = typeOfNode.get(SAPNodeProperties.type_name.name()).asString();
+        String typeOfNodeTypeProperty = building.getSourceNodeProperty(SAPNodeProperties.type_name);
 
         return SAPNodeTypes.valueOf(typeOfNodeTypeProperty);
     }
@@ -82,20 +91,19 @@ public class ACityLayouter {
         switch (typeOfType){
             case Class:
             case Interface:
-                building.setHeight(5); //TODO Config
+                building.setHeight(config.getACityTableTypeBuildingHeight("tableTypeBuilding_class"));
                 break;
             case Table:
             case TableType:
-                building.setHeight(4); //TODO Config
+                building.setHeight(config.getACityTableTypeBuildingHeight("tableTypeBuilding_table"));
                 break;
             case Structure:
-                building.setHeight(2); //TODO Config
+                building.setHeight(config.getACityTableTypeBuildingHeight("tableTypeBuilding_structure"));
                 break;
             case DataElement:
-                building.setHeight(1); //TODO Config
+                building.setHeight(config.getACityTableTypeBuildingHeight("tableTypeBuilding_dateElement"));
             default:
-                Node sourceNode = building.getSourceNode();
-                String tableTypeName = sourceNode.get(SAPNodeProperties.object_name.name()).asString();
+                String tableTypeName = building.getSourceNodeProperty(SAPNodeProperties.type_name);
                 log.error("Type \"" + typeOfType + "\" not allowed for tableType-Element \"" +  tableTypeName );
         }
 
@@ -145,7 +153,10 @@ public class ACityLayouter {
 
     private void layoutBuilding(ACityElement building) {
         Collection<ACityElement> floors = building.getSubElementsOfType(ACityElement.ACityType.Floor);
+        //log.info(floors.size() + " floors loaded");
+
         Collection<ACityElement> chimneys = building.getSubElementsOfType(ACityElement.ACityType.Chimney);
+        //log.info(chimneys.size() + " chimneys loaded");
 
         ACityBuildingLayout buildingLayout = new ACityBuildingLayout(building, floors, chimneys, config);
         buildingLayout.calculate();

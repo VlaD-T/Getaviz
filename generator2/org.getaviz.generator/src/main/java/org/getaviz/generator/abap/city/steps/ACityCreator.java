@@ -136,15 +136,13 @@ public class ACityCreator {
             addChildToTypeDistrict(parentDistrict, childElement, typeDistrictMap, ACityElement.ACitySubType.DDIC, SAPNodeTypes.TableType);
         }
 
-        //TODO hier und an allen anderen Stellen eine neue Methode auf ACityElement.getSourceNodeProperty(SAPNodeProperties) verwenden
-        String districtName = parentDistrict.getSourceNode().get(SAPNodeProperties.object_name.name()).asString();
+        String districtName = parentDistrict.getSourceNodeProperty(SAPNodeProperties.object_name);
         log.info(typeDistrictMap.size() + " typeDistricts created for district \"" + districtName + "\"");
     }
 
     private void addChildToTypeDistrict(ACityElement parentDistrict, ACityElement childElement, Map<ACityElement.ACitySubType, ACityElement> typeDistrictMap, ACityElement.ACitySubType districtType, SAPNodeTypes sapNodeTypes) {
 
-        Node childSourceNode = childElement.getSourceNode();
-        String typeNameProperty = childSourceNode.get(SAPNodeProperties.type_name.name()).asString();
+        String typeNameProperty = childElement.getSourceNodeProperty(SAPNodeProperties.type_name);
 
         if( typeNameProperty.equals(sapNodeTypes.name())){
 

@@ -688,6 +688,23 @@ public class SettingsConfiguration {
 		}
 	}
 
+	public double getACityTableTypeBuildingHeight(String type) {
+		switch (type) {
+			case "tableTypeBuilding_structure":
+				return config.getDouble("city.abap.height.tableTypeBuilding_structure", 0.1);
+			case "tableTypeBuilding_class":
+			case "tableTypeBuilding_interface":
+				return config.getDouble("city.abap.height.tableTypeBuilding_class", 0.1);
+			case "tableTypeBuilding_tabletype":
+			case "tableTypeBuilding_table":
+				return config.getDouble("city.abap.height.tableTypeBuilding_table", 0.1);
+			case "tableTypeBuilding_dataElement":
+				return config.getDouble("city.abap.height.tableTypeBuilding_dataElement", 0.1);
+			default:
+				return config.getDouble(String.valueOf(0.1));
+		}
+	}
+
 	public double getACityDistrictHeight() {return config.getDouble("city.abap.height.district", 0.2); }
 	public double adjustACityDistrictYPosition() {return config.getDouble("city.abap.adjust.district.yPosition", 0.1); }
 
