@@ -5,7 +5,6 @@ import org.apache.commons.logging.LogFactory;
 import org.getaviz.generator.SettingsConfiguration;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -25,7 +24,6 @@ public class ACityDesigner {
 
     private SourceNodeRepository nodeRepository;
     private ACityRepository repository;
-    private ACityElement aCityElementTest;
 
     public ACityDesigner(ACityRepository aCityRepository, SourceNodeRepository sourceNodeRepository, SettingsConfiguration config) {
         this.config = config;
@@ -36,47 +34,63 @@ public class ACityDesigner {
         log.info("created");
     }
 
+
+
     public void designRepository(){
+        designACityElementsByType(ACityElement.ACityType.District);
 
-        log.info("Design Floors");
+        designACityElementsByType(ACityElement.ACityType.Building);
 
-        Collection<ACityElement> floors = repository.getElementsByType(ACityElement.ACityType.Floor);
-        log.info(floors.size() + " floors loaded");
-        for (ACityElement floor: floors) {
-            designFloor(floor);
-        }
-        //log.info(floors.size() + " floors loaded");
+        designACityElementsByType(ACityElement.ACityType.Floor);
 
-
-
-        log.info("Design Chimneys");
-
-        Collection<ACityElement> chimneys = repository.getElementsByType(ACityElement.ACityType.Chimney);
-        log.info(chimneys.size() + " chimneys loaded");
-        for (ACityElement chimney: chimneys) {
-            designChimney(chimney);
-        }
-
-
-
-        log.info("Design Buildings");
-
-        Collection<ACityElement> buildings = repository.getElementsByType(ACityElement.ACityType.Building);
-        log.info(buildings.size() + " buildings loaded");
-        for (ACityElement building: buildings) {
-            designBuildings(building);
-        }
-
-
-        log.info("Design Districts");
-
-        Collection<ACityElement> districts = repository.getElementsByType(ACityElement.ACityType.District);
-        log.info(districts.size() + " districts loaded");
-        for (ACityElement district: districts) {
-            designDistrict(district);
-        }
+        designACityElementsByType(ACityElement.ACityType.Chimney);
     }
 
+    private void designACityElementsByType(ACityElement.ACityType aCityType){
+        log.info("Design " + aCityType.name());
+
+        Map<String, AtomicInteger> counterMap = new HashMap<>();
+
+        Collection<ACityElement> aCityElements = repository.getElementsByType(aCityType);
+        log.info(aCityElements.size() + " " + aCityType.name() + " loaded");
+
+        for (ACityElement aCityElement: aCityElements) {
+
+            switch (aCityType) {
+                case District: designDistrict(aCityElement); break;
+                case Building: designBuilding(aCityElement); break;
+                case Floor: designFloor(aCityElement); break;
+                case Chimney: designChimney(aCityElement); break;
+                default:
+                    //TODO Error
+            }
+            countACityElementByType(counterMap, aCityElement);
+        }
+
+        counterMap.forEach( (propertyTypeName, counter) -> {
+            log.info(counter + " " + aCityType.name() + "s of type " + propertyTypeName + " designed" );
+        });
+    }
+
+
+
+    private void countACityElementByType(Map<String, AtomicInteger> counterMap, ACityElement aCityElement){
+
+        String propertyTypeName = getPropertyTypeName(aCityElement);
+
+        if(!counterMap.containsKey(propertyTypeName)){
+            counterMap.put(propertyTypeName, new AtomicInteger(0));
+        }
+        AtomicInteger counterValue = counterMap.get(propertyTypeName);
+        counterValue.addAndGet(1);
+    }
+
+    private String getPropertyTypeName(ACityElement aCityElement){
+        if(aCityElement.getSubType() != null){
+            return aCityElement.getSubType().name() + "-TypeDistrict";
+        }
+        return aCityElement.getSourceNodeProperty(SAPNodeProperties.type_name);
+    }
 
 
     private void designDistrict(ACityElement district) {
@@ -98,16 +112,15 @@ public class ACityDesigner {
         }
     }
 
-    private void designBuildings(ACityElement building) {
+    private void designBuilding(ACityElement building) {
 
         Node sourceNode = building.getSourceNode();
 
         if (sourceNode == null) {
-            log.error("SourceNode nicht vorhnaden");
+            log.error("SourceNode nicht vorhanden");
         } else {
 
             String propertyTypeName = building.getSourceNodeProperty(SAPNodeProperties.type_name);
-            //Collection<Node> propTypes = nodeRepository.getNodesByProperty(SAPNodeProperties.type_name, propertyTypeName);
 
             switch (SAPNodeTypes.valueOf(propertyTypeName)) {
 
@@ -165,7 +178,6 @@ public class ACityDesigner {
                     building.setWidth(config.getACityBuildingWidth("tableTypeBuilding"));
                     building.setLength(config.getACityBuildingLength("tableTypeBuilding"));
             }
-           //log.info(propTypes.size() + " buildings of type " + propertyTypeName + " designed");
         }
     }
 
@@ -181,17 +193,9 @@ public class ACityDesigner {
 
         Node sourceNode = floor.getSourceNode();
 
-        String propertyTypeName = floor.getSourceNodeProperty(SAPNodeProperties.type_name);
-
-        Collection<Node> propTypes = nodeRepository.getNodesByProperty(SAPNodeProperties.type_name, propertyTypeName);
-        SAPNodeTypes type = floor.getSourceNodeType();
-        Map<SAPNodeTypes, ACityElement> typeDistrictMap = new HashMap<>();
-
         if (sourceNode != null) {
 
-            //String propertyTypeName = floor.getSourceNodeProperty(SAPNodeProperties.type_name);
-
-            //Collection<Node> propTypes = nodeRepository.getNodesByProperty(SAPNodeProperties.type_name, propertyTypeName);
+            String propertyTypeName = floor.getSourceNodeProperty(SAPNodeProperties.type_name);
 
             switch (SAPNodeTypes.valueOf(propertyTypeName)) {
                 case Method:
@@ -231,17 +235,11 @@ public class ACityDesigner {
                     break;
             }
 
-            //log.info(propTypes.size() + " floors of type \"" + propertyTypeName + "\" designed");
 
-
-        } else
-            {
+        } else {
                 floor.setColor("#ffffcc");
                 floor.setShape(ACityElement.ACityShape.Cone);
                 floor.setYPosition(floor.getYPosition() - config.adjustACityFloorYPosition());
-            }
-
-        //log.info(propTypes.size() + " floors of type \"" + propertyTypeName + "\" designed");
-
+        }
     }
 }

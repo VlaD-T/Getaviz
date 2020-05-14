@@ -83,7 +83,14 @@ public class GeneratorTest {
             System.out.print(htmlFile);
         }
 
+
+        try {
+            mockUp.getConnector().close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         mockUp.close();
+
     }
 
 }

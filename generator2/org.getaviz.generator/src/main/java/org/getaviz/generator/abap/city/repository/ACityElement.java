@@ -4,6 +4,7 @@ import java.util.*;
 
 import org.getaviz.generator.abap.city.enums.SAPNodeProperties;
 import org.getaviz.generator.abap.city.enums.SAPNodeTypes;
+import org.neo4j.driver.v1.Value;
 import org.neo4j.driver.v1.types.Node;
 
 public class ACityElement {
@@ -179,7 +180,17 @@ public class ACityElement {
 
     public String getSourceNodeProperty(SAPNodeProperties sapNodeProperties) {
 
-             String sourceNodeProperty = getSourceNode().get(sapNodeProperties.name()).asString();
+        Node sourceNode = getSourceNode();
+        if(sourceNode == null){
+            //TODO Exception
+        }
+
+        Value propertyValue = sourceNode.get(sapNodeProperties.name());
+        if(propertyValue == null){
+            //TODO Exception
+        }
+
+        String sourceNodeProperty = propertyValue.asString();
 
         return sourceNodeProperty;
     }
