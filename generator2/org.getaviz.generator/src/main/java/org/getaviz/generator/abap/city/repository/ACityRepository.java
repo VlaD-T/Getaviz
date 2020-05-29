@@ -99,6 +99,10 @@ public class ACityRepository {
         elementsByHash.forEach((id, element) -> {
             //TODO Node mit Hash bereits in Neo4J vorhanden? -> Update der Properties
 
+            /*if (element.getSourceNode().id() != 0){
+                connector.executeWrite("MATCH (n:Elements) WHERE ID(n) = " + element.getNodeID() + " SET  n.properties = {" +  getACityProperties(element) + "}") ;
+            }
+             */
 
             Long aCityNodeID = connector.addNode("CREATE ( n:Elements { " + getACityProperties(element) + "})", "n").id();
 
@@ -137,6 +141,7 @@ public class ACityRepository {
             }
 
             ACityElement parentElement = element.getParentElement();
+
             if (parentElement != null){
                 String statement = "MATCH (acityNode:Elements), (acityParentNode:Elements)" +
                         "WHERE ID(acityNode) =  " + element.getNodeID() +

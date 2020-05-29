@@ -92,15 +92,4 @@ public class NodeRepositoryPropertyRelationLoadTest {
         assertEquals(61, attributeSourceNodes.size());
 
     }
-
-    @Test
-    void loadNodesByRelations(){
-        //TODO CONTAINS, USES und TYPEOF laden und auf Vorhandensein prüfen
-
-    }
-
-
-
-
-
 }

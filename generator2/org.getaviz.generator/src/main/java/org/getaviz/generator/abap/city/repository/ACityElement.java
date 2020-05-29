@@ -2,6 +2,8 @@ package org.getaviz.generator.abap.city.repository;
 
 import java.util.*;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.getaviz.generator.abap.city.enums.SAPNodeProperties;
 import org.getaviz.generator.abap.city.enums.SAPNodeTypes;
 import org.neo4j.driver.v1.Value;
@@ -9,7 +11,7 @@ import org.neo4j.driver.v1.types.Node;
 
 public class ACityElement {
 
-
+    private Log log = LogFactory.getLog(this.getClass());
 
     public ACityShape getShape() {
         return shape;
@@ -181,13 +183,25 @@ public class ACityElement {
     public String getSourceNodeProperty(SAPNodeProperties sapNodeProperties) {
 
         Node sourceNode = getSourceNode();
+
+        try{
         if(sourceNode == null){
-            //TODO Exception
+            //TODO Exception oder log fatal?
+            throw new Exception("sourceNode is equal null");
+        }
+        } catch (Exception e) {
+            log.error(e.getMessage());
         }
 
         Value propertyValue = sourceNode.get(sapNodeProperties.name());
-        if(propertyValue == null){
-            //TODO Exception
+        try {
+            if (propertyValue == null) {
+                //TODO Exception oder lof fatal?
+                //throw new Exception("propertyValue is equal null");
+            }
+        } catch (Exception e) {
+            //log.error(e.getMessage());
+            log.error(e + "propertyValue is equal null"); // Fehler führt schon in viel eherer Verarbeitung zum Abbruch
         }
 
         String sourceNodeProperty = propertyValue.asString();

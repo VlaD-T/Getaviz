@@ -35,8 +35,8 @@ public class ACityDesigner {
     }
 
 
-
     public void designRepository(){
+
         designACityElementsByType(ACityElement.ACityType.District);
 
         designACityElementsByType(ACityElement.ACityType.Building);
@@ -62,7 +62,9 @@ public class ACityDesigner {
                 case Floor: designFloor(aCityElement); break;
                 case Chimney: designChimney(aCityElement); break;
                 default:
-                    //TODO default building + err log
+                    designBuilding(aCityElement);
+                    log.error(aCityType.name() + "is not a valid cityType");
+                    break;
             }
             countACityElementByType(counterMap, aCityElement);
         }
@@ -108,7 +110,8 @@ public class ACityDesigner {
                 case FunctionGroup: district.setColor(config.getACityDistrictColorHex("functionGroupDistrict")); break;
                 case Table:         district.setColor(config.getACityDistrictColorHex("tableDistrict")); break;
                 case DDIC:          district.setColor(config.getACityDistrictColorHex("dataDictionaryDistrict")); break;
-                //TODO default
+                default:            district.setColor(config.getACityDistrictColorHex("defaultValue"));
+                                    log.error(district.getSubType().name() + " is not a valid type for \"district\""); break;
             }
         }
     }
@@ -171,7 +174,14 @@ public class ACityDesigner {
                 building.setShape(config.getACityBuildingShape("tableTypeBuilding"));
                 building.setWidth(config.getACityBuildingWidth("tableTypeBuilding"));
                 building.setLength(config.getACityBuildingLength("tableTypeBuilding"));
-                //TODO default
+                break;
+            default:
+                building.setColor(config.getACityDistrictColorHex("defaultValue"));
+                building.setShape(config.getACityBuildingShape("defaultValue"));
+                building.setWidth(config.getACityBuildingWidth("defaultValue"));
+                building.setLength(config.getACityBuildingLength("defaultValue"));
+                log.error(propertyTypeName + " is not a valid type for \"building\"");
+                break;
         }
     }
 
@@ -221,7 +231,11 @@ public class ACityDesigner {
                 floor.setLength(floor.getLength() - config.adjustACityFloorLength());
                 break;
             default:
-                //TODO default design
+                floor.setColor(config.getACityFloorColorHex("dataElementFloor"));
+                floor.setShape(config.getACityFloorShape("dataElementFloor"));
+                floor.setYPosition(floor.getYPosition() - config.adjustACityFloorYPosition());
+                floor.setWidth(floor.getWidth() - config.adjustACityFloorWidth());
+                floor.setLength(floor.getLength() - config.adjustACityFloorLength());
                 log.error(propertyTypeName + " is not a valid type for \"floor\"");
                 break;
         }

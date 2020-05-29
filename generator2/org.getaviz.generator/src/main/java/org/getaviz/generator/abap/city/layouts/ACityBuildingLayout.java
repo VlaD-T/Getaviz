@@ -51,9 +51,9 @@ public class ACityBuildingLayout {
 
         building.setWidth(groundAreaLength);
         building.setLength(groundAreaLength);
-
         building.setHeight(floorHeightSum);
-    }
+
+      }
 
     private Double getBiggestChimneyHeight() {
         double biggestChimneyHeight = 0.0;

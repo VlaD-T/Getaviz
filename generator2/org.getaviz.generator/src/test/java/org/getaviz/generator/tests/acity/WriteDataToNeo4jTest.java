@@ -155,7 +155,7 @@ public class WriteDataToNeo4jTest {
         Record sourceResult = (Record) connector.executeRead("MATCH p=()<-[r:SOURCE]-() RETURN count(p) AS result").single();
         int sourceResults = sourceResult.get("result").asInt();
 
-        assertEquals(294, sourceResults); // 326 (contains) - typeDistricts (25) = 301
+        assertEquals(294, sourceResults); // 296 (contains) - typeDistricts (25) = 271
     }
 
     @Test
@@ -164,21 +164,9 @@ public class WriteDataToNeo4jTest {
         Record sourceResult = connector.executeRead("MATCH p=()-[r:CHILD]->() RETURN count(p) AS result").single();
         int sourceResults = sourceResult.get("result").asInt();
 
-        //TODO Amount not reasonable
-        assertEquals(302, sourceResults); // 326 (contains) + 25 typedistricts = 351
-    }
+        assertEquals(302, sourceResults);// 117 Buildings + 99 Floors + 61 Chimneys + 25 Districts*
 
-    @Test
-    void NodesWithChildRelation2() {
-
-       // StatementResult sourceResult = connector.executeRead("MATCH (x)-[r:CHILD]->() RETURN x");
-        //sourceResult.forEachRemaining((result) -> {
-            //Node propertyValue = result.get("x").asNode();
-
-           // System.out.println(propertyValue.values());
-        //});
-
-        //TODO Amount not reasonable
-       // assertEquals(302, sourceResults); // 326 (contains) + 25 typedistricts = 351
+        //* 25 child relations are available for the type-districts, but not for the namespace districts
+        // --> There shouldn't be nesting for districts. that's why the remaining 17 districts have no child relations
     }
 }

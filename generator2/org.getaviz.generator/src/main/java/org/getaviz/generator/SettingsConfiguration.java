@@ -673,7 +673,7 @@ public class SettingsConfiguration {
 			case "classBuilding":
 				return config.getDouble("city.abap.width.classBuilding", 0.1);
 			default:
-				return config.getDouble(String.valueOf(0.1));
+				return 0.1;
 		}
 	}
 
@@ -684,7 +684,7 @@ public class SettingsConfiguration {
 			case "structureBuilding":
 				return config.getDouble("city.abap.length.structureBuilding", 0.1);
 			default:
-				return config.getDouble(String.valueOf(0.1));
+				return 0.1;
 		}
 	}
 
@@ -701,7 +701,7 @@ public class SettingsConfiguration {
 			case "tableTypeBuilding_dataElement":
 				return config.getDouble("city.abap.height.tableTypeBuilding_dataElement", 0.1);
 			default:
-				return config.getDouble(String.valueOf(0.1));
+				return 0.1;
 		}
 	}
 
