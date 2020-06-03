@@ -13,10 +13,12 @@ import org.getaviz.generator.abap.city.repository.ACityRepository;
 import org.getaviz.generator.abap.city.repository.SourceNodeRepository;
 import org.neo4j.driver.v1.types.Node;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class ACityLayouter {
+public class MetropolisLayouter {
 
     private Log log = LogFactory.getLog(this.getClass());
     private SettingsConfiguration config;
@@ -25,7 +27,7 @@ public class ACityLayouter {
     private SourceNodeRepository nodeRepository;
     private ACityRepository repository;
 
-    public ACityLayouter(ACityRepository aCityRepository, SourceNodeRepository sourceNodeRepository, SettingsConfiguration config) {
+    public MetropolisLayouter(ACityRepository aCityRepository, SourceNodeRepository sourceNodeRepository, SettingsConfiguration config) {
         this.config = config;
 
         repository = aCityRepository;
@@ -68,8 +70,6 @@ public class ACityLayouter {
 
         layoutParentDistricts(buildings);
 
-
-
     }
 
     private SAPNodeTypes getTableTypeTypeOfType(ACityElement building) {
@@ -77,7 +77,6 @@ public class ACityLayouter {
         Node tableTypeSourceNode = building.getSourceNode();
 
         Collection<Node> typeOfNodes = nodeRepository.getRelatedNodes(tableTypeSourceNode, SAPRelationLabels.TYPEOF, true);
-
         if(typeOfNodes.isEmpty()){
             String tableTypeName = building.getSourceNodeProperty(SAPNodeProperties.object_name);
             log.warn("TYPEOF related nodes not found for tableType \"" + tableTypeName + "\"");
@@ -89,14 +88,9 @@ public class ACityLayouter {
             return null;
         }
 
-        //gebraucht vom typeofnode nicht vom building
-       String typeOfNodeTypeProperty = building.getSourceNodeProperty(SAPNodeProperties.type_name);
-
-        //ACityElement typeOfNodesTest = new ACityElement(ACityElement.ACityType.Building);
-        //String typeOfNodeTypeProperty = typeOfNodesTest.getSourceNodeProperty(SAPNodeProperties.type_name);
+        String typeOfNodeTypeProperty = building.getSourceNodeProperty(SAPNodeProperties.type_name);
 
         return SAPNodeTypes.valueOf(typeOfNodeTypeProperty);
-
     }
 
     private void layoutTableTypeBuilding(ACityElement building, SAPNodeTypes typeOfType) {
@@ -144,10 +138,10 @@ public class ACityLayouter {
 
     private String getRowtype(ACityElement aCityElement){
 
-            if (aCityElement.getSourceNodeProperty(SAPNodeProperties.type_name) == SAPNodeTypes.TableType.name()){
-                if (aCityElement.getSourceNodeProperty(SAPNodeProperties.rowtype) == null) {
-                    return "TableType doesn't have a rowType";
-                }
+        if (aCityElement.getSourceNodeProperty(SAPNodeProperties.type_name) == SAPNodeTypes.TableType.name()){
+            if (aCityElement.getSourceNodeProperty(SAPNodeProperties.rowtype) == null) {
+                return "TableType doesn't have a rowType";
+            }
 
         }
         return aCityElement.getSourceNodeProperty(SAPNodeProperties.rowtype);

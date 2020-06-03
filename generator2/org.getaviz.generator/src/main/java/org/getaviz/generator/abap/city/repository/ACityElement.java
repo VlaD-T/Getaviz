@@ -31,21 +31,21 @@ public class ACityElement {
 
     public enum ACityType {
         District, Building, Floor, Chimney,
-
     }
 
     public enum ACitySubType {
         Class, Report, FunctionGroup, Table, DDIC
-    }
 
+        // additional subTypes for metropolis
+        , Interface, DataElement, Structure
+    }
 
     public enum ACityShape {
         Box, Cylinder, Cone
     }
 
+
     private String hash;
-
-
 
     private Long nodeID;
     private Long sourceNodeID;
@@ -80,7 +80,6 @@ public class ACityElement {
     public Long getSourceNodeID() {
         return sourceNode.id();
     }
-
 
     public Node getSourceNode() {
         return sourceNode;
@@ -187,10 +186,12 @@ public class ACityElement {
         try{
         if(sourceNode == null){
             //TODO Exception oder log fatal?
+
             throw new Exception("sourceNode is equal null");
         }
         } catch (Exception e) {
             log.error(e.getMessage());
+            //log.error(e + "sourceNode is equal null");
         }
 
         Value propertyValue = sourceNode.get(sapNodeProperties.name());
