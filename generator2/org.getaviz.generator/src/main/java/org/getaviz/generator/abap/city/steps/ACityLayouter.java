@@ -52,6 +52,7 @@ public class ACityLayouter {
                 SAPNodeTypes buildingSourceType = getTableTypeTypeOfType(building);
 
                 if(buildingSourceType != null){
+                    //TODO kein Counter, stattdessen hier loggen, mit Name des TT und dem RowType
                     counter.addAndGet(1);
                     layoutTableTypeBuilding(building, buildingSourceType);
                 }
@@ -61,11 +62,13 @@ public class ACityLayouter {
             }
         }
 
+        //TODO in Log oben aufnehmen, Absolute Anzahl entfernen
         log.info(counter + " \"TableTypes\" exists ");
         counterMap.forEach( (propertyRowtype, rowtypeCounter) -> {
             log.info(rowtypeCounter + " " + SAPNodeTypes.TableType.name() + "s with rowtype \"" + propertyRowtype + "\" layouted" );
         });
 
+        //TODO leere Pakete werden nicht vom Layout erfasst, da keine Buildings
         layoutParentDistricts(buildings);
 
 
@@ -153,21 +156,21 @@ public class ACityLayouter {
         return aCityElement.getSourceNodeProperty(SAPNodeProperties.rowtype);
     }
 
+
     private void layoutParentDistricts(Collection<ACityElement> districtElements) {
 
         Collection<ACityElement> parentDistricts = getParentDistricts(districtElements);
         log.info(parentDistricts.size() + " parentDistrict loaded"); // first for buildings, then for typedistricts
 
-        if (parentDistricts.isEmpty()){
-            layoutVirtualRootDistrict(districtElements);
-            return;
-        }
-
         for(ACityElement parentDistrict : parentDistricts){
             layoutDistrict(parentDistrict);
         }
 
-        layoutParentDistricts(parentDistricts);
+        if (!parentDistricts.isEmpty()){
+            layoutParentDistricts(parentDistricts);
+        } else {
+            layoutVirtualRootDistrict();
+        }
     }
 
 
@@ -212,13 +215,19 @@ public class ACityLayouter {
         aCityDistrictLayout.calculate();
 
         if ( district.getSubType() != null) {
-            log.info("\"" + district.getSubType() + "\"" + "-Distritct with " + subElements.size() + " buildings layouted");
+            log.info("\"" + district.getSubType() + "\"" + "-District with " + subElements.size() + " buildings layouted");
         } else {
             log.info("\"" + district.getSourceNodeProperty(SAPNodeProperties.object_name) + "\"" + "-Package with " + subElements.size() + " typeDistricts layouted");
         }
     }
 
-    private void layoutVirtualRootDistrict(Collection<ACityElement> districts){
+    private void layoutVirtualRootDistrict(){
+
+
+        Collection<ACityElement> districtsWithoutParents = new Vector<>(); //TODO auslesen aller Pakete ohne Parent
+        //TODO Logausgabe, wieviele geladen wurden
+
+        //TODO Counter entfernen
         AtomicInteger virtualRootDistrictCounter = new AtomicInteger(0);
 
         ACityElement virtualRootDistrict = new ACityElement(ACityElement.ACityType.District);
@@ -226,7 +235,7 @@ public class ACityLayouter {
         virtualRootDistrictCounter.addAndGet(1);
         log.info(virtualRootDistrictCounter + " virtual root districts loaded");
 
-        ACityDistrictLayout aCityDistrictLayout = new ACityDistrictLayout(virtualRootDistrict,  districts, config);
+        ACityDistrictLayout aCityDistrictLayout = new ACityDistrictLayout(virtualRootDistrict,  districtsWithoutParents, config);
         aCityDistrictLayout.calculate();
     }
 
