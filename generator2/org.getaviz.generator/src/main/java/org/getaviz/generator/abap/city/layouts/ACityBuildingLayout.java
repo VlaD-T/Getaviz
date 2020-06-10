@@ -45,6 +45,7 @@ public class ACityBuildingLayout {
     }
 
     private void setSizeOfBuilding() {
+
         Double floorHeightSum = calculateFloorHeightSum();
         Double biggestChimneyHeight = getBiggestChimneyHeight();
         Double groundAreaLength = calculateGroundAreaByChimneyAmount();
@@ -68,11 +69,12 @@ public class ACityBuildingLayout {
 
     private Double calculateFloorHeightSum() {
         double floorHeightSum = config.getFloorHeightSum();
+
         for(ACityElement floor : floors){
-            double floorTopEdge = floor.getYPosition() + ( floor.getHeight() / 2);
-            if(floorTopEdge > floorHeightSum){
-                floorHeightSum = floorTopEdge;
-            }
+                double floorTopEdge = floor.getYPosition() + (floor.getHeight() / 2);
+                if (floorTopEdge > floorHeightSum) {
+                    floorHeightSum = floorTopEdge;
+                }
         }
         return floorHeightSum;
     }

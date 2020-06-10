@@ -182,27 +182,13 @@ public class ACityElement {
     public String getSourceNodeProperty(SAPNodeProperties sapNodeProperties) {
 
         Node sourceNode = getSourceNode();
-
-        try{
         if(sourceNode == null){
-            //TODO Exception oder log fatal?
-
-            throw new Exception("sourceNode is equal null");
-        }
-        } catch (Exception e) {
-            log.error(e.getMessage());
-            //log.error(e + "sourceNode is equal null");
+            log.fatal("sourceNode is equal null");
         }
 
         Value propertyValue = sourceNode.get(sapNodeProperties.name());
-        try {
-            if (propertyValue == null) {
-                //TODO Exception oder lof fatal?
-                //throw new Exception("propertyValue is equal null");
-            }
-        } catch (Exception e) {
-            //log.error(e.getMessage());
-            log.error(e + "propertyValue is equal null"); // Fehler führt schon in viel eherer Verarbeitung zum Abbruch
+        if (propertyValue == null) {
+            log.fatal( "propertyValue is equal null"); // Fehler führt schon in viel eherer Verarbeitung zum Abbruch
         }
 
         String sourceNodeProperty = propertyValue.asString();
