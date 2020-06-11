@@ -32,6 +32,7 @@ public class ACityLayouter {
         repository = aCityRepository;
         nodeRepository = sourceNodeRepository;
 
+        log.info("****************************************************************************************************************************************************************");
         log.info("created");
 
     }

@@ -92,11 +92,9 @@ public class MetropolisCreator {
                         continue;
                     }
 
-
-                        element.addSubElement(childElement);
-                        childElement.setParentElement(element);
-                        relationCounter++;
-
+                    element.addSubElement(childElement);
+                    childElement.setParentElement(element);
+                    relationCounter++;
 
             }
         }

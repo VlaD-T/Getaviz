@@ -31,6 +31,7 @@ public class ACityDesigner {
         repository = aCityRepository;
         nodeRepository = sourceNodeRepository;
 
+        log.info("****************************************************************************************************************************************************************");
         log.info("created");
     }
 

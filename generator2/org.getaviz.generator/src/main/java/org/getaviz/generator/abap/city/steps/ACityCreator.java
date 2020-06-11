@@ -27,6 +27,7 @@ public class ACityCreator {
         repository = aCityRepository;
         nodeRepository = sourceNodeRepository;
 
+        log.info("****************************************************************************************************************************************************************");
         log.info("created");
     }
 

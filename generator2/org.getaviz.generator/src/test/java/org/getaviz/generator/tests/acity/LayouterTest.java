@@ -8,7 +8,6 @@ import org.getaviz.generator.abap.city.repository.ACityElement;
 import org.getaviz.generator.abap.city.repository.ACityRepository;
 import org.getaviz.generator.abap.city.repository.SourceNodeRepository;
 import org.getaviz.generator.abap.city.steps.ACityCreator;
-import org.getaviz.generator.abap.city.steps.ACityDesigner;
 import org.getaviz.generator.abap.city.steps.ACityLayouter;
 import org.getaviz.generator.database.DatabaseConnector;
 import org.getaviz.generator.mockups.ABAPmock;
@@ -44,7 +43,7 @@ public class LayouterTest {
         nodeRepository = new SourceNodeRepository();
         nodeRepository.loadNodesByPropertyValue(SAPNodeProperties.type_name, SAPNodeTypes.Namespace.name());
         nodeRepository.loadNodesByRelation(SAPRelationLabels.CONTAINS, true);
-        nodeRepository.loadNodesByRelation(SAPRelationLabels.TYPEOF, true);
+        nodeRepository.loadNodesWithRelation(SAPRelationLabels.TYPEOF);
 
         aCityRepository = new ACityRepository();
 
@@ -86,9 +85,6 @@ public class LayouterTest {
                 case "DataElement":
                     assertEquals(1, ttBuilding.getHeight()); break;
             }
-
-
-
         }
     }
 
