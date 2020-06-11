@@ -44,6 +44,7 @@ public class LayouterTest {
         nodeRepository = new SourceNodeRepository();
         nodeRepository.loadNodesByPropertyValue(SAPNodeProperties.type_name, SAPNodeTypes.Namespace.name());
         nodeRepository.loadNodesByRelation(SAPRelationLabels.CONTAINS, true);
+        nodeRepository.loadNodesByRelation(SAPRelationLabels.TYPEOF, true);
 
         aCityRepository = new ACityRepository();
 
@@ -61,22 +62,32 @@ public class LayouterTest {
 
     @Test
     void layoutTableTypesHeight() {
-        Collection<ACityElement> buildings = aCityRepository.getElementsByTypeAndSourceProperty(ACityElement.ACityType.Building, SAPNodeProperties.type_name, "TableType");
+        Collection<ACityElement> ttBuildings = aCityRepository.getElementsByTypeAndSourceProperty(ACityElement.ACityType.Building, SAPNodeProperties.type_name, "TableType");
 
-        for (ACityElement building: buildings
-             ) {
-            Node tableTypeSourceNode = building.getSourceNode();
+        for (ACityElement ttBuilding: ttBuildings) {
+            Node tableTypeSourceNode = ttBuilding.getSourceNode();
             Collection<Node> typeOfNodes = nodeRepository.getRelatedNodes(tableTypeSourceNode, SAPRelationLabels.TYPEOF, true);
-            assertNotEquals(0, typeOfNodes.size());
+            assertEquals(1, typeOfNodes.size());
 
-                for (Node typeOfNode : typeOfNodes) {
-                    Value propertyValue = typeOfNode.get(SAPNodeProperties.type_name.name());
-                    String typeOfNodeTypeProperty = propertyValue.asString();
+            Node typeOfNode = typeOfNodes.iterator().next();
 
-                    if (typeOfNodeTypeProperty == SAPNodeTypes.Structure.name()) {
-                        assertEquals(3, building.getHeight());
-                    }
-                }
+            Value propertyValue = typeOfNode.get(SAPNodeProperties.type_name.name());
+            String typeOfNodeTypeProperty = propertyValue.asString();
+
+            switch (typeOfNodeTypeProperty) {
+                case "Structure":
+                    assertEquals(2, ttBuilding.getHeight()); break;
+                case "Table":
+                case "TableType":
+                    assertEquals(4, ttBuilding.getHeight()); break;
+                case "Class":
+                case "Interface":
+                    assertEquals(5, ttBuilding.getHeight()); break;
+                case "DataElement":
+                    assertEquals(1, ttBuilding.getHeight()); break;
+            }
+
+
 
         }
     }
