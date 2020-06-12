@@ -20,9 +20,7 @@ import org.neo4j.driver.v1.types.Node;
 import java.util.Collection;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
-//TODO
 public class LayouterTest {
 
     private static SettingsConfiguration config = SettingsConfiguration.getInstance();

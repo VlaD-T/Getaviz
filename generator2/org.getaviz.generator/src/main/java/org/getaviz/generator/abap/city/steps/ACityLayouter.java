@@ -197,14 +197,15 @@ public class ACityLayouter {
     private void layoutDistrict(ACityElement district) {
         Collection<ACityElement> subElements = district.getSubElements();
 
-        ACityDistrictLayout aCityDistrictLayout = new ACityDistrictLayout(district,  subElements, config);
-        aCityDistrictLayout.calculate();
+            ACityDistrictLayout aCityDistrictLayout = new ACityDistrictLayout(district, subElements, config);
+            aCityDistrictLayout.calculate();
 
-        if ( district.getSubType() != null) {
-            log.info("\"" + district.getSubType() + "\"" + "-District with " + subElements.size() + " buildings layouted");
-        } else {
-            log.info("\"" + district.getSourceNodeProperty(SAPNodeProperties.object_name) + "\"" + "-Package with " + subElements.size() + " typeDistricts layouted");
-        }
+            if (district.getSubType() != null) {
+                log.info("\"" + district.getSubType() + "\"" + "-District with " + subElements.size() + " buildings layouted");
+            } else {
+                log.info("\"" + district.getSourceNodeProperty(SAPNodeProperties.object_name) + "\"" + "-Package with " + subElements.size() + " typeDistricts layouted");
+            }
+
     }
 
     private void layoutVirtualRootDistrict(){
