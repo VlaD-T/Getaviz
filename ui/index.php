@@ -29,7 +29,7 @@
         <script src="node_modules/aframe/dist/aframe-v1.0.0.min.js"></script>
         <script type="text/javascript" src="scripts/AframeCanvasManipulator.js"></script>
         <script type="text/javascript" src="scripts/AframeActionController.js"></script>
-	    <script type="text/javascript" src="scripts/RelationConnector/AframeRelationConnectorController.js"></script>
+	    <script type="text/javascript" src="scripts/RelationConnector/RelationConnectorControllerLazyLoad.js"></script>
 	    <script type="text/javascript" src="scripts/CanvasHover/AframeCanvasHoverController.js"></script>
         <script type="text/javascript" src="scripts/camera-beta.js"></script>
 EOT;

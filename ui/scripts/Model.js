@@ -215,6 +215,7 @@ var model = (function() {
 		
 		switch(entity.type) {
 			case "Project" :
+			case "Relation":
 			case "Namespace":
 				break;
 
